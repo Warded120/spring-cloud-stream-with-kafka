@@ -3,7 +3,7 @@ version: '3.8'
 services:
   kafka:
     image: bitnami/kafka:3.8.0
-    container_name: kafka2
+    container_name: kafka-broker
     ports:
       - "9092:9092"
     environment:
