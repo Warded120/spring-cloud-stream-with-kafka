@@ -1,8 +1,7 @@
 package com.ihren.misc.serialization;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.ihren.misc.mapper.ObjectMapperConfig;
 import com.ihren.misc.mapper.ObjectMapperFactory;
 import com.ihren.misc.serialization.exception.SerializationException;
 import com.ihren.model.Person;
@@ -31,8 +30,6 @@ public class PersonDeserializer implements Deserializer<Person> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        objectMapper
-            .enable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-            .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        ObjectMapperConfig.configureObjectMapper(objectMapper);
     }
 }

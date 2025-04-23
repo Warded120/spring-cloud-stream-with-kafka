@@ -1,15 +1,17 @@
 server:
   port: 8080
 spring:
-  application.name: producer
+  application:
+    name: producer
   cloud:
     stream:
       bindings:
         producePerson-out-0:
           destination: people
           group: consumer
-          producer:
-            use-native-encoding: true
+      default:
+        producer:
+          use-native-encoding: true
       kafka:
         binder:
           brokers: localhost:9092

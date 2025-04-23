@@ -1,3 +1,3 @@
 package com.ihren.model;
 
-public record Person(long id, String firstName, String lastName) { }
+public record Person(String firstName, String lastName, int age) { }

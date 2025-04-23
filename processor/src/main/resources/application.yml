@@ -1,20 +1,22 @@
 server:
   port: 8081
 spring:
-  application.name: processor
+  application:
+    name: processor
   cloud:
     stream:
       bindings:
         processPerson-in-0:
           destination: people
           group: consumer
-          consumer:
-            use-native-decoding: true
         processPerson-out-0:
           destination: processed-people
           group: consumer
-          producer:
-            use-native-encoding: true
+      default:
+        consumer:
+          use-native-decoding: true
+        producer:
+          use-native-encoding: true
       kafka:
         binder:
           brokers: localhost:9092
