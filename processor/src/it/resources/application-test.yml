@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        processPerson-in-0:
+          destination: people
+          group: consumer
+          content-type: application/json
+        processPerson-out-0:
+          destination: processed-people
+          group: consumer
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: ${spring.embedded.kafka.brokers}
+          consumer-properties:
+            value.deserializer: com.ihren.misc.serialization.PersonDeserializer
+          producer-properties:
+            value.serializer: com.ihren.misc.serialization.PersonSerializer
