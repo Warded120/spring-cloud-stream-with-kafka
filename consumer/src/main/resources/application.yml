@@ -8,8 +8,9 @@ spring:
         consumePerson-in-0:
           destination: processed-people
           group: consumer
-          consumer:
-            use-native-decoding: true
+      default:
+        consumer:
+          use-native-decoding: true
       kafka:
         binder:
           brokers: localhost:9092
