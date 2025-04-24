@@ -11,8 +11,8 @@ import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import java.util.Map;
 
-@Configuration
-@Testcontainers
+//@Configuration
+//@Testcontainers
 public class KafkaContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, TestExecutionListener {
 
     DockerContainer<ConfluentKafkaContainer> kafkaContainer = new ConfluentKafkaDockerContainer();
