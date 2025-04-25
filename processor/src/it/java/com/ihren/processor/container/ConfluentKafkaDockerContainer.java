@@ -1,4 +1,4 @@
-package com.ihren.processor;
+package com.ihren.processor.container;
 
 import org.testcontainers.kafka.ConfluentKafkaContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -8,7 +8,7 @@ public class ConfluentKafkaDockerContainer implements DockerContainer<ConfluentK
             DockerImageName.parse("confluentinc/cp-kafka").withTag("7.4.0");
 
 
-    ConfluentKafkaContainer container = new ConfluentKafkaContainer(IMAGE);
+    private final ConfluentKafkaContainer container = new ConfluentKafkaContainer(IMAGE);
 
     @Override
     public void start() {
