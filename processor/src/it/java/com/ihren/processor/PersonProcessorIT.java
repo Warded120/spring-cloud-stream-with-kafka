@@ -7,7 +7,6 @@ import com.ihren.processor.config.KafkaTemplateConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @IntegrationTest
@@ -52,7 +52,9 @@ public class PersonProcessorIT {
                     ConsumerRecords<String, Person> records = kafkaConsumer.poll(Duration.ofMillis(500));
                     if (!records.isEmpty()) {
                         Person processedPerson = records.iterator().next().value();
-                        Assertions.assertEquals(person, processedPerson);
+                        assertEquals(person, processedPerson);
+                    } else {
+                        fail("person not processed");
                     }
                 }
         );
