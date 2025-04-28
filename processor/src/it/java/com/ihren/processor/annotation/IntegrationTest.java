@@ -1,7 +1,11 @@
 package com.ihren.processor.annotation;
 
 import com.ihren.processor.KafkaContextInitializer;
+import com.ihren.processor.ProcessorApplication;
+import com.ihren.processor.config.KafkaConsumerConfig;
+import com.ihren.processor.config.KafkaTemplateConfig;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,10 +17,11 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = ProcessorApplication.class)
 @ContextConfiguration(initializers = KafkaContextInitializer.class)
 @TestExecutionListeners(listeners = KafkaContextInitializer.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@Import({KafkaTemplateConfig.class, KafkaConsumerConfig.class})
 @ActiveProfiles("test")
 public @interface IntegrationTest {
 }

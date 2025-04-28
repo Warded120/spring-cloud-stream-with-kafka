@@ -4,24 +4,24 @@ import com.ihren.model.Person;
 import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.config.KafkaConsumerConfig;
 import com.ihren.processor.config.KafkaTemplateConfig;
+import io.vavr.control.Try;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
+
 import java.time.Duration;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @IntegrationTest
-@Import({KafkaTemplateConfig.class, KafkaConsumerConfig.class})
-public class PersonProcessorIT {
+public class PersonConfigIT {
 
     @Autowired
     private KafkaTemplate<String, Person> kafkaTemplate;
@@ -30,33 +30,35 @@ public class PersonProcessorIT {
     KafkaConsumer<String, Person> kafkaConsumer;
 
     @BeforeEach
-    void setUp() {
-        kafkaConsumer.subscribe(Collections.singletonList("processed-people"));
-    }
+    void setUp() { }
 
     @AfterEach
     void tearDown() {
-        kafkaConsumer.close();
+        //kafkaConsumer.close();
     }
 
     @Test
     void testProcessPerson() {
+        //given
         Person person = new Person(1L, "Ivan", "Hrenevych");
 
         // when
         kafkaTemplate.send("people", person);
+        kafkaConsumer.subscribe(Collections.singletonList("processed-people"));
 
         // then
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(
-                () -> {
-                    ConsumerRecords<String, Person> records = kafkaConsumer.poll(Duration.ofMillis(500));
-                    if (!records.isEmpty()) {
-                        Person processedPerson = records.iterator().next().value();
-                        assertEquals(person, processedPerson);
-                    } else {
-                        fail("person not processed");
-                    }
-                }
-        );
+        Try.withResources(() -> kafkaConsumer)
+            .of(consumer -> {
+                ConsumerRecords<String, Person> consumerRecords = consumer.poll(Duration.ofSeconds(10));
+                assertEquals(1, consumerRecords.count(), "Should have 1 record");
+                return consumerRecords.iterator().next();
+            })
+            .onSuccess(record ->
+                assertEquals(person, record.value())
+            )
+            .onFailure(throwable ->
+                Assertions.fail(throwable.getMessage())
+            )
+            .get();
     }
 }

@@ -1,5 +1,7 @@
 spring:
   cloud:
+    function:
+      definition: processPerson
     stream:
       bindings:
         processPerson-in-0:
@@ -14,6 +16,13 @@ spring:
         producer:
           use-native-encoding: true
       kafka:
+        bindings:
+          processPerson-in-0:
+            consumer:
+              start-offset: earliest
+              configuration:
+                isolation:
+                  level: read_commited
         binder:
           consumer-properties:
             value.deserializer: com.ihren.misc.serialization.PersonDeserializer

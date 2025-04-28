@@ -3,6 +3,8 @@ server:
 spring:
   application.name: processor
   cloud:
+    function:
+      definition: processPerson
     stream:
       bindings:
         processPerson-in-0:
