@@ -1,4 +1,4 @@
-package com.ihren.processor;
+package com.ihren.processor.initializer;
 
 import com.ihren.processor.container.ConfluentKafkaDockerContainer;
 import com.ihren.processor.container.DockerContainer;
@@ -14,7 +14,7 @@ import org.testcontainers.kafka.ConfluentKafkaContainer;
 import java.util.Map;
 import java.util.Optional;
 
-public class KafkaContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, TestExecutionListener {
+public class KafkaInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, TestExecutionListener {
 
     private final DockerContainer<ConfluentKafkaContainer> kafkaDockerContainer = new ConfluentKafkaDockerContainer();
     private static ConfluentKafkaContainer kafkaContainer;

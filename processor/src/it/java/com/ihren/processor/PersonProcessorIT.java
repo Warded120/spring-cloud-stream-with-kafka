@@ -2,8 +2,6 @@ package com.ihren.processor;
 
 import com.ihren.model.Person;
 import com.ihren.processor.annotation.IntegrationTest;
-import com.ihren.processor.config.KafkaConsumerConfig;
-import com.ihren.processor.config.KafkaTemplateConfig;
 import io.vavr.control.Try;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -12,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.Duration;
@@ -21,7 +18,7 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @IntegrationTest
-public class PersonConfigIT {
+public class PersonProcessorIT {
 
     @Autowired
     private KafkaTemplate<String, Person> kafkaTemplate;
