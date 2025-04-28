@@ -1,19 +1,19 @@
 package com.ihren.processor.processor;
 
 import com.ihren.model.Person;
-import com.ihren.processor.sink.PersonSink;
+import com.ihren.processor.processor.mapper.PersonMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class PersonProcessor {
-    private final PersonSink personSink;
+public class PersonProcessor implements Function<Person, Person> {
+    private final PersonMapper personMapper;
 
-    public Function<Person, Person> processPerson() {
-        return personSink::sink;
+    @Override
+    public Person apply(Person person) {
+        return person;
     }
 }

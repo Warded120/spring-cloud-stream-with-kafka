@@ -8,10 +8,11 @@ import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
-public class PersonProcessor {
+public class PersonProcessor implements Consumer<Person> {
     private final PersonSink personSink;
 
-    public Consumer<Person> processPerson() {
-        return personSink::sink;
+    @Override
+    public void accept(Person person) {
+        personSink.sink(person);
     }
 }

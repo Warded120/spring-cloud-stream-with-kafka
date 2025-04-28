@@ -1,20 +1,19 @@
-package com.ihren.producer;
+package com.ihren.producer.processor;
 
 import com.ihren.model.Person;
 import com.ihren.producer.service.PersonGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
 
 @Component
 @RequiredArgsConstructor
-public class PersonProducer {
+public class PersonProcessor implements Supplier<Person> {
     private final PersonGenerator personGenerator;
 
-    @Bean
-    public Supplier<Person> producePerson() {
-        return personGenerator::generate;
+    @Override
+    public Person get() {
+        return personGenerator.generate();
     }
 }

@@ -11,6 +11,6 @@ import java.util.function.Consumer;
 public class ConsumerConfig {
     @Bean
     public Consumer<Person> consumePerson(PersonProcessor personProcessor) {
-        return personProcessor.processPerson();
+        return personProcessor;
     }
 }

@@ -11,6 +11,6 @@ import java.util.function.Function;
 public class ProcessorConfig {
     @Bean
     public Function<Person, Person> processPerson(PersonProcessor personProcessor) {
-        return personProcessor.processPerson();
+        return personProcessor;
     }
 }
