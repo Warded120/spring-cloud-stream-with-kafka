@@ -2,10 +2,12 @@ package com.ihren.processor.initializer;
 
 import com.ihren.processor.container.ConfluentKafkaDockerContainer;
 import com.ihren.processor.container.DockerContainer;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
@@ -16,8 +18,8 @@ import java.util.Optional;
 
 public class KafkaInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, TestExecutionListener {
 
-    private final DockerContainer<ConfluentKafkaContainer> kafkaDockerContainer = new ConfluentKafkaDockerContainer();
     private static ConfluentKafkaContainer kafkaContainer;
+    private final DockerContainer<ConfluentKafkaContainer> kafkaDockerContainer = new ConfluentKafkaDockerContainer();
 
     @Override
     public void beforeTestClass(TestContext testContext) {
@@ -52,7 +54,7 @@ public class KafkaInitializer implements ApplicationContextInitializer<Configura
 
     @Override
     public void initialize(ConfigurableApplicationContext context) {
-        var properties = Map.of(
+        Map<String, String> properties = Map.of(
                 "spring.kafka.bootstrap-servers", kafkaContainer.getBootstrapServers(),
                 "spring.kafka.consumer.group-id", "consumer"
         );
@@ -62,7 +64,7 @@ public class KafkaInitializer implements ApplicationContextInitializer<Configura
     }
 
     private Object getTestIsolationLevel(Class<?> clazz) {
-        final var annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(clazz, DirtiesContext.class);
+        AnnotationAttributes annotationAttributes = AnnotatedElementUtils.getMergedAnnotationAttributes(clazz, DirtiesContext.class);
 
         return Optional.ofNullable(annotationAttributes)
                 .map(attributes -> attributes.get("classMode"))

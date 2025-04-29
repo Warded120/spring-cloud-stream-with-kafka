@@ -13,8 +13,10 @@ import java.util.Map;
 @TestConfiguration
 public class KafkaConsumerConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers;
-    @Value("${spring.kafka.consumer.group-id}") String groupId;
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
+    @Value("${spring.kafka.consumer.group-id}")
+    private String groupId;
 
     @Bean
     public KafkaConsumer<String, Person> kafkaConsumer() {

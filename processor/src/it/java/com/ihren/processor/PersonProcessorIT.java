@@ -24,14 +24,16 @@ public class PersonProcessorIT {
     private KafkaTemplate<String, Person> kafkaTemplate;
 
     @Autowired
-    KafkaConsumer<String, Person> kafkaConsumer;
+    private KafkaConsumer<String, Person> kafkaConsumer;
 
     @BeforeEach
-    void setUp() { }
+    void setUp() {
+        kafkaConsumer.subscribe(Collections.singletonList("processed-people"));
+    }
 
     @AfterEach
     void tearDown() {
-        //kafkaConsumer.close();
+        kafkaConsumer.close();
     }
 
     @Test
@@ -41,7 +43,6 @@ public class PersonProcessorIT {
 
         // when
         kafkaTemplate.send("people", person);
-        kafkaConsumer.subscribe(Collections.singletonList("processed-people"));
 
         // then
         Try.withResources(() -> kafkaConsumer)
