@@ -2,7 +2,6 @@ package com.ihren.processor.initializer;
 
 import com.ihren.processor.container.ConfluentKafkaDockerContainer;
 import com.ihren.processor.container.DockerContainer;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -12,7 +11,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 import org.testcontainers.kafka.ConfluentKafkaContainer;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,8 +53,7 @@ public class KafkaInitializer implements ApplicationContextInitializer<Configura
     @Override
     public void initialize(ConfigurableApplicationContext context) {
         Map<String, String> properties = Map.of(
-                "spring.kafka.bootstrap-servers", kafkaContainer.getBootstrapServers(),
-                "spring.kafka.consumer.group-id", "consumer"
+                "spring.kafka.bootstrap-servers", kafkaContainer.getBootstrapServers()
         );
 
         TestPropertyValues.of(properties)

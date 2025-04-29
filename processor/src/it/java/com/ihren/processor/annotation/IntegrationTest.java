@@ -17,11 +17,23 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@SpringBootTest(classes = ProcessorApplication.class)
-@ContextConfiguration(initializers = KafkaInitializer.class)
-@TestExecutionListeners(listeners = KafkaInitializer.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-@Import({KafkaTemplateConfig.class, KafkaConsumerConfig.class})
 @ActiveProfiles("test")
+@SpringBootTest(
+        classes = ProcessorApplication.class
+)
+@ContextConfiguration(
+        initializers = KafkaInitializer.class
+)
+@TestExecutionListeners(
+        listeners = KafkaInitializer.class,
+        mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
+)
+@DirtiesContext(
+        classMode = DirtiesContext.ClassMode.BEFORE_CLASS
+)
+@Import({
+        KafkaTemplateConfig.class,
+        KafkaConsumerConfig.class
+})
 public @interface IntegrationTest {
 }

@@ -13,6 +13,4 @@ public class PersonConfig {
     public Function<Person, Person> processPerson(PersonProcessor processor) {
         return processor;
     }
-
-
 }
