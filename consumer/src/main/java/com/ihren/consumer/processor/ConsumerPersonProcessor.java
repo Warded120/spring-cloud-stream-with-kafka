@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
-public class PersonProcessor implements Consumer<Person> {
+public class ConsumerPersonProcessor implements Consumer<Person> {
     private final PersonSink personSink;
 
     @Override

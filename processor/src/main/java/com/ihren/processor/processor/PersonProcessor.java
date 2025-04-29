@@ -1,7 +1,7 @@
 package com.ihren.processor.processor;
 
 import com.ihren.model.Person;
-import com.ihren.processor.processor.mapper.PersonMapper;
+import com.ihren.processor.mapper.PersonMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +14,6 @@ public class PersonProcessor implements Function<Person, Person> {
 
     @Override
     public Person apply(Person person) {
-        return person;
+        return personMapper.map(person);
     }
 }

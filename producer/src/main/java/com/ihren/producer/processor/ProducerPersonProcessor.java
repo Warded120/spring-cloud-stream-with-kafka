@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 @Component
 @RequiredArgsConstructor
-public class PersonProcessor implements Supplier<Person> {
+public class ProducerPersonProcessor implements Supplier<Person> {
     private final PersonGenerator personGenerator;
 
     @Override

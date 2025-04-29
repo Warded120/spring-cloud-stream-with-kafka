@@ -4,6 +4,8 @@ spring:
   application:
     name: processor
   cloud:
+    function:
+      definition: processPerson
     stream:
       bindings:
         processPerson-in-0:
@@ -11,7 +13,6 @@ spring:
           group: consumer
         processPerson-out-0:
           destination: processed-people
-          group: consumer
       default:
         consumer:
           use-native-decoding: true

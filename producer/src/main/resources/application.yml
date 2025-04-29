@@ -1,14 +1,13 @@
 server:
   port: 8080
 spring:
-  application:
-    name: producer
   cloud:
+    function:
+      definition: producePerson
     stream:
       bindings:
         producePerson-out-0:
           destination: people
-          group: consumer
       default:
         producer:
           use-native-encoding: true

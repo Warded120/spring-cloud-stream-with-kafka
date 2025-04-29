@@ -4,6 +4,8 @@ spring:
   application:
     name: consumer
   cloud:
+    function:
+      definition: consumePerson
     stream:
       bindings:
         consumePerson-in-0:
