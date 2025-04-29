@@ -1,0 +1,150 @@
+<?xml version="1.0" ?>
+
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+    <module name="SuppressWarningsFilter"/>
+    <module name="TreeWalker">
+
+        <!-- Annotations -->
+
+        <module name="AnnotationLocation"/>
+        <module name="AnnotationUseStyle"/>
+        <module name="MissingOverride"/>
+        <module name="SuppressWarningsHolder"/>
+
+        <!-- Annotations -->
+
+        <!-- Block Checks -->
+
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="EmptyCatchBlock"/>
+        <module name="NeedBraces"/>
+
+        <!-- Block Checks -->
+
+        <!-- Class Design -->
+
+        <module name="FinalClass"/>
+        <module name="InnerTypeLast"/>
+        <module name="MutableException"/>
+        <module name="VisibilityModifier"/>
+
+        <!-- Class Design -->
+
+        <!-- Coding -->
+
+        <module name="DeclarationOrder"/>
+        <module name="DefaultComesLast"/>
+        <module name="EmptyStatement"/>
+        <module name="EqualsAvoidNull"/>
+        <module name="IllegalCatch"/>
+        <module name="IllegalInstantiation"/>
+        <module name="IllegalThrows"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="NoFinalizer"/>
+        <module name="OneStatementPerLine"/>
+        <module name="OverloadMethodsDeclarationOrder"/>
+        <module name="RequireThis"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
+        <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
+        <module name="UnnecessarySemicolonInEnumeration"/>
+        <module name="UnnecessarySemicolonInTryWithResources"/>
+        <module name="UnusedLocalVariable"/>
+
+        <!-- Coding -->
+
+        <!-- Imports -->
+
+        <module name="AvoidStarImport"/>
+        <module name="AvoidStaticImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+
+        <!-- Imports -->
+
+        <!-- Miscellaneous -->
+
+        <module name="ArrayTypeStyle"/>
+        <module name="NoCodeInFile"/>
+        <module name="UpperEll"/>
+
+        <!-- Miscellaneous -->
+
+        <!-- Modifiers -->
+
+        <module name="ModifierOrder"/>
+
+        <!-- Modifiers -->
+
+        <!-- Naming Conventions -->
+
+        <module name="ConstantName"/>
+        <module name="LambdaParameterName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+
+        <!-- Naming Conventions -->
+
+        <!-- Size Violations -->
+
+        <module name="LambdaBodyLength">
+            <property name="max" value="30"/>
+        </module>
+        <module name="MethodLength">
+            <property name="tokens" value="METHOD_DEF"/>
+            <property name="max" value="60"/>
+        </module>
+
+        <!-- Size Violations -->
+
+        <!-- Whitespaces -->
+
+        <module name="EmptyForInitializerPad"/>
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="NoLineWrap"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/>
+        <module name="OperatorWrap"/>
+        <module name="ParenPad"/>
+        <module name="SingleSpaceSeparator"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
+
+        <!-- Whitespaces -->
+
+    </module>
+    <module name="SuppressionFilter">
+        <property name="file" value="./suppressions.xml"/>
+    </module>
+    <module name="FileLength">
+        <property name="max" value="300"/>
+    </module>
+    <module name="LineLength">
+        <property name="max" value="160"/>
+    </module>
+    <module name="RegexpMultiline">
+        <property name="format" value="System\.(out)|(err)\.print(ln)?\("/>
+    </module>
+    <module name="RegexpMultiline">
+        <property name="format" value="(.+)\.printStackTrace\("/>
+    </module>
+    <module name="RegexpMultiline">
+        <property name="format" value="System\.exit\("/>
+    </module>
+    <module name="UniqueProperties"/>
+</module>
