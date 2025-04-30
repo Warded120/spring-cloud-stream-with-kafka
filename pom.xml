@@ -18,8 +18,6 @@
 
     <modules>
         <module>processor</module>
-        <module>model</module>
-        <module>misc</module>
     </modules>
 
     <properties>

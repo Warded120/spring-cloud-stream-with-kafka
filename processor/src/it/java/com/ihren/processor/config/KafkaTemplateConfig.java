@@ -1,7 +1,7 @@
 package com.ihren.processor.config;
 
-import com.ihren.misc.serialization.PersonSerializer;
-import com.ihren.model.Person;
+import com.ihren.processor.serialization.PersonSerializer;
+import com.ihren.processor.model.Person;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

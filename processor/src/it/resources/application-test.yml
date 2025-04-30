@@ -1,4 +1,0 @@
-test:
-  topic:
-    in: people
-    out: processed-people

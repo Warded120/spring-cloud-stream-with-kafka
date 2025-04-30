@@ -1,7 +1,7 @@
 package com.ihren.processor.config;
 
-import com.ihren.misc.serialization.PersonDeserializer;
-import com.ihren.model.Person;
+import com.ihren.processor.serialization.PersonDeserializer;
+import com.ihren.processor.model.Person;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;

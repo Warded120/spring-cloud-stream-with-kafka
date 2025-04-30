@@ -20,9 +20,9 @@ spring:
         binder:
           brokers: localhost:9092
           consumer-properties:
-            value.deserializer: com.ihren.misc.serialization.PersonDeserializer
+            value.deserializer: com.ihren.processor.serialization.PersonDeserializer
           producer-properties:
-            value.serializer: com.ihren.misc.serialization.PersonSerializer
+            value.serializer: com.ihren.processor.serialization.PersonSerializer
         bindings:
           processPerson-in-0:
             consumer:

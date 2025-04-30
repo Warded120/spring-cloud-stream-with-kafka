@@ -1,14 +1,13 @@
-package com.ihren.misc.serialization;
+package com.ihren.processor.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ihren.misc.config.ObjectMapperConfig;
-import com.ihren.misc.serialization.exception.SerializationException;
-import com.ihren.model.Person;
+import com.ihren.processor.config.ObjectMapperConfig;
+import com.ihren.processor.serialization.exception.SerializationException;
+import com.ihren.processor.model.Person;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.springframework.stereotype.Component;
-
 import java.util.Map;
 
 @Component
@@ -23,7 +22,7 @@ public class PersonDeserializer implements Deserializer<Person> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        ObjectMapperConfig.configureObjectMapper(objectMapper);
+        ObjectMapperConfig.configure(objectMapper);
     }
     @Override
     public Person deserialize(String s, byte[] bytes) {

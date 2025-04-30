@@ -1,6 +1,6 @@
 package com.ihren.processor;
 
-import com.ihren.model.Person;
+import com.ihren.processor.model.Person;
 import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.util.KafkaUtils;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -15,10 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @IntegrationTest
 public class PersonProcessorIT {
 
-    @Value("${test.topic.in}")
+    @Value("${spring.cloud.stream.bindings.processPerson-in-0.destination}")
     private String topicIn;
 
-    @Value("${test.topic.out}")
+    @Value("${spring.cloud.stream.bindings.processPerson-out-0.destination}")
     private String topicOut;
 
     @Autowired

@@ -1,6 +1,6 @@
 package com.ihren.processor.config;
 
-import com.ihren.model.Person;
+import com.ihren.processor.model.Person;
 import com.ihren.processor.processor.PersonProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

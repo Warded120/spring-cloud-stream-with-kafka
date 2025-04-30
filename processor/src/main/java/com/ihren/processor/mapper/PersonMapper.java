@@ -1,6 +1,6 @@
 package com.ihren.processor.mapper;
 
-import com.ihren.model.Person;
+import com.ihren.processor.model.Person;
 import org.springframework.stereotype.Component;
 
 @Component
