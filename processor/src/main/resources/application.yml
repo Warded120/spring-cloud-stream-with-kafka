@@ -1,6 +1,8 @@
 server:
   port: 8081
 spring:
+  application:
+    name: processor
   cloud:
     function:
       definition: processPerson
@@ -16,7 +18,6 @@ spring:
           group: processor
         processPerson-out-0:
           destination: processed-people
-          group: consumer
       kafka:
         binder:
           brokers: localhost:9092

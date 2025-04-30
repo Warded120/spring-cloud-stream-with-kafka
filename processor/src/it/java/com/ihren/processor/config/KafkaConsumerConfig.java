@@ -15,7 +15,7 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${spring.cloud.stream.bindings.processPerson-out-0.group}")
+    @Value("${spring.application.name}")
     private String groupId;
 
     @Bean

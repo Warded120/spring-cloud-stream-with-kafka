@@ -7,4 +7,3 @@ spring:
           group: processor-test
         processPerson-out-0:
           destination: processed-people-test
-          group: consumer-test
