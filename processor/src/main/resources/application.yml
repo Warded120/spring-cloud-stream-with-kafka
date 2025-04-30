@@ -13,9 +13,10 @@ spring:
       bindings:
         processPerson-in-0:
           destination: people
-          group: spring-cloud-stream-with-kafka
+          group: processor
         processPerson-out-0:
           destination: processed-people
+          group: consumer
       kafka:
         binder:
           brokers: localhost:9092
