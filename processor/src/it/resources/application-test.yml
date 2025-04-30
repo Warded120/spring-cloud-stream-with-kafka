@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        processPerson-in-0:
+          destination: people-test
+          group: processor-test
+        processPerson-out-0:
+          destination: processed-people-test

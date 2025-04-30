@@ -1,10 +1,9 @@
 package com.ihren.processor.processor;
 
-import com.ihren.model.Person;
+import com.ihren.processor.model.Person;
 import com.ihren.processor.mapper.PersonMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import java.util.function.Function;
 
 @Component
