@@ -1,0 +1,20 @@
+package com.ihren.processor.dto;
+
+import com.ihren.processor.validation.discount.ValidDiscount;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
+public record TransactionDto(
+        @ValidDiscount
+        String discount,
+        @NotBlank
+        Long sequenceNumber,
+        @NotBlank
+        String endDateTime,
+        @NotEmpty
+        List<ItemDto> items,
+        @NotNull
+        TotalDto total
+) { }
