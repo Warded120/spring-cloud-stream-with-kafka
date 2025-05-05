@@ -10,6 +10,7 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
+        componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public interface TotalMapper {

@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class MapStructConfig {
-    @Bean
-    @Primary
+    //@Bean
+    //@Primary
     public TransactionMapper transactionMapper(TransactionMapperImpl implementation) {
         return implementation;
     }

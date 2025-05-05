@@ -3,27 +3,25 @@ package com.ihren.processor.processor;
 import com.ihren.processor.dto.ItemDto;
 import com.ihren.processor.dto.TotalDto;
 import com.ihren.processor.dto.TransactionDto;
-import com.ihren.processor.mapper.ItemMapperImpl;
-import com.ihren.processor.mapper.TotalMapperImpl;
-import com.ihren.processor.mapper.TransactionMapper;
-import com.ihren.processor.mapper.TransactionMapperImpl;
 import com.ihren.processor.model.Transaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.util.List;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
 class TransactionProcessorTest {
 
-    private final TransactionMapper transactionMapper = new TransactionMapperImpl(new ItemMapperImpl(), new TotalMapperImpl());
+    @Autowired
+    private TransactionProcessor transactionProcessor;
 
     @Test
     void applyTest() {
+        //given
         List<ItemDto> items = List.of(
                 new ItemDto(1L, "1", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
                 new ItemDto(2L, "2", "2023-04-10T11:00:00Z", "2023-04-10T13:00:00Z")
@@ -39,7 +37,7 @@ class TransactionProcessorTest {
                 total
         );
 
-        Transaction applied = transactionMapper.map(transactionDto);
+        Transaction applied = transactionProcessor.apply(transactionDto);
         System.out.println(applied);
     }
 }

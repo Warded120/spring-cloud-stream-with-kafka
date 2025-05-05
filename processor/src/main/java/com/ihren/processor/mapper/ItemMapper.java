@@ -4,10 +4,12 @@ import com.ihren.processor.dto.ItemDto;
 import com.ihren.processor.model.Item;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
+        componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public interface ItemMapper {

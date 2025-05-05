@@ -1,32 +1,30 @@
-package com.ihren.processor.serialization.model.transaction;
+package com.ihren.processor.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.config.ObjectMapperConfig;
-import com.ihren.processor.model.Transaction;
 import com.ihren.processor.serialization.exception.SerializationException;
 import io.vavr.control.Try;
-import lombok.RequiredArgsConstructor;
 import org.apache.kafka.common.serialization.Deserializer;
-import org.springframework.stereotype.Component;
 import java.util.Map;
 
-@Component
-@RequiredArgsConstructor
-public class TransactionDeserializer implements Deserializer<Transaction> {
+public class GenericDeserializer<T> implements Deserializer<T> {
 
     private final ObjectMapper objectMapper;
+    private final Class<T> targetClass;
 
-    public TransactionDeserializer() {
+    public GenericDeserializer(Class<T> targetClass) {
         this.objectMapper = new ObjectMapper();
+        this.targetClass = targetClass;
     }
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
         ObjectMapperConfig.configure(objectMapper);
     }
+
     @Override
-    public Transaction deserialize(String s, byte[] bytes) {
-        return Try.of(() -> objectMapper.readValue(bytes, Transaction.class))
+    public T deserialize(String s, byte[] bytes) {
+            return Try.of(() -> objectMapper.readValue(bytes, targetClass))
                 .getOrElseThrow(e -> new SerializationException("failed to deserialize person", e));
     }
 }
