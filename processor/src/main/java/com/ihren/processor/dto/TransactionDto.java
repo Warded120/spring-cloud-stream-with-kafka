@@ -13,7 +13,6 @@ public record TransactionDto(
         @NotBlank
         Long sequenceNumber,
         @NotBlank
-        //TODO: maybe add validation for Instant format (it must be able to parse into Instant object)
         String endDateTime,
         @NotEmpty
         List<@Valid ItemDto> items,

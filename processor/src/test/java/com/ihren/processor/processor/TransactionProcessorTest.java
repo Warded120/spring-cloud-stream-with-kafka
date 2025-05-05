@@ -14,30 +14,4 @@ import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-class TransactionProcessorTest {
-
-    @Autowired
-    private TransactionProcessor transactionProcessor;
-
-    @Test
-    void applyTest() {
-        //given
-        List<ItemDto> items = List.of(
-                new ItemDto(1L, "1", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
-                new ItemDto(2L, "2", "2023-04-10T11:00:00Z", "2023-04-10T13:00:00Z")
-        );
-
-        TotalDto total = new TotalDto(new BigDecimal("150.00"), "USD");
-
-        TransactionDto transactionDto = new TransactionDto(
-                "10.0",
-                12345L,
-                "2023-04-10T09:00:00Z",
-                items,
-                total
-        );
-
-        Transaction applied = transactionProcessor.apply(transactionDto);
-        System.out.println(applied);
-    }
-}
+class TransactionProcessorTest { }

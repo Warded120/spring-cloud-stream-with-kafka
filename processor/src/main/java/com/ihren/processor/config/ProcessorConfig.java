@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.util.function.Function;
 
-//@Configuration
+@Configuration
 public class ProcessorConfig {
-    //TODO: change application.yml kafka bindings
-    //@Bean
+    //TODO: setup application.yml kafka bindings
+    @Bean
     public Function<TransactionDto, Transaction> processTransaction(TransactionProcessor processor) {
         return processor;
     }

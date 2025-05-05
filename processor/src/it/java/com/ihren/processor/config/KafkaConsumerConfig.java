@@ -17,7 +17,7 @@ public class KafkaConsumerConfig {
     @Value("${spring.application.name}")
     private String groupId;
 
-    @Bean
+    //@Bean
     public KafkaConsumer<String, /*TODO: verify*/ Transaction> kafkaConsumer() {
         Map<String, Object> configs = Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,

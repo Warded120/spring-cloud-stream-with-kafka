@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 //TODO: do I need this for validation?
-//@Configuration
+@Configuration
 public class ValidationConfig {
-    //@Bean
+    @Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }

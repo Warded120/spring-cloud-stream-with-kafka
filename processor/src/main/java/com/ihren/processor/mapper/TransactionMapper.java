@@ -18,14 +18,14 @@ import java.util.UUID;
         uses = {ItemMapper.class, TotalMapper.class}
 )
 public interface TransactionMapper {
-    @Mapping(target = "transactionId", expression = "java(java.util.UUID.randomUUID())")
+    @Mapping(target = "transactionId", source = ".", qualifiedByName = "generateTransactionId")
     @Mapping(target = "source", constant = "Softserve")
     @Mapping(target = "discount", ignore = true)
-    @Mapping(target = "operationDateTime", expression = "java(java.time.Instant.parse(dto.endDateTime()))") //TODO: meybe it needs a custom map method to check if it's parsable
+    @Mapping(target = "operationDateTime", source = "endDateTime", qualifiedByName = "parseOperationDateTime")
     Transaction map(TransactionDto dto);
 
     @Named("generateTransactionId")
-    default UUID generateTransactionId() {
+    default UUID generateTransactionId(TransactionDto dto) {
         return UUID.randomUUID();
     }
 
