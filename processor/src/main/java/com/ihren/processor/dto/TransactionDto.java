@@ -1,6 +1,7 @@
 package com.ihren.processor.dto;
 
 import com.ihren.processor.validation.discount.ValidDiscount;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,9 +13,11 @@ public record TransactionDto(
         @NotBlank
         Long sequenceNumber,
         @NotBlank
+        //TODO: maybe add validation for Instant format (it must be able to parse into Instant object)
         String endDateTime,
         @NotEmpty
-        List<ItemDto> items,
+        List<@Valid ItemDto> items,
         @NotNull
+        @Valid
         TotalDto total
 ) { }

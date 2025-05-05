@@ -7,5 +7,4 @@ import java.math.BigDecimal;
 public record Total(
         BigDecimal amount,
         Currency currency
-) {
-}
+) { }

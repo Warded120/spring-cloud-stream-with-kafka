@@ -11,5 +11,4 @@ public record ItemDto(
         String beginDateTime,
         @NotBlank
         String endDateTime
-) {
-}
+) { }

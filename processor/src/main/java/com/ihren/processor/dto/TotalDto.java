@@ -12,5 +12,4 @@ public record TotalDto(
         @NotBlank
         @ValidCurrency
         String currency
-) {
-}
+) { }

@@ -1,22 +1,20 @@
-package com.ihren.processor.serialization;
+package com.ihren.processor.serialization.dto.total;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.config.ObjectMapperConfig;
+import com.ihren.processor.dto.TotalDto;
 import com.ihren.processor.serialization.exception.SerializationException;
-import com.ihren.processor.model.Person;
 import io.vavr.control.Try;
-import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.Serializer;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
-public class PersonDeserializer implements Deserializer<Person> {
+public class TotalDtoSerializer implements Serializer<TotalDto> {
 
     private final ObjectMapper objectMapper;
 
-    public PersonDeserializer() {
+    public TotalDtoSerializer() {
         this.objectMapper = new ObjectMapper();
     }
 
@@ -24,9 +22,10 @@ public class PersonDeserializer implements Deserializer<Person> {
     public void configure(Map<String, ?> configs, boolean isKey) {
         ObjectMapperConfig.configure(objectMapper);
     }
+
     @Override
-    public Person deserialize(String s, byte[] bytes) {
-        return Try.of(() -> objectMapper.readValue(bytes, Person.class))
-                .getOrElseThrow(e -> new SerializationException("failed to deserialize person", e));
+    public byte[] serialize(String s, TotalDto item) {
+        return Try.of(() -> objectMapper.writeValueAsBytes(item))
+                .getOrElseThrow(e -> new SerializationException("failed to serialize person", e));
     }
 }
