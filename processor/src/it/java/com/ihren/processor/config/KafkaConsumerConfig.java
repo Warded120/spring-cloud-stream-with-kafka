@@ -1,6 +1,7 @@
 package com.ihren.processor.config;
 
 import com.ihren.processor.model.Transaction;
+import com.ihren.processor.serialization.GenericDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -18,15 +19,13 @@ public class KafkaConsumerConfig {
     private String groupId;
 
     @Bean
-    public KafkaConsumer<String, /*TODO: verify*/ Transaction> kafkaConsumer(
-            StringDeserializer keyDeserializer,
-            TransactionDeserializer valueDeserializer
-    ) {
+    public KafkaConsumer<String, Transaction> kafkaConsumer() {
         Map<String, Object> configs = Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                 ConsumerConfig.GROUP_ID_CONFIG, groupId,
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializer.getClass(),
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializer.getClass()
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, GenericDeserializer.class,
+                "value.deserializer.target.class", Transaction.class.getName()
         );
 
         return new KafkaConsumer<>(configs);

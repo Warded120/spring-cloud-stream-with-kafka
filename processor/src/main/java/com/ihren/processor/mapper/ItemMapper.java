@@ -1,6 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.dto.ItemDto;
+import com.ihren.processor.mapper.exception.MappingException;
 import com.ihren.processor.model.Item;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,7 +24,7 @@ public interface ItemMapper {
             case "2" -> "Coupon";
             case "3" -> "Base";
             case "4" -> "Total";
-            default -> "Unknown";
+            default -> throw new MappingException("Unexpected value: " + loyaltyAccountId + ". expected values are: 1, 2, 3, 4");
         };
     }
 }

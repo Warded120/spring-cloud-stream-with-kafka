@@ -1,12 +1,13 @@
 package com.ihren.processor.dto;
 
+import com.ihren.processor.validation.contains.in.ContainsIn;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ItemDto(
         @NotNull
         Long id,
-        //TODO: add custom validation for checking if number is in range: account (String) -> if account Id 1 -> Main, 2 -> Coupon, 3 -> Base, 4 -> Total. For other cases -> invalid
+        @ContainsIn({"1", "2", "3", "4"})
         CharSequence loyaltyAccountId,
         @NotBlank
         String beginDateTime,

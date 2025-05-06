@@ -10,15 +10,20 @@ import java.util.Map;
 public class GenericDeserializer<T> implements Deserializer<T> {
 
     private final ObjectMapper objectMapper;
-    private final Class<T> targetClass;
+    private Class<T> targetClass;
 
-    public GenericDeserializer(Class<T> targetClass) {
+    public GenericDeserializer() {
         this.objectMapper = new ObjectMapper();
-        this.targetClass = targetClass;
     }
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
+        String className = (String) configs.get("value.deserializer.target.class");
+        try {
+            this.targetClass = (Class<T>) Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new SerializationException("Failed to load target class", e);
+        }
         ObjectMapperConfig.configure(objectMapper);
     }
 

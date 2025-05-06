@@ -1,15 +1,12 @@
 package com.ihren.processor.dto;
 
-import com.ihren.processor.validation.currency.ValidCurrency;
-import jakarta.validation.constraints.NotBlank;
+import com.ihren.processor.validation.contains.in.ContainsIn;
 import jakarta.validation.constraints.NotNull;
-
 import java.math.BigDecimal;
 
 public record TotalDto(
         @NotNull
         BigDecimal amount,
-        @NotBlank
-        @ValidCurrency
+        @ContainsIn
         String currency
 ) { }

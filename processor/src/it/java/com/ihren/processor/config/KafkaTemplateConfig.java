@@ -19,21 +19,18 @@ public class KafkaTemplateConfig {
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, /*TODO: verify*/ TransactionDto> producerFactory(
-            StringSerializer keySerializer,
-            GenericSerializer<TransactionDto> valueSerializer
-    ) {
+    public ProducerFactory<String, TransactionDto> producerFactory() {
         Map<String, Object> config = Map.of(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
-                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer.getClass(),
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer.getClass()
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GenericSerializer.class
         );
 
-        return new DefaultKafkaProducerFactory<>(config, keySerializer, valueSerializer);
+        return new DefaultKafkaProducerFactory<>(config);
     }
 
     @Bean
-    public KafkaTemplate<String, /*TODO: verify*/ TransactionDto> kafkaTemplate(ProducerFactory<String, /*TODO: verify*/ TransactionDto> factory) {
+    public KafkaTemplate<String, TransactionDto> kafkaTemplate(ProducerFactory<String, TransactionDto> factory) {
         return new KafkaTemplate<>(factory);
     }
 }

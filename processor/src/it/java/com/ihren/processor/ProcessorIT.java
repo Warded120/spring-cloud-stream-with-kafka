@@ -31,13 +31,14 @@ public class ProcessorIT {
     @Value("${spring.cloud.stream.bindings.processTransaction-out-0.destination}")
     private String topicOut;
 
-    //TODO: setup application-test.yml
+    //TODO: write unit tests for mappers, validators,
+    //TODO: add one more test for invalid TransactionDto
     @Test
     void applyTest() {
 
         //given
         List<ItemDto> items = List.of(
-                new ItemDto(1L, "1", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
+                new ItemDto(1L, "4", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
                 new ItemDto(2L, "2", "2023-04-10T11:00:00Z", "2023-04-10T13:00:00Z")
         );
 
