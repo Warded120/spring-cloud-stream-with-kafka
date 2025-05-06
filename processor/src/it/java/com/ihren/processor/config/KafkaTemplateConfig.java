@@ -1,6 +1,6 @@
 package com.ihren.processor.config;
 
-import com.ihren.processor.model.Transaction;
+import com.ihren.processor.dto.TransactionDto;
 import com.ihren.processor.serialization.GenericSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -19,19 +19,21 @@ public class KafkaTemplateConfig {
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, /*TODO: verify*/ Transaction> producerFactory(
+    public ProducerFactory<String, /*TODO: verify*/ TransactionDto> producerFactory(
             StringSerializer keySerializer,
-            GenericSerializer<Transaction> valueSerializer
+            GenericSerializer<TransactionDto> valueSerializer
     ) {
         Map<String, Object> config = Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer.getClass(),
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer.getClass()
         );
 
         return new DefaultKafkaProducerFactory<>(config, keySerializer, valueSerializer);
     }
 
     @Bean
-    public KafkaTemplate<String, /*TODO: verify*/ Transaction> kafkaTemplate(ProducerFactory<String, /*TODO: verify*/ Transaction> factory) {
+    public KafkaTemplate<String, /*TODO: verify*/ TransactionDto> kafkaTemplate(ProducerFactory<String, /*TODO: verify*/ TransactionDto> factory) {
         return new KafkaTemplate<>(factory);
     }
 }

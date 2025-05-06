@@ -1,5 +1,6 @@
 package com.ihren.processor.config;
 
+import com.ihren.processor.dto.TransactionDto;
 import com.ihren.processor.model.Transaction;
 import com.ihren.processor.serialization.GenericDeserializer;
 import com.ihren.processor.serialization.GenericSerializer;
@@ -21,12 +22,24 @@ public class SerializationConfig {
     }
 
     @Bean
+    public GenericSerializer<TransactionDto> transactionDtoSerializer() {
+        return new GenericSerializer<>();
+    }
+
+    @Bean
+    GenericDeserializer<TransactionDto> transactionDtoDeserializer() {
+        return new GenericDeserializer<>(TransactionDto.class);
+    }
+
+    @Bean
     public GenericSerializer<Transaction> transactionSerializer() {
         return new GenericSerializer<>();
     }
 
     @Bean
-    GenericDeserializer<Transaction> transactionDeserializer() {
-        return new GenericDeserializer<>(Transaction.class);
+    TransactionDeserializer transactionDeserializer() {
+        TransactionDeserializer transactionDeserializer = new TransactionDeserializer();
+        transactionDeserializer.configure(null, false);
+        return transactionDeserializer;
     }
 }

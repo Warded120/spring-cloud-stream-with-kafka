@@ -3,32 +3,32 @@ server:
 spring:
   application:
     name: processor
-#  cloud:
-#    function:
-#      definition: processPerson
-#    stream:
-#      default:
-#        consumer:
-#          use-native-decoding: true
-#        producer:
-#          use-native-encoding: true
-#      bindings:
-#        processPerson-in-0:
-#          destination: people
-#          group: processor
-#        processPerson-out-0:
-#          destination: processed-people
-#      kafka:
-#        binder:
-#          brokers: localhost:9092
-#          consumer-properties:
-#            value.deserializer: com.ihren.processor.serialization.PersonDeserializer
-#          producer-properties:
-#            value.serializer: com.ihren.processor.serialization.PersonSerializer
-#        bindings:
-#          processPerson-in-0:
-#            consumer:
-#              startOffset: earliest
-#              configuration:
-#                isolation:
-#                  level: read_committed
+  cloud:
+    function:
+      definition: processTransaction
+    stream:
+      default:
+        consumer:
+          use-native-decoding: true
+        producer:
+          use-native-encoding: true
+      bindings:
+        processTransaction-in-0:
+          destination: transaction
+          group: processor
+        processTransaction-out-0:
+          destination: processed-transaction
+      kafka:
+        binder:
+          brokers: localhost:9092
+          consumer-properties:
+            value.deserializer: com.ihren.processor.serialization.transaction.TransactionDtoDeserializer
+          producer-properties:
+            value.serializer: com.ihren.processor.serialization.transaction.TransactionSerializer
+        bindings:
+          processPerson-in-0:
+            consumer:
+              startOffset: earliest
+              configuration:
+                isolation:
+                  level: read_committed

@@ -12,8 +12,6 @@ import java.util.function.Function;
 public class TransactionProcessor implements Function<TransactionDto, Transaction> {
     private final TransactionMapper mapper;
 
-    //TODO: trigger validation
-    //TODO: implement exception handler (if validation failed then return null, implement DLT in future)
     @Override
     public Transaction apply(TransactionDto dto) {
         return mapper.map(dto);

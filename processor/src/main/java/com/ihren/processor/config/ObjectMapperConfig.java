@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class ObjectMapperConfig {
     public static void configure(ObjectMapper objectMapper) {
         objectMapper
+                .findAndRegisterModules()
                 .enable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }

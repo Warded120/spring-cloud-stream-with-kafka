@@ -9,7 +9,6 @@ import java.util.function.Function;
 
 @Configuration
 public class ProcessorConfig {
-    //TODO: setup application.yml kafka bindings
     @Bean
     public Function<TransactionDto, Transaction> processTransaction(TransactionProcessor processor) {
         return processor;

@@ -7,7 +7,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 //TODO: do I need this for validation?
 @Configuration
 public class ValidationConfig {
-    @Bean
+    //@Bean
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }

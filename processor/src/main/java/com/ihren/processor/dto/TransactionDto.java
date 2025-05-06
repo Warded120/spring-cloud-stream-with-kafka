@@ -10,7 +10,7 @@ import java.util.List;
 public record TransactionDto(
         @ValidDiscount
         String discount,
-        @NotBlank
+        @NotNull
         Long sequenceNumber,
         @NotBlank
         String endDateTime,

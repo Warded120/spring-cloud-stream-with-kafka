@@ -23,6 +23,6 @@ public class GenericSerializer<T> implements Serializer<T> {
     @Override
     public byte[] serialize(String s, T data) {
         return Try.of(() -> objectMapper.writeValueAsBytes(data))
-                .getOrElseThrow(e -> new SerializationException("failed to serialize person", e));
+                .getOrElseThrow(e -> new SerializationException("failed to serialize T", e));
     }
 }

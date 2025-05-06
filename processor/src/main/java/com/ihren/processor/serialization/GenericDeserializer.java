@@ -25,6 +25,6 @@ public class GenericDeserializer<T> implements Deserializer<T> {
     @Override
     public T deserialize(String s, byte[] bytes) {
             return Try.of(() -> objectMapper.readValue(bytes, targetClass))
-                .getOrElseThrow(e -> new SerializationException("failed to deserialize person", e));
+                .getOrElseThrow(e -> new SerializationException("failed to deserialize " + targetClass.getSimpleName(), e));
     }
 }

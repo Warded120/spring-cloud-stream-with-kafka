@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Constraint(validatedBy = CurrencyValidator.class)
 public @interface ValidCurrency {
-    String message() default "currency must be one of: USD, GBP, EUR, CNY, UAH";
+    String message() default "currency must be one of: USD, GBP, EUR, CNY, UAH"; //TODO: construct the message on the fly
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
