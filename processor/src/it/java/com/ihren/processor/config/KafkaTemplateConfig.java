@@ -1,6 +1,7 @@
 package com.ihren.processor.config;
 
 import com.ihren.processor.model.Transaction;
+import com.ihren.processor.serialization.GenericSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,15 +18,16 @@ public class KafkaTemplateConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    //@Bean
-    public ProducerFactory<String, /*TODO: verify*/ Transaction> producerFactory() {
+    @Bean
+    public ProducerFactory<String, /*TODO: verify*/ Transaction> producerFactory(
+            StringSerializer keySerializer,
+            GenericSerializer<Transaction> valueSerializer
+    ) {
         Map<String, Object> config = Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
-                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class
-                //ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, PersonSerializer.class
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers
         );
 
-        return new DefaultKafkaProducerFactory<>(config);
+        return new DefaultKafkaProducerFactory<>(config, keySerializer, valueSerializer);
     }
 
     @Bean
