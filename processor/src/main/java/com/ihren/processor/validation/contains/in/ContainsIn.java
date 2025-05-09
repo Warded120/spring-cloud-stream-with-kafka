@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
-@Constraint(validatedBy = {ContainsInCharSequenceValidator.class, ContainsInCurrencyValidator.class})
+@Constraint(validatedBy = {ContainsInCharSequenceValidator.class, ContainsInStringValidator.class})
 public @interface ContainsIn {
     String[] value() default {};
     String message() default "Value '{validated.value}' is not allowed. Allowed values are: {value}";

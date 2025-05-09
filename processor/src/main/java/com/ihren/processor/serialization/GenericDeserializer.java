@@ -20,7 +20,7 @@ public class GenericDeserializer<T> implements Deserializer<T> {
     public void configure(Map<String, ?> configs, boolean isKey) {
         String className = (String) configs.get("value.deserializer.target.class");
         try {
-            this.targetClass = (Class<T>) Class.forName(className);
+            this.targetClass = getTargetClass(className);
         } catch (ClassNotFoundException e) {
             throw new SerializationException("Failed to load target class", e);
         }
@@ -30,6 +30,10 @@ public class GenericDeserializer<T> implements Deserializer<T> {
     @Override
     public T deserialize(String s, byte[] bytes) {
             return Try.of(() -> objectMapper.readValue(bytes, targetClass))
-                .getOrElseThrow(e -> new SerializationException("failed to deserialize " + targetClass.getSimpleName(), e));
+                .getOrElseThrow(e -> new SerializationException("failed to deserialize " + targetClass, e));
+    }
+
+    protected Class<T> getTargetClass(String className) throws ClassNotFoundException {
+        return (Class<T>) Class.forName(className);
     }
 }

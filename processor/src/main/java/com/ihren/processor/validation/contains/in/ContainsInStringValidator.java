@@ -7,15 +7,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ContainsInCurrencyValidator implements ConstraintValidator<ContainsIn, String> {
+public class ContainsInStringValidator implements ConstraintValidator<ContainsIn, String> {
 
-    private static final Set<String> allowedValues = Stream.of(Currency.values())
+    private final Set<String> allowedValues = Stream.of(Currency.values())
             .map(Enum::name)
             .collect(Collectors.toSet());
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if(allowedValues.contains(value)) {
+        if (allowedValues.contains(value)) {
             return true;
         }
 

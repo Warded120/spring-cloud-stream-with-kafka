@@ -8,7 +8,6 @@ import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 
 public class GenericSerializer<T> implements Serializer<T> {
-
     private final ObjectMapper objectMapper;
 
     public GenericSerializer() {

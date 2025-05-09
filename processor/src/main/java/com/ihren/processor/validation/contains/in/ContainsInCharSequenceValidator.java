@@ -15,13 +15,12 @@ public class ContainsInCharSequenceValidator implements ConstraintValidator<Cont
 
     @Override
     public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-        if(allowedValues.contains(value.toString())) {
+        if (allowedValues.contains(value.toString())) {
             return true;
         }
 
         context.disableDefaultConstraintViolation();
-        context
-                .buildConstraintViolationWithTemplate(
+        context.buildConstraintViolationWithTemplate(
                         "Value '" + value + "' is not allowed. Allowed values are: " + String.join(", ", allowedValues)
                 )
                 .addConstraintViolation();

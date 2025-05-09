@@ -4,7 +4,9 @@ import com.ihren.processor.initializer.KafkaInitializer;
 import com.ihren.processor.ProcessorApplication;
 import com.ihren.processor.config.KafkaConsumerConfig;
 import com.ihren.processor.config.KafkaTemplateConfig;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,5 +37,6 @@ import java.lang.annotation.Target;
         KafkaTemplateConfig.class,
         KafkaConsumerConfig.class
 })
+@ExtendWith(OutputCaptureExtension.class)
 public @interface IntegrationTest {
 }

@@ -16,7 +16,7 @@ public record TransactionDto(
         String endDateTime,
         @NotEmpty
         List<@Valid ItemDto> items,
-        @NotNull
         @Valid
+        @NotNull
         TotalDto total
 ) { }
