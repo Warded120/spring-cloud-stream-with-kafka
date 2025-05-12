@@ -11,7 +11,9 @@ import com.ihren.processor.model.Item;
 import com.ihren.processor.model.Total;
 import com.ihren.processor.model.Transaction;
 import com.ihren.processor.util.KafkaUtils;
+import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,6 +45,9 @@ public class ProcessorIT {
     @Autowired
     private KafkaConsumer<String, Transaction> kafkaConsumer;
 
+    @Autowired
+    private Admin admin;
+
     @MockitoSpyBean
     private TransactionMapper mapper;
 
@@ -50,8 +57,10 @@ public class ProcessorIT {
     @Value("${spring.cloud.stream.bindings.processTransaction-out-0.destination}")
     private String topicOut;
 
+    //TODO: clear the input topic before each test (configure and use kafkaClient or smth like that)
     @BeforeEach
     public void init() {
+        KafkaUtils.purgeAllRecords(admin, topicIn);
         kafkaConsumer.subscribe(Collections.singletonList(topicOut));
     }
 

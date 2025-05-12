@@ -1,5 +1,6 @@
 package com.ihren.processor.annotation;
 
+import com.ihren.processor.config.KafkaAdminClientConfig;
 import com.ihren.processor.initializer.KafkaInitializer;
 import com.ihren.processor.ProcessorApplication;
 import com.ihren.processor.config.KafkaConsumerConfig;
@@ -35,7 +36,8 @@ import java.lang.annotation.Target;
 )
 @Import({
         KafkaTemplateConfig.class,
-        KafkaConsumerConfig.class
+        KafkaConsumerConfig.class,
+        KafkaAdminClientConfig.class
 })
 @ExtendWith(OutputCaptureExtension.class)
 public @interface IntegrationTest {
