@@ -7,10 +7,10 @@ import io.vavr.control.Try;
 import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
 
-public class GenericSerializer<T> implements Serializer<T> {
+public class JsonSerializer<T> implements Serializer<T> {
     private final ObjectMapper objectMapper;
 
-    public GenericSerializer() {
+    public JsonSerializer() {
         this.objectMapper = new ObjectMapper();
     }
 

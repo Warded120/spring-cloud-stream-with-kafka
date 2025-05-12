@@ -7,23 +7,20 @@ import io.vavr.control.Try;
 import org.apache.kafka.common.serialization.Deserializer;
 import java.util.Map;
 
-public class GenericDeserializer<T> implements Deserializer<T> {
+public class JsonDeserializer<T> implements Deserializer<T> {
 
     private final ObjectMapper objectMapper;
     private Class<T> targetClass;
 
-    public GenericDeserializer() {
+    public JsonDeserializer() {
         this.objectMapper = new ObjectMapper();
     }
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
         String className = (String) configs.get("value.deserializer.target.class");
-        try {
-            this.targetClass = getTargetClass(className);
-        } catch (ClassNotFoundException e) {
-            throw new SerializationException("Failed to load target class", e);
-        }
+        Try.of(() -> this.targetClass = getTargetClass(className))
+                .getOrElseThrow(ex -> new SerializationException("Failed to load target class", ex));
         ObjectMapperConfig.configure(objectMapper);
     }
 

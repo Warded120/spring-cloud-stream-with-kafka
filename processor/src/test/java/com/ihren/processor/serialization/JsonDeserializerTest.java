@@ -27,10 +27,10 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
-class GenericDeserializerTest {
+class JsonDeserializerTest {
     @Spy
     @InjectMocks
-    private GenericDeserializer genericDeserializer;
+    private JsonDeserializer jsonDeserializer;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -40,7 +40,7 @@ class GenericDeserializerTest {
     @BeforeEach
     void setUp() {
         objectMapperConfig = mockStatic(ObjectMapperConfig.class);
-        ReflectionTestUtils.setField(genericDeserializer, "objectMapper", objectMapper);
+        ReflectionTestUtils.setField(jsonDeserializer, "objectMapper", objectMapper);
     }
 
     @AfterEach
@@ -58,7 +58,7 @@ class GenericDeserializerTest {
         given(objectMapper.readValue(bytes, (Class)null)).willReturn(expected);
 
         //when
-        String actual = (String)genericDeserializer.deserialize(topic, bytes);
+        String actual = (String) jsonDeserializer.deserialize(topic, bytes);
 
         //then
         assertEquals(expected, actual);
@@ -76,7 +76,7 @@ class GenericDeserializerTest {
 
         //when
         //then
-        assertThrows(SerializationException.class, () -> genericDeserializer.deserialize(topic, bytes));
+        assertThrows(SerializationException.class, () -> jsonDeserializer.deserialize(topic, bytes));
     }
 
     @Test
@@ -86,10 +86,10 @@ class GenericDeserializerTest {
         boolean isKey = true;
 
         given(configs.get("value.deserializer.target.class")).willReturn("targetClass");
-        doReturn(String.class).when(genericDeserializer).getTargetClass("targetClass");
+        doReturn(String.class).when(jsonDeserializer).getTargetClass("targetClass");
 
         //when
-        genericDeserializer.configure(configs, isKey);
+        jsonDeserializer.configure(configs, isKey);
 
         //then
         objectMapperConfig.verify(() -> ObjectMapperConfig.configure(objectMapper));
@@ -101,10 +101,10 @@ class GenericDeserializerTest {
         boolean isKey = true;
 
         given(configs.get("value.deserializer.target.class")).willReturn("invalidClass");
-        doThrow(ClassNotFoundException.class).when(genericDeserializer).getTargetClass("invalidClass");
+        doThrow(ClassNotFoundException.class).when(jsonDeserializer).getTargetClass("invalidClass");
 
         //when
-        assertThrows(SerializationException.class, () -> genericDeserializer.configure(configs, isKey));
+        assertThrows(SerializationException.class, () -> jsonDeserializer.configure(configs, isKey));
 
         //then
         objectMapperConfig.verify(() -> ObjectMapperConfig.configure(objectMapper), never());

@@ -22,9 +22,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
-class GenericSerializerTest {
+class JsonSerializerTest {
     @InjectMocks
-    private GenericSerializer genericSerializer;
+    private JsonSerializer jsonSerializer;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -34,7 +34,7 @@ class GenericSerializerTest {
     @BeforeEach
     void setUp() {
         objectMapperConfig = mockStatic(ObjectMapperConfig.class);
-        ReflectionTestUtils.setField(genericSerializer, "objectMapper", objectMapper);
+        ReflectionTestUtils.setField(jsonSerializer, "objectMapper", objectMapper);
     }
 
     @AfterEach
@@ -53,7 +53,7 @@ class GenericSerializerTest {
         given(objectMapper.writeValueAsBytes(data)).willReturn(expected);
 
         //when
-        byte[] actual = genericSerializer.serialize(topic, data);
+        byte[] actual = jsonSerializer.serialize(topic, data);
 
         //then
         assertArrayEquals(expected, actual);
@@ -69,7 +69,7 @@ class GenericSerializerTest {
 
         //when
         //then
-        assertThrows(SerializationException.class, () -> genericSerializer.serialize(topic, data));
+        assertThrows(SerializationException.class, () -> jsonSerializer.serialize(topic, data));
     }
 
     @Test
@@ -79,7 +79,7 @@ class GenericSerializerTest {
         boolean isKey = false;
 
         //when
-        genericSerializer.configure(configs, isKey);
+        jsonSerializer.configure(configs, isKey);
 
         //then
         objectMapperConfig.verify(() -> ObjectMapperConfig.configure(objectMapper));

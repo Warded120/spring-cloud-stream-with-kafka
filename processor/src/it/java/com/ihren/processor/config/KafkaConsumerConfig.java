@@ -1,7 +1,7 @@
 package com.ihren.processor.config;
 
 import com.ihren.processor.model.Transaction;
-import com.ihren.processor.serialization.GenericDeserializer;
+import com.ihren.processor.serialization.JsonDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -24,7 +24,7 @@ public class KafkaConsumerConfig {
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                 ConsumerConfig.GROUP_ID_CONFIG, groupId,
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, GenericDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
                 "value.deserializer.target.class", Transaction.class.getName()
         );
 

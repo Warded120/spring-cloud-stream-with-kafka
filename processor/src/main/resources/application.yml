@@ -22,10 +22,10 @@ spring:
         binder:
           brokers: localhost:9092
           consumer-properties:
-            value.deserializer: com.ihren.processor.serialization.GenericDeserializer
+            value.deserializer: com.ihren.processor.serialization.JsonDeserializer
             value.deserializer.target.class: com.ihren.processor.dto.TransactionDto
           producer-properties:
-            value.serializer: com.ihren.processor.serialization.GenericSerializer
+            value.serializer: com.ihren.processor.serialization.JsonSerializer
         bindings:
           processPerson-in-0:
             consumer:

@@ -1,7 +1,7 @@
 package com.ihren.processor.config;
 
 import com.ihren.processor.dto.TransactionDto;
-import com.ihren.processor.serialization.GenericSerializer;
+import com.ihren.processor.serialization.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ public class KafkaTemplateConfig {
         Map<String, Object> config = Map.of(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GenericSerializer.class
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class
         );
 
         return new DefaultKafkaProducerFactory<>(config);
