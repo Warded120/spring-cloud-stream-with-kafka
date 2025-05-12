@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.function.Function;
 
 @Configuration
-public class ProcessorConfig {
+public class AppConfig {
     @Bean
     public Function<TransactionDto, Transaction> processTransaction(TransactionProcessor processor) {
         return processor;

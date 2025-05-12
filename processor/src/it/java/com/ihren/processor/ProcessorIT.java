@@ -115,7 +115,7 @@ public class ProcessorIT {
         kafkaTemplate.send(topicIn, transactionDto);
 
         //when
-        Transaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, Duration.ofSeconds(5)).value();
+        Transaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3));
 
         //then
         assertEquals(expectedTransaction, actual);
@@ -131,7 +131,7 @@ public class ProcessorIT {
                 new ItemDto(2L, "2", "2023-04-10T11:00:00Z", "2023-04-10T13:00:00Z")
         );
 
-        TotalDto total = new TotalDto(new BigDecimal("150.00"), "USDd");
+        TotalDto total = new TotalDto(new BigDecimal("150.00"), "invalid");
 
         TransactionDto transactionDto = new TransactionDto(
                 "10.00",
@@ -144,7 +144,7 @@ public class ProcessorIT {
 
         //when
         //then
-        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(5)));
+        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3)));
 
         assertTrue(output.getOut().contains("Errors were found"));
     }

@@ -18,24 +18,21 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 @UtilityClass
 public class KafkaUtils {
-    public<K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+    public<K, V> V getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() -> {
                     ConsumerRecord<K, V> record = KafkaTestUtils.getSingleRecord(consumer, topic, timeout);
                     System.out.println(record.value());
-                    return record;
+                    return record.value();
                 })
                 .recover(ex -> null)
                 .get();
     }
 
     public <K, V> boolean hasRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
-        return Try.of(() -> getRecord(consumer, topic, timeout).value() != null)
-                .recover(ex -> false)
-                .get();
+        return getRecord(consumer, topic, timeout) != null;
     }
 
     public void purgeAllRecords(Admin admin, String topic) {

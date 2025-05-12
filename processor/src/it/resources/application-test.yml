@@ -4,6 +4,7 @@ spring:
       bindings:
         processTransaction-in-0:
           destination: test
+          #TODO: why IT fails if I remove group?
           group: processor-test
         processTransaction-out-0:
           destination: processed-test
