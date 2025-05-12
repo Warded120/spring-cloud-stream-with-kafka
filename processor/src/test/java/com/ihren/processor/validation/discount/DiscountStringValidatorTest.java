@@ -25,7 +25,7 @@ class DiscountStringValidatorTest {
     }
 
     @Test
-    void should_ReturnTrue_when_InputNotMatchesRegExp() {
+    void should_ReturnFalse_when_InputIsInvalid() {
         //given
         String value = "invalid";
 

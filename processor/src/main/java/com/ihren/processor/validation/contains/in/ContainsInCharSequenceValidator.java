@@ -2,6 +2,7 @@ package com.ihren.processor.validation.contains.in;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import java.util.Optional;
 import java.util.Set;
 
 public class ContainsInCharSequenceValidator implements ConstraintValidator<ContainsIn, CharSequence> {
@@ -15,15 +16,17 @@ public class ContainsInCharSequenceValidator implements ConstraintValidator<Cont
 
     @Override
     public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-        if (allowedValues.contains(value.toString())) {
-            return true;
-        }
-
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(
-                        "Value '" + value + "' is not allowed. Allowed values are: " + String.join(", ", allowedValues)
-                )
-                .addConstraintViolation();
-        return false;
+        return Optional.ofNullable(value)
+                .map(CharSequence::toString)
+                .map(allowedValues::contains)
+                .filter(contains -> contains)
+                .orElseGet(() -> {
+                    context.disableDefaultConstraintViolation();
+                    context.buildConstraintViolationWithTemplate(
+                                    "Value '" + value + "' is not allowed. Allowed values are: " + String.join(", ", allowedValues)
+                            )
+                            .addConstraintViolation();
+                    return false;
+                });
     }
 }

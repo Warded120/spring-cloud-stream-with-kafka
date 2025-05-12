@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Constraint(validatedBy = DiscountStringValidator.class)
-public @interface ValidDiscount {
+public @interface Discount {
     String message() default "discount must be up to 100.00";
 
     Class<?>[] groups() default {};
