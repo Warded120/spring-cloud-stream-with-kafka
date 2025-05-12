@@ -10,17 +10,16 @@ import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.model.Item;
 import com.ihren.processor.model.Total;
 import com.ihren.processor.model.Transaction;
-import com.ihren.processor.processor.TransactionProcessor;
 import com.ihren.processor.util.KafkaUtils;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
@@ -42,6 +41,9 @@ public class ProcessorIT {
     @Autowired
     private KafkaConsumer<String, Transaction> kafkaConsumer;
 
+    @MockitoSpyBean
+    private TransactionMapper mapper;
+
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.destination}")
     private String topicIn;
 
@@ -61,6 +63,7 @@ public class ProcessorIT {
     @Test
     void should_ProcessTransactionDto_when_InputIsValid() {
         //given
+        UUID uuid = UUID.randomUUID();
         String endDateTime = "2023-04-10T09:00:00Z";
         Instant operationDateTime = Instant.parse(endDateTime);
 
@@ -88,7 +91,7 @@ public class ProcessorIT {
         Total expectedTotal = new Total(amount, Currency.USD);
 
         Transaction expectedTransaction = new Transaction(
-            null,
+            uuid,
             Constants.SOFTSERVE,
             null,
             1L,
@@ -97,8 +100,7 @@ public class ProcessorIT {
             expectedTotal
         );
 
-        //TODO: how to mock mapper.generateTransactionId() to return certain UUID
-        //given(mapper.generateTransactionId(transactionDto)).willReturn(uuid);
+        given(mapper.generateTransactionId(transactionDto)).willReturn(uuid);
 
         kafkaTemplate.send(topicIn, transactionDto);
 
@@ -108,8 +110,7 @@ public class ProcessorIT {
         //then
         assertEquals(expectedTransaction, actual);
 
-        //TODO: verify mapper.generateTransactionId(transactionDto)
-        //then(mapper).should().generateTransactionId(transactionDto);
+        then(mapper).should().generateTransactionId(transactionDto);
     }
 
     @Test
