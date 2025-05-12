@@ -19,6 +19,7 @@ public interface ItemMapper {
 
     @Named("mapAccount")
     default String mapAccount(CharSequence loyaltyAccountId) {
+        //TODO: replace with Enum
         return switch (loyaltyAccountId.toString()) {
             case "1" -> "Main";
             case "2" -> "Coupon";

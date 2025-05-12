@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
+//TODO: create a separate annotation for each Validator. Don't pass any values (String[] allowedItems) in annotation, it must be done in annotation logic
 @Constraint(validatedBy = {ContainsInCharSequenceValidator.class, ContainsInStringValidator.class})
 public @interface ContainsIn {
     String[] value() default {};

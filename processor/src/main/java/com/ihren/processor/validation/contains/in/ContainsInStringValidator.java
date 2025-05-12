@@ -3,7 +3,6 @@ package com.ihren.processor.validation.contains.in;
 import com.ihren.processor.constant.Currency;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +14,7 @@ public class ContainsInStringValidator implements ConstraintValidator<ContainsIn
 
     @Override
     public void initialize(ContainsIn annotation) {
+        //TODO: ternary operator is not needed
         this.allowedValues = annotation.value().length > 0
                 ? Set.of(annotation.value())
                 : Stream.of(Currency.values())
