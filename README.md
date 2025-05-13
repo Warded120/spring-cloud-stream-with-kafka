@@ -57,4 +57,8 @@ Total
 - amount (BigDecimal)
 - currency (Enum)
 
-UML Diagram: https://www.figma.com/board/3amr00FmlTo52hMEoBAvRy/Architecture-layers?node-id=0-1&p=f
+UML Diagram: https://www.figma.com/board/3amr00FmlTo52hMEoBAvRy/Architecture-layers?node-id=0-1&p=f<br>
+WEB:<br>
+![img1.png](diagrams/WebDiagram.png)<br>
+Kafka:<br>
+![img2.png](diagrams/KafkaDiagram.png)<br>
