@@ -7,10 +7,7 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
-import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import java.time.Instant;
-import java.util.UUID;
 
 @Mapper(
         componentModel = ComponentModel.SPRING,
@@ -19,21 +16,10 @@ import java.util.UUID;
         uses = {ItemMapper.class, TotalMapper.class}
 )
 public interface TransactionMapper {
-    @Mapping(target = "transactionId", source = ".", qualifiedByName = "generateTransactionId")
+    @Mapping(target = "transactionId", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "source", constant = Constants.SOFTSERVE)
     @Mapping(target = "discount", ignore = true)
-    @Mapping(target = "operationDateTime", source = "endDateTime", qualifiedByName = "parseOperationDateTime")
+    //TODO: do I need DateTimeUtils class to have a method that parses Instant?
+    @Mapping(target = "operationDateTime", expression = "java(java.time.Instant.parse(dto.endDateTime()))")
     Transaction map(TransactionDto dto);
-
-    //TODO: use expression instead of @Named method
-    @Named("generateTransactionId")
-    default UUID generateTransactionId(TransactionDto dto) {
-        return UUID.randomUUID();
-    }
-
-    //TODO: use expression instead of @Named method
-    @Named("parseOperationDateTime")
-    default Instant parseOperationDateTime(String endDateTime) {
-        return Instant.parse(endDateTime);
-    }
 }

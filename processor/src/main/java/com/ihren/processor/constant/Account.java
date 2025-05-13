@@ -18,7 +18,6 @@ public enum Account {
         this.name = name;
     }
 
-    //TODO: maybe override valueOf() method
     public static String fromId(String id) {
         return Stream.of(values())
                 .filter(account -> account.id.equals(id))

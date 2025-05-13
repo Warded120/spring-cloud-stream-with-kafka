@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import java.util.Arrays;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
@@ -22,6 +23,6 @@ public interface ItemMapper {
     @Named("mapAccount")
     default String mapAccount(CharSequence loyaltyAccountId) {
         return Try.of(() -> Account.fromId(loyaltyAccountId.toString()))
-                .getOrElseThrow(() -> new MappingException("Unexpected value: " + loyaltyAccountId + ". expected values are: 1, 2, 3, 4"));
+                .getOrElseThrow(() -> new MappingException("Unexpected value: " + loyaltyAccountId + ". expected values are: " + Arrays.toString(Account.values())));
     }
 }
