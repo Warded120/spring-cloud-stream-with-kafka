@@ -141,7 +141,6 @@ public class ProcessorIT {
         //then
         assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3)));
 
-        //TODO: replace it with the name of an exception that has been logged
         assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
     }
 }

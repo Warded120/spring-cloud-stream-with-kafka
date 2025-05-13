@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotNull;
 
 public record ItemDto(
         //TODO: add message attributes to all constraints
-        @NotNull
+        @NotNull(message = "cannot be null")
         Long id,
         @AccountId
         CharSequence loyaltyAccountId,
-        @NotBlank
+        @NotBlank(message = "cannot be blank")
         String beginDateTime,
-        @NotBlank
+        @NotBlank(message = "cannot be blank")
         String endDateTime
 ) { }
