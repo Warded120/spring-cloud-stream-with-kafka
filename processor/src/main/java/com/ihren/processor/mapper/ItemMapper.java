@@ -21,7 +21,7 @@ public interface ItemMapper {
 
     @Named("mapAccount")
     default String mapAccount(CharSequence loyaltyAccountId) {
-        return Try.of(() -> Account.fromId(Integer.parseInt(loyaltyAccountId.toString())))
+        return Try.of(() -> Account.fromId(loyaltyAccountId.toString()))
                 .getOrElseThrow(() -> new MappingException("Unexpected value: " + loyaltyAccountId + ". expected values are: 1, 2, 3, 4"));
     }
 }

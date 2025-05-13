@@ -8,10 +8,13 @@ import com.ihren.processor.dto.TransactionDto;
 import com.ihren.processor.model.Item;
 import com.ihren.processor.model.Total;
 import com.ihren.processor.model.Transaction;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
@@ -24,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionMapperImplTest {
@@ -36,6 +40,18 @@ class TransactionMapperImplTest {
 
     @Mock
     private TotalMapper totalMapper;
+
+    private MockedStatic<UUID> uuidGenerator;
+
+    @BeforeEach
+    void setUp() {
+        uuidGenerator = mockStatic(UUID.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        uuidGenerator.close();
+    }
 
     @Test
     void should_ReturnTransaction_when_TransactionDtoIsValid() {
@@ -54,7 +70,8 @@ class TransactionMapperImplTest {
         given(transactionDto.items()).willReturn(List.of(itemDto));
         given(transactionDto.total()).willReturn(totalDto);
 
-        given(transactionMapper.generateTransactionId(transactionDto)).willReturn(uuid);
+        uuidGenerator.when(() -> UUID.randomUUID()).thenReturn(uuid);
+        //given(transactionMapper.generateTransactionId(transactionDto)).willReturn(uuid);
         given(itemMapper.map(itemDto)).willReturn(item);
         given(totalMapper.map(totalDto)).willReturn(total);
 

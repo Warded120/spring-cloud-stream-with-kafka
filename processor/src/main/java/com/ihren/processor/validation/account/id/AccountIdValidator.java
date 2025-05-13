@@ -16,7 +16,6 @@ public class AccountIdValidator implements ConstraintValidator<AccountId, CharSe
     public void initialize(AccountId annotation) {
         this.allowedValues = Arrays.stream(Account.values())
                 .map(Account::getId)
-                .map(Object::toString)
                 .collect(Collectors.toSet());
     }
 

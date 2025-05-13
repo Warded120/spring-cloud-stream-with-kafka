@@ -23,7 +23,6 @@ class AccountIdValidatorTest {
         //given
         Set<String> expected = Arrays.stream(Account.values())
                 .map(Account::getId)
-                .map(Object::toString)
                 .collect(Collectors.toSet());
 
         AccountId annotation = mock();

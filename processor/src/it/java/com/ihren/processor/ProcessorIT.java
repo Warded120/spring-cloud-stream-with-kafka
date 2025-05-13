@@ -45,7 +45,6 @@ public class ProcessorIT {
     @Autowired
     private Admin admin;
 
-    //TODO: modify TransactionMapper to use expression instead of @Named method and mockStatic UUID.randomUuid()
     @MockitoSpyBean
     private TransactionMapper mapper;
 

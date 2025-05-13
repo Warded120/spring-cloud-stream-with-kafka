@@ -49,11 +49,9 @@ public class KafkaUtils {
                         Collections.singletonMap(topicPartition, OffsetSpec.latest())
                 );
 
-                long latestOffset = listOffsetsResult.all().get().get(topicPartition).offset();
-
                 recordsToDeleteMap.put(
                         topicPartition,
-                        RecordsToDelete.beforeOffset(latestOffset)
+                        RecordsToDelete.beforeOffset(-1)
                 );
             }
 
