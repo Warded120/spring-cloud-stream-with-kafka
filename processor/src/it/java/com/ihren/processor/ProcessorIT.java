@@ -6,7 +6,6 @@ import com.ihren.processor.constant.Currency;
 import com.ihren.processor.dto.ItemDto;
 import com.ihren.processor.dto.TotalDto;
 import com.ihren.processor.dto.TransactionDto;
-import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.model.Item;
 import com.ihren.processor.model.Total;
 import com.ihren.processor.model.Transaction;
@@ -20,19 +19,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @IntegrationTest
 public class ProcessorIT {
@@ -44,9 +43,6 @@ public class ProcessorIT {
 
     @Autowired
     private Admin admin;
-
-    @MockitoSpyBean
-    private TransactionMapper mapper;
 
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.destination}")
     private String topicIn;
@@ -68,7 +64,6 @@ public class ProcessorIT {
     @Test
     void should_ProcessTransactionDto_when_InputIsValid() {
         //given
-        UUID uuid = UUID.randomUUID();
         String endDateTime = "2023-04-10T09:00:00Z";
         Instant operationDateTime = Instant.parse(endDateTime);
 
@@ -96,7 +91,7 @@ public class ProcessorIT {
         Total expectedTotal = new Total(amount, Currency.USD);
 
         Transaction expectedTransaction = new Transaction(
-            uuid,
+            null,
             Constants.SOFTSERVE,
             null,
             1L,
@@ -105,24 +100,28 @@ public class ProcessorIT {
             expectedTotal
         );
 
-        given(mapper.generateTransactionId(transactionDto)).willReturn(uuid);
-
         kafkaTemplate.send(topicIn, transactionDto);
 
         //when
         Transaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3));
 
         //then
-        assertEquals(expectedTransaction, actual);
-
-        then(mapper).should().generateTransactionId(transactionDto);
+        assertAll(
+                () -> assertNotNull(actual.transactionId()),
+                () -> assertEquals(expectedTransaction.source(), actual.source()),
+                () -> assertNull(actual.discount()),
+                () -> assertEquals(expectedTransaction.sequenceNumber(), actual.sequenceNumber()),
+                () -> assertEquals(expectedTransaction.operationDateTime(), actual.operationDateTime()),
+                () -> assertArrayEquals(expectedTransaction.items().toArray(), actual.items().toArray()),
+                () -> assertEquals(expectedTransaction.total(), actual.total())
+        );
     }
 
     @Test
     void should_LogError_when_TransactionIsInvalid(CapturedOutput output) {
         //given
         List<ItemDto> items = List.of(
-                new ItemDto(1L, "4", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
+                new ItemDto(1L, "5", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
                 new ItemDto(2L, "2", "2023-04-10T11:00:00Z", "2023-04-10T13:00:00Z")
         );
 
