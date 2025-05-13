@@ -19,8 +19,8 @@ public class TransactionProcessor implements Function<TransactionDto, Transactio
     @Override
     public Transaction apply(TransactionDto dto) {
         return exceptionHandler.handle(item -> {
-                validator.validate(dto);
-                return mapper.map(dto);
+                validator.validate(item);
+                return mapper.map(item);
             },
             dto)
             .get();

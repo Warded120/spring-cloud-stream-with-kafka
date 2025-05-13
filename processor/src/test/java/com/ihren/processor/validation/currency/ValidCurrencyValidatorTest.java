@@ -1,4 +1,4 @@
-package com.ihren.processor.validation.contains.in;
+package com.ihren.processor.validation.currency;
 
 import com.ihren.processor.constant.Currency;
 import jakarta.validation.ConstraintValidatorContext;
@@ -11,8 +11,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
-class ContainsInStringValidatorTest {
-    private final ContainsInStringValidator validator = new ContainsInStringValidator();
+class ValidCurrencyValidatorTest {
+    private final ValidCurrencyValidator validator = new ValidCurrencyValidator();
 
     @Test
     void should_ReturnTrue_when_InputIsValid() {

@@ -15,7 +15,8 @@ public class ExceptionHandler<I, O> {
     public Try<O> handle(Function<I, O> function, I input) {
         return Try.of(() -> function.apply(input))
             .recover(ex -> {
-                sink.apply(ex.getMessage());
+                //TODO: log the exception that has been thrown and, optionally, the message
+                sink.apply(ex.getMessage(), ex);
                 return null;
             });
     }

@@ -25,11 +25,13 @@ public interface TransactionMapper {
     @Mapping(target = "operationDateTime", source = "endDateTime", qualifiedByName = "parseOperationDateTime")
     Transaction map(TransactionDto dto);
 
+    //TODO: use expression instead of @Named method
     @Named("generateTransactionId")
     default UUID generateTransactionId(TransactionDto dto) {
         return UUID.randomUUID();
     }
 
+    //TODO: use expression instead of @Named method
     @Named("parseOperationDateTime")
     default Instant parseOperationDateTime(String endDateTime) {
         return Instant.parse(endDateTime);

@@ -13,10 +13,8 @@ import com.ihren.processor.model.Transaction;
 import com.ihren.processor.util.KafkaUtils;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +26,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,6 +45,7 @@ public class ProcessorIT {
     @Autowired
     private Admin admin;
 
+    //TODO: modify TransactionMapper to use expression instead of @Named method and mockStatic UUID.randomUuid()
     @MockitoSpyBean
     private TransactionMapper mapper;
 
@@ -58,7 +55,6 @@ public class ProcessorIT {
     @Value("${spring.cloud.stream.bindings.processTransaction-out-0.destination}")
     private String topicOut;
 
-    //TODO: clear the input topic before each test (configure and use kafkaClient or smth like that)
     @BeforeEach
     public void init() {
         KafkaUtils.purgeAllRecords(admin, topicIn);
@@ -146,6 +142,7 @@ public class ProcessorIT {
         //then
         assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3)));
 
-        assertTrue(output.getOut().contains("Errors were found"));
+        //TODO: replace it with the name of an exception that has been logged
+        assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
     }
 }

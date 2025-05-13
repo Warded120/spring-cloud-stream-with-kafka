@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DiscountStringValidatorTest {
-    private final DiscountStringValidator validator = new DiscountStringValidator();
+class DiscountValidatorTest {
+    private final DiscountValidator validator = new DiscountValidator();
 
     @Test
     void should_ReturnTrue_when_InputIsValid() {

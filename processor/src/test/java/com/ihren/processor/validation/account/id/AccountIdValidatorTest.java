@@ -1,9 +1,12 @@
-package com.ihren.processor.validation.contains.in;
+package com.ihren.processor.validation.account.id;
 
+import com.ihren.processor.constant.Account;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,16 +15,18 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
-class ContainsInCharSequenceValidatorTest {
-    private final ContainsInCharSequenceValidator validator = new ContainsInCharSequenceValidator();
+class AccountIdValidatorTest {
+    private final AccountIdValidator validator = new AccountIdValidator();
 
     @Test
     void should_initialize() {
         //given
-        Set<String> expected = Set.of("1");
+        Set<String> expected = Arrays.stream(Account.values())
+                .map(Account::getId)
+                .map(Object::toString)
+                .collect(Collectors.toSet());
 
-        ContainsIn annotation = mock();
-        given(annotation.value()).willReturn(new String[] {"1"});
+        AccountId annotation = mock();
 
         //when
         validator.initialize(annotation);

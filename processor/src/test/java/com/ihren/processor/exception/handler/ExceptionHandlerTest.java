@@ -56,6 +56,6 @@ class ExceptionHandlerTest {
         assertEquals(null, actual.get());
 
         then(function).should().apply(input);
-        then(sink).should().apply(any());
+        then(sink).should().apply(any(),any());
     }
 }

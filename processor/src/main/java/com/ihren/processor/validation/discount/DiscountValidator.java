@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DiscountStringValidator implements ConstraintValidator<Discount, String> {
+public class DiscountValidator implements ConstraintValidator<Discount, String> {
     private static final Pattern PATTERN = Pattern.compile("^\\d{1,3}\\.\\d{1,2}$");
     public static final String MAX_DISCOUNT = "100.00";
 

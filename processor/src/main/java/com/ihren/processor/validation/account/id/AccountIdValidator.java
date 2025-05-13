@@ -1,17 +1,23 @@
-package com.ihren.processor.validation.contains.in;
+package com.ihren.processor.validation.account.id;
 
+import com.ihren.processor.constant.Account;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class ContainsInCharSequenceValidator implements ConstraintValidator<ContainsIn, CharSequence> {
+public class AccountIdValidator implements ConstraintValidator<AccountId, CharSequence> {
 
     private Set<String> allowedValues;
 
     @Override
-    public void initialize(ContainsIn annotation) {
-        this.allowedValues = Set.of(annotation.value());
+    public void initialize(AccountId annotation) {
+        this.allowedValues = Arrays.stream(Account.values())
+                .map(Account::getId)
+                .map(Object::toString)
+                .collect(Collectors.toSet());
     }
 
     @Override

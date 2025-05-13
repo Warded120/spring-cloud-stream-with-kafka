@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class LoggingSink implements Sink<String> {
 
     @Override
-    public void apply(String message) {
-        log.error(message);
+    public void apply(String message, Throwable ex) {
+        log.error(message, ex);
     }
 }

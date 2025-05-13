@@ -1,4 +1,4 @@
-package com.ihren.processor.validation.contains.in;
+package com.ihren.processor.validation.currency;
 
 import com.ihren.processor.constant.Currency;
 import jakarta.validation.ConstraintValidator;
@@ -8,16 +8,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ContainsInStringValidator implements ConstraintValidator<ContainsIn, String> {
+public class ValidCurrencyValidator implements ConstraintValidator<ValidCurrency, String> {
 
     private Set<String> allowedValues;
 
     @Override
-    public void initialize(ContainsIn annotation) {
-        //TODO: ternary operator is not needed
-        this.allowedValues = annotation.value().length > 0
-                ? Set.of(annotation.value())
-                : Stream.of(Currency.values())
+    public void initialize(ValidCurrency annotation) {
+        this.allowedValues =  Stream.of(Currency.values())
                     .map(Enum::name)
                     .collect(Collectors.toSet());
     }

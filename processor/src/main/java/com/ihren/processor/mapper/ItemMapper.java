@@ -1,8 +1,10 @@
 package com.ihren.processor.mapper;
 
+import com.ihren.processor.constant.Account;
 import com.ihren.processor.dto.ItemDto;
 import com.ihren.processor.mapper.exception.MappingException;
 import com.ihren.processor.model.Item;
+import io.vavr.control.Try;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -19,13 +21,7 @@ public interface ItemMapper {
 
     @Named("mapAccount")
     default String mapAccount(CharSequence loyaltyAccountId) {
-        //TODO: replace with Enum
-        return switch (loyaltyAccountId.toString()) {
-            case "1" -> "Main";
-            case "2" -> "Coupon";
-            case "3" -> "Base";
-            case "4" -> "Total";
-            default -> throw new MappingException("Unexpected value: " + loyaltyAccountId + ". expected values are: 1, 2, 3, 4");
-        };
+        return Try.of(() -> Account.fromId(Integer.parseInt(loyaltyAccountId.toString())))
+                .getOrElseThrow(() -> new MappingException("Unexpected value: " + loyaltyAccountId + ". expected values are: 1, 2, 3, 4"));
     }
 }
