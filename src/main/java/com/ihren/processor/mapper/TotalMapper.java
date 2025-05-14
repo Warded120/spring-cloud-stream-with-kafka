@@ -13,13 +13,13 @@ import org.mapstruct.ReportingPolicy;
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-public interface TotalMapper {
+public abstract class TotalMapper {
 
     @Mapping(target = "currency", source = "currency", qualifiedByName = "mapCurrency")
-    Total map(TotalDto dto);
+    public abstract Total map(TotalDto dto);
 
     @Named("mapCurrency")
-    default CurrencyCode mapCurrency(String currency) {
+    protected CurrencyCode mapCurrency(String currency) {
         return CurrencyCode.valueOf(currency);
     }
 }

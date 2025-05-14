@@ -16,12 +16,12 @@ import java.util.Arrays;
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-public interface ItemMapper {
+public abstract class ItemMapper {
     @Mapping(target = "account", source = "loyaltyAccountId", qualifiedByName = "mapAccount")
-    Item map(ItemDto dto);
+    public abstract Item map(ItemDto dto);
 
     @Named("mapAccount")
-    default String mapAccount(CharSequence loyaltyAccountId) {
+    protected String mapAccount(CharSequence loyaltyAccountId) {
         return Try.of(() -> Account.getNameById(loyaltyAccountId.toString()))
                 .getOrElseThrow(() ->
                         new MappingException(
