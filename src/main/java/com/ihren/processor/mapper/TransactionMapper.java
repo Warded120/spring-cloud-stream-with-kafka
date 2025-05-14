@@ -19,7 +19,6 @@ public interface TransactionMapper {
     @Mapping(target = "transactionId", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "source", constant = Constants.SOFTSERVE)
     @Mapping(target = "discount", ignore = true)
-    //TODO: do I need DateTimeUtils class to have a method that parses Instant?
-    @Mapping(target = "operationDateTime", expression = "java(java.time.Instant.parse(dto.endDateTime()))")
+    @Mapping(target = "operationDateTime", expression = "java(com.ihren.processor.util.DateTimeUtils.parseInstant(dto.endDateTime()))")
     Transaction map(TransactionDto dto);
 }
