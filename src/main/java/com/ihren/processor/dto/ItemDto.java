@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ItemDto(
-        @NotNull(message = "cannot be null")
+        @NotNull(message = "item id cannot be null")
         Long id,
         @AccountId
         CharSequence loyaltyAccountId,
-        @NotBlank(message = "cannot be blank")
+        @NotBlank(message = "item begin date time cannot be blank")
         String beginDateTime,
-        @NotBlank(message = "cannot be blank")
+        @NotBlank(message = "item end date time cannot be blank")
         String endDateTime
 ) { }

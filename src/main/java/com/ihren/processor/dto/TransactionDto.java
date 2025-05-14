@@ -10,13 +10,13 @@ import java.util.List;
 public record TransactionDto(
         @Discount
         String discount,
-        @NotNull(message = "cannot be null")
+        @NotNull(message = "transaction sequence number cannot be null")
         Long sequenceNumber,
-        @NotBlank(message = "cannot be blank")
+        @NotBlank(message = "transaction end date time cannot be blank")
         String endDateTime,
-        @NotEmpty(message = "list must have at least one element")
+        @NotEmpty(message = "items list must have at least one element")
         List<@Valid ItemDto> items,
         @Valid
-        @NotNull(message = "cannot be null")
+        @NotNull(message = "total cannot be null")
         TotalDto total
 ) { }

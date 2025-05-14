@@ -1,9 +1,11 @@
 package com.ihren.processor.constant;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import java.util.stream.Stream;
 
 @Getter
+@RequiredArgsConstructor
 public enum Account {
     MAIN("1", "Main"),
     COUPON("2", "Coupon"),
@@ -12,11 +14,6 @@ public enum Account {
 
     private final String id;
     private final String name;
-
-    Account(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 
     public static String getNameById(String id) {
         return Stream.of(values())
