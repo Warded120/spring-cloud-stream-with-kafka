@@ -23,14 +23,17 @@ public class CurrencyValidator implements ConstraintValidator<Currency, String> 
     public boolean isValid(String value, ConstraintValidatorContext context) {
         return Optional.ofNullable(value)
                 .map(String::toString)
-                .map(allowedValues::contains)
-                .filter(contains -> contains)
+                .filter(allowedValues::contains)
+                .map(ifContains -> true)
                 .orElseGet(() -> {
                     context.disableDefaultConstraintViolation();
                     context
                             .buildConstraintViolationWithTemplate(
-                                    "Value '" + value + "' is not allowed. Allowed values are: " + String.join(", ", allowedValues)
-                            )
+                                    String.format(
+                                            "Value '%s' is not allowed. Allowed values are: %s",
+                                            value,
+                                            String.join(", ", allowedValues)
+                                    )                            )
                             .addConstraintViolation();
 
                     return false;

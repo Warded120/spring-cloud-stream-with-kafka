@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -30,7 +28,8 @@ import static org.mockito.Mockito.never;
 class JsonDeserializerTest {
     @Spy
     @InjectMocks
-    private JsonDeserializer jsonDeserializer;
+    //TODO: try Object.class for mocking
+    private JsonDeserializer<Object> jsonDeserializer;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -51,19 +50,20 @@ class JsonDeserializerTest {
     @Test
     void should_ReturnType_when_InputIsValid() throws IOException {
         //given
-        String expected = "data";
-        byte[] bytes = "Data".getBytes();
+        Object expected = new Object();
+        byte[] bytes = new byte[]{1};
         String topic = "topic";
 
-        given(objectMapper.readValue(bytes, (Class)null)).willReturn(expected);
+        given(objectMapper.readValue(bytes, Object.class)).willReturn(expected);
+        ReflectionTestUtils.setField(jsonDeserializer, "targetClass", Object.class);
 
         //when
-        String actual = (String) jsonDeserializer.deserialize(topic, bytes);
+        Object actual = jsonDeserializer.deserialize(topic, bytes);
 
         //then
         assertEquals(expected, actual);
 
-        then(objectMapper).should().readValue(bytes, (Class)null);
+        then(objectMapper).should().readValue(bytes, Object.class);
     }
 
     @Test
@@ -72,7 +72,7 @@ class JsonDeserializerTest {
         byte[] bytes = "data".getBytes();
         String topic = "topic";
 
-        given(objectMapper.readValue(bytes, (Class)null)).willThrow(IOException.class);
+        given(objectMapper.readValue(bytes, Object.class)).willThrow(IOException.class);
 
         //when
         //then
@@ -80,13 +80,12 @@ class JsonDeserializerTest {
     }
 
     @Test
-    void should_configureObjectMapper_when_EverythingIsOK() throws ClassNotFoundException {
+    void should_configureObjectMapper_when_EverythingIsOK() {
         //given
         Map configs = mock();
         boolean isKey = true;
 
-        given(configs.get("value.deserializer.target.class")).willReturn("targetClass");
-        doReturn(String.class).when(jsonDeserializer).getTargetClass("targetClass");
+        given(configs.get("value.deserializer.target.class")).willReturn("java.lang.Object");
 
         //when
         jsonDeserializer.configure(configs, isKey);
@@ -95,13 +94,12 @@ class JsonDeserializerTest {
         objectMapperConfig.verify(() -> ObjectMapperConfig.configure(objectMapper));
     }
     @Test
-    void should_ThrowSerializationException_when_ClassNotFound() throws ClassNotFoundException {
+    void should_ThrowSerializationException_when_ClassNotFound() {
         //given
         Map configs = mock();
         boolean isKey = true;
 
         given(configs.get("value.deserializer.target.class")).willReturn("invalidClass");
-        doThrow(ClassNotFoundException.class).when(jsonDeserializer).getTargetClass("invalidClass");
 
         //when
         assertThrows(SerializationException.class, () -> jsonDeserializer.configure(configs, isKey));

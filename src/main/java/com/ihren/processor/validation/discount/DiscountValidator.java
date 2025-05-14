@@ -16,17 +16,21 @@ public class DiscountValidator implements ConstraintValidator<Discount, String> 
 
     @Override
     public boolean isValid(String discount, ConstraintValidatorContext constraintValidatorContext) {
-        if (discount == null) {
-            return true;
-        }
-        return Optional.of(discount)
-                .map(PATTERN::matcher)
-                .filter(Matcher::matches)
-                .map(m -> Try.of(() -> new BigDecimal(discount))
-                        .map(n ->
-                            n.compareTo(BigDecimal.ZERO) >= 0
-                         && n.compareTo(new BigDecimal(MAX_DISCOUNT)) <= 0)
-                        .getOrElse(false))
-                .orElse(false);
+        return Optional.ofNullable(discount)
+                .flatMap(ifNotNull -> Optional.of(discount)
+                        .map(PATTERN::matcher)
+                        .filter(Matcher::matches)
+                        .flatMap(ifMatches ->
+                                Try.of(() -> new BigDecimal(discount))
+                                        .map(number ->
+                                                number.compareTo(BigDecimal.ZERO) >= 0
+                                                        && number.compareTo(new BigDecimal(MAX_DISCOUNT)) <= 0
+                                        )
+                                        .toJavaOptional()
+                        )
+                        .or(() -> Optional.of(false))
+                )
+                .orElse(true);
+
     }
 }
