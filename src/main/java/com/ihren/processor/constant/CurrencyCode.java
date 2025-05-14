@@ -1,5 +1,5 @@
 package com.ihren.processor.constant;
 
-public enum Currency {
+public enum CurrencyCode {
     USD, GBP, EUR, CNY, UAH
 }

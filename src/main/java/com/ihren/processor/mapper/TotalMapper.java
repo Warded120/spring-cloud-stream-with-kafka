@@ -1,6 +1,6 @@
 package com.ihren.processor.mapper;
 
-import com.ihren.processor.constant.Currency;
+import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.dto.TotalDto;
 import com.ihren.processor.model.Total;
 import org.mapstruct.Mapper;
@@ -19,7 +19,7 @@ public interface TotalMapper {
     Total map(TotalDto dto);
 
     @Named("mapCurrency")
-    default Currency mapCurrency(String currency) {
-        return Currency.valueOf(currency);
+    default CurrencyCode mapCurrency(String currency) {
+        return CurrencyCode.valueOf(currency);
     }
 }

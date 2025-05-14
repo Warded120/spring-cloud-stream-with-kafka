@@ -2,7 +2,7 @@ package com.ihren.processor;
 
 import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.constant.Constants;
-import com.ihren.processor.constant.Currency;
+import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.dto.ItemDto;
 import com.ihren.processor.dto.TotalDto;
 import com.ihren.processor.dto.TransactionDto;
@@ -88,7 +88,7 @@ public class ProcessorIT {
                 new Item(1L, "Total", itemBeginDateTime, ItemEndDateTime)
         );
 
-        Total expectedTotal = new Total(amount, Currency.USD);
+        Total expectedTotal = new Total(amount, CurrencyCode.USD);
 
         Transaction expectedTransaction = new Transaction(
             null,

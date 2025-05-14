@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
-@Constraint(validatedBy = ValidCurrencyValidator.class)
-public @interface ValidCurrency {
+@Constraint(validatedBy = CurrencyValidator.class)
+public @interface Currency {
     String message() default "Value '{validated.value}' is not allowed. Allowed values are: {value}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

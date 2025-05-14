@@ -1,7 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Constants;
-import com.ihren.processor.constant.Currency;
+import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.dto.ItemDto;
 import com.ihren.processor.dto.TotalDto;
 import com.ihren.processor.dto.TransactionDto;
@@ -59,7 +59,7 @@ class TransactionMapperImplTest {
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
         Item item = new Item(1L, "Main", "beginDateTime", "endDateTime");
-        Total total = new Total(BigDecimal.valueOf(360L), Currency.USD);
+        Total total = new Total(BigDecimal.valueOf(360L), CurrencyCode.USD);
         Transaction expected = new Transaction(uuid, Constants.SOFTSERVE, null, 1L, instant, List.of(item), total);
 
         ItemDto itemDto = mock(ItemDto.class);
@@ -89,7 +89,7 @@ class TransactionMapperImplTest {
         //given
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
-        Total expectedTotal = new Total(BigDecimal.valueOf(360L), Currency.USD);
+        Total expectedTotal = new Total(BigDecimal.valueOf(360L), CurrencyCode.USD);
         Transaction expected = new Transaction(uuid, Constants.SOFTSERVE, null, 1L, instant, null, expectedTotal);
 
         TotalDto totalDto = mock(TotalDto.class);

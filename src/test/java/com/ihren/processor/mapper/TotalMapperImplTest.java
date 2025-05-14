@@ -1,6 +1,6 @@
 package com.ihren.processor.mapper;
 
-import com.ihren.processor.constant.Currency;
+import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.dto.TotalDto;
 import com.ihren.processor.model.Total;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class TotalMapperImplTest {
     @Test
     void should_ReturnTotal_when_TotalDtoIsValid() {
         //given
-        Total expected = new Total(BigDecimal.valueOf(360L), Currency.USD);
+        Total expected = new Total(BigDecimal.valueOf(360L), CurrencyCode.USD);
 
         TotalDto totalDto = mock(TotalDto.class);
         given(totalDto.amount()).willReturn(BigDecimal.valueOf(360L));

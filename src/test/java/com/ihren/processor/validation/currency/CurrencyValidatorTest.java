@@ -1,6 +1,6 @@
 package com.ihren.processor.validation.currency;
 
-import com.ihren.processor.constant.Currency;
+import com.ihren.processor.constant.CurrencyCode;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -13,17 +13,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
-class ValidCurrencyValidatorTest {
-    private final ValidCurrencyValidator validator = new ValidCurrencyValidator();
+class CurrencyValidatorTest {
+    private final CurrencyValidator validator = new CurrencyValidator();
 
     @Test
     void should_InitializeAllowedItems() {
         //given
-        Set<String> expected = Stream.of(Currency.values())
+        Set<String> expected = Stream.of(CurrencyCode.values())
                 .map(Enum::name)
                 .collect(Collectors.toSet());
 
-        ValidCurrency annotation = mock();
+        Currency annotation = mock();
 
         //when
         validator.initialize(annotation);
@@ -35,7 +35,7 @@ class ValidCurrencyValidatorTest {
     @Test
     void should_ReturnTrue_when_InputIsValid() {
         //given
-        String currencyName = Currency.USD.name();
+        String currencyName = CurrencyCode.USD.name();
         ReflectionTestUtils.setField(validator, "allowedValues", Set.of(currencyName));
         ConstraintValidatorContext context = mock(ConstraintValidatorContext.class);
 
@@ -47,7 +47,7 @@ class ValidCurrencyValidatorTest {
     @Test
     void should_ReturnFalse_when_InputIsInvalid() {
         //given
-        String value = Currency.USD.name();
+        String value = CurrencyCode.USD.name();
         Set<String> allowedValues = Set.of("EUR");
         String message = "Value '" + value + "' is not allowed. Allowed values are: " + String.join(", ", allowedValues);
 
