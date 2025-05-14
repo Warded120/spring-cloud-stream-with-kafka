@@ -33,4 +33,24 @@ class DiscountValidatorTest {
         //then
         assertFalse(validator.isValid(value, null));
     }
+
+    @Test
+    void should_ReturnFalse_when_InputIsBiggerThanMaxDiscount() {
+        //given
+        String value = "101.99";
+
+        //when
+        //then
+        assertFalse(validator.isValid(value, null));
+    }
+
+    @Test
+    void should_ReturnFalse_when_InputIsLessThanZero() {
+        //given
+        String value = "-1.99";
+
+        //when
+        //then
+        assertFalse(validator.isValid(value, null));
+    }
 }

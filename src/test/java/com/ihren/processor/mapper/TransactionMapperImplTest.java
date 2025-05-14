@@ -71,7 +71,6 @@ class TransactionMapperImplTest {
         given(transactionDto.total()).willReturn(totalDto);
 
         uuidGenerator.when(() -> UUID.randomUUID()).thenReturn(uuid);
-        //given(transactionMapper.generateTransactionId(transactionDto)).willReturn(uuid);
         given(itemMapper.map(itemDto)).willReturn(item);
         given(totalMapper.map(totalDto)).willReturn(total);
 
@@ -82,6 +81,33 @@ class TransactionMapperImplTest {
         assertEquals(expected, actual);
 
         then(itemMapper).should().map(itemDto);
+        then(totalMapper).should().map(totalDto);
+    }
+
+    @Test
+    void should_ReturnTransactionWithNullItems_when_TransactionDtoItemsIsNull() {
+        //given
+        UUID uuid = UUID.randomUUID();
+        Instant instant = Instant.now();
+        Total expectedTotal = new Total(BigDecimal.valueOf(360L), Currency.USD);
+        Transaction expected = new Transaction(uuid, Constants.SOFTSERVE, null, 1L, instant, null, expectedTotal);
+
+        TotalDto totalDto = mock(TotalDto.class);
+        TransactionDto transactionDto = mock(TransactionDto.class);
+        given(transactionDto.sequenceNumber()).willReturn(1L);
+        given(transactionDto.endDateTime()).willReturn(instant.toString());
+        given(transactionDto.items()).willReturn(null);
+        given(transactionDto.total()).willReturn(totalDto);
+
+        uuidGenerator.when(() -> UUID.randomUUID()).thenReturn(uuid);
+        given(totalMapper.map(totalDto)).willReturn(expectedTotal);
+
+        //when
+        Transaction actual = transactionMapper.map(transactionDto);
+
+        //then
+        assertEquals(expected, actual);
+
         then(totalMapper).should().map(totalDto);
     }
 

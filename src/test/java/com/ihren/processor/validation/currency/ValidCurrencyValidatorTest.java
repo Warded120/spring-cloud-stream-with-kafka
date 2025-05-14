@@ -5,6 +5,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -13,6 +15,22 @@ import static org.mockito.Mockito.mock;
 
 class ValidCurrencyValidatorTest {
     private final ValidCurrencyValidator validator = new ValidCurrencyValidator();
+
+    @Test
+    void should_InitializeAllowedItems() {
+        //given
+        Set<String> expected = Stream.of(Currency.values())
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+
+        ValidCurrency annotation = mock();
+
+        //when
+        validator.initialize(annotation);
+
+        //then
+        assertEquals(expected, ReflectionTestUtils.getField(validator, "allowedValues"));
+    }
 
     @Test
     void should_ReturnTrue_when_InputIsValid() {

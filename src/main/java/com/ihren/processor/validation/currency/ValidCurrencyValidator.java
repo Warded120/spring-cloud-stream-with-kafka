@@ -14,7 +14,7 @@ public class ValidCurrencyValidator implements ConstraintValidator<ValidCurrency
 
     @Override
     public void initialize(ValidCurrency annotation) {
-        this.allowedValues =  Stream.of(Currency.values())
+        this.allowedValues = Stream.of(Currency.values())
                     .map(Enum::name)
                     .collect(Collectors.toSet());
     }

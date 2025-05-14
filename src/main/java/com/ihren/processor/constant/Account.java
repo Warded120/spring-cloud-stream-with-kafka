@@ -18,7 +18,7 @@ public enum Account {
         this.name = name;
     }
 
-    public static String fromId(String id) {
+    public static String getNameById(String id) {
         return Stream.of(values())
                 .filter(account -> account.id.equals(id))
                 .map(account -> account.name)

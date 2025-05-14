@@ -1,6 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.dto.ItemDto;
+import com.ihren.processor.mapper.exception.MappingException;
 import com.ihren.processor.model.Item;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
@@ -43,5 +45,15 @@ class ItemMapperImplTest {
         //when
         //then
         assertNull(itemMapper.map(null));
+    }
+
+    @Test
+    void should_ThrowMappingException_when_inputIsInvalid() {
+        ItemDto itemDto = mock(ItemDto.class);
+        given(itemDto.loyaltyAccountId()).willReturn("invalid");
+
+        //when
+        //then
+        assertThrows(MappingException.class, () -> itemMapper.map(itemDto));
     }
 }
