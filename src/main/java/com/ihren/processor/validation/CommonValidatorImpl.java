@@ -12,7 +12,7 @@ import java.util.Set;
 public class CommonValidatorImpl<T> implements CommonValidator<T> {
     private final Validator validator;
 
-    public void validate(T t) {
+    public T validate(T t) {
         Set<ConstraintViolation<T>> errors = validator.validate(t);
 
         if (!errors.isEmpty()) {
@@ -25,5 +25,6 @@ public class CommonValidatorImpl<T> implements CommonValidator<T> {
                     )
             );
         }
+        return t;
     }
 }

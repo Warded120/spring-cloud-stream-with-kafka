@@ -33,6 +33,7 @@ class ExceptionHandlerTest {
         given(function.apply(input)).willReturn(expected);
 
         //when
+        //TODO: pass message<T>
         Try actual = handler.handle(function, input);
 
         //then
@@ -50,6 +51,7 @@ class ExceptionHandlerTest {
         given(function.apply(input)).willThrow(new RuntimeException("error"));
 
         //when
+        //TODO: pass message<T>
         Try actual = handler.handle(function, input);
 
         //then

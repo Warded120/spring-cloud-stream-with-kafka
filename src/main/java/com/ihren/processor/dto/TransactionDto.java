@@ -1,3 +1,4 @@
+//TODO: rename package to input and move to model package
 package com.ihren.processor.dto;
 
 import com.ihren.processor.validation.discount.Discount;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+//TODO: rename all dto's to have prefix input
 public record TransactionDto(
         @Discount
         String discount,
