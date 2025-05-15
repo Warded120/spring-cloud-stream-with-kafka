@@ -1,6 +1,6 @@
 package com.ihren.processor.config;
 
-import com.ihren.processor.dto.InputTransaction;
+import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.Transaction;
 import com.ihren.processor.processor.TransactionProcessor;
 import org.springframework.context.annotation.Bean;

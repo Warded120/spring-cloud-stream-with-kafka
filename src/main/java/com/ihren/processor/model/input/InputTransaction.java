@@ -1,5 +1,5 @@
 //TODO: rename package to input and move to model package
-package com.ihren.processor.dto;
+package com.ihren.processor.model.input;
 
 import com.ihren.processor.validation.discount.Discount;
 import jakarta.validation.Valid;

@@ -1,7 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.dto.InputTotal;
+import com.ihren.processor.model.input.InputTotal;
 import com.ihren.processor.model.Total;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

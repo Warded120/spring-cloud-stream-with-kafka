@@ -1,4 +1,4 @@
-package com.ihren.processor.dto;
+package com.ihren.processor.model.input;
 
 import com.ihren.processor.validation.account.id.AccountId;
 import jakarta.validation.constraints.NotBlank;

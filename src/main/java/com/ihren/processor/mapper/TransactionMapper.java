@@ -1,7 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Constants;
-import com.ihren.processor.dto.InputTransaction;
+import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.Transaction;
 import com.ihren.processor.util.DateTimeUtils;
 import org.mapstruct.InjectionStrategy;

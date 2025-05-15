@@ -1,6 +1,6 @@
 package com.ihren.processor.config;
 
-import com.ihren.processor.dto.InputTransaction;
+import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.serialization.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;

@@ -2,9 +2,9 @@ package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.dto.InputItem;
-import com.ihren.processor.dto.InputTotal;
-import com.ihren.processor.dto.InputTransaction;
+import com.ihren.processor.model.input.InputItem;
+import com.ihren.processor.model.input.InputTotal;
+import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.Item;
 import com.ihren.processor.model.Total;
 import com.ihren.processor.model.Transaction;

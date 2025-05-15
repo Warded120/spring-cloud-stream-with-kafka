@@ -23,7 +23,7 @@ spring:
           brokers: localhost:9092
           consumer-properties:
             value.deserializer: com.ihren.processor.serialization.JsonDeserializer
-            value.deserializer.target.class: com.ihren.processor.dto.InputTransaction
+            value.deserializer.target.class: com.ihren.processor.model.input.InputTransaction
           producer-properties:
             value.serializer: com.ihren.processor.serialization.JsonSerializer
         bindings:

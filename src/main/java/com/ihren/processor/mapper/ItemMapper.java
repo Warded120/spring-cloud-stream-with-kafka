@@ -1,7 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Account;
-import com.ihren.processor.dto.InputItem;
+import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.mapper.exception.MappingException;
 import com.ihren.processor.model.Item;
 import io.vavr.control.Try;
