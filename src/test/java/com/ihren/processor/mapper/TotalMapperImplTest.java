@@ -1,7 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.dto.TotalDto;
+import com.ihren.processor.dto.InputTotal;
 import com.ihren.processor.model.Total;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,12 +25,12 @@ class TotalMapperImplTest {
         //given
         Total expected = new Total(BigDecimal.valueOf(360L), CurrencyCode.USD);
 
-        TotalDto totalDto = mock(TotalDto.class);
-        given(totalDto.amount()).willReturn(BigDecimal.valueOf(360L));
-        given(totalDto.currency()).willReturn("USD");
+        InputTotal inputTotal = mock(InputTotal.class);
+        given(inputTotal.amount()).willReturn(BigDecimal.valueOf(360L));
+        given(inputTotal.currency()).willReturn("USD");
 
         //when
-        Total actual = totalMapper.map(totalDto);
+        Total actual = totalMapper.map(inputTotal);
 
         //then
         assertEquals(expected, actual);

@@ -1,7 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Account;
-import com.ihren.processor.dto.ItemDto;
+import com.ihren.processor.dto.InputItem;
 import com.ihren.processor.mapper.exception.MappingException;
 import com.ihren.processor.model.Item;
 import io.vavr.control.Try;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 )
 public abstract class ItemMapper {
     @Mapping(target = "account", source = "loyaltyAccountId", qualifiedByName = "mapAccount")
-    public abstract Item map(ItemDto dto);
+    public abstract Item map(InputItem dto);
 
     @Named("mapAccount")
     protected String mapAccount(CharSequence loyaltyAccountId) {

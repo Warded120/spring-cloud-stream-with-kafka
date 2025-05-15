@@ -2,9 +2,9 @@ package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.dto.ItemDto;
-import com.ihren.processor.dto.TotalDto;
-import com.ihren.processor.dto.TransactionDto;
+import com.ihren.processor.dto.InputItem;
+import com.ihren.processor.dto.InputTotal;
+import com.ihren.processor.dto.InputTransaction;
 import com.ihren.processor.model.Item;
 import com.ihren.processor.model.Total;
 import com.ihren.processor.model.Transaction;
@@ -62,26 +62,26 @@ class TransactionMapperImplTest {
         Total total = new Total(BigDecimal.valueOf(360L), CurrencyCode.USD);
         Transaction expected = new Transaction(uuid, Constants.SOFTSERVE, null, 1L, instant, List.of(item), total);
 
-        ItemDto itemDto = mock(ItemDto.class);
-        TotalDto totalDto = mock(TotalDto.class);
-        TransactionDto transactionDto = mock(TransactionDto.class);
-        given(transactionDto.sequenceNumber()).willReturn(1L);
-        given(transactionDto.endDateTime()).willReturn(instant.toString());
-        given(transactionDto.items()).willReturn(List.of(itemDto));
-        given(transactionDto.total()).willReturn(totalDto);
+        InputItem inputItem = mock(InputItem.class);
+        InputTotal inputTotal = mock(InputTotal.class);
+        InputTransaction inputTransaction = mock(InputTransaction.class);
+        given(inputTransaction.sequenceNumber()).willReturn(1L);
+        given(inputTransaction.endDateTime()).willReturn(instant.toString());
+        given(inputTransaction.items()).willReturn(List.of(inputItem));
+        given(inputTransaction.total()).willReturn(inputTotal);
 
         uuidGenerator.when(() -> UUID.randomUUID()).thenReturn(uuid);
-        given(itemMapper.map(itemDto)).willReturn(item);
-        given(totalMapper.map(totalDto)).willReturn(total);
+        given(itemMapper.map(inputItem)).willReturn(item);
+        given(totalMapper.map(inputTotal)).willReturn(total);
 
         //when
-        Transaction actual = transactionMapper.map(transactionDto);
+        Transaction actual = transactionMapper.map(inputTransaction);
 
         //then
         assertEquals(expected, actual);
 
-        then(itemMapper).should().map(itemDto);
-        then(totalMapper).should().map(totalDto);
+        then(itemMapper).should().map(inputItem);
+        then(totalMapper).should().map(inputTotal);
     }
 
     @Test
@@ -92,23 +92,23 @@ class TransactionMapperImplTest {
         Total expectedTotal = new Total(BigDecimal.valueOf(360L), CurrencyCode.USD);
         Transaction expected = new Transaction(uuid, Constants.SOFTSERVE, null, 1L, instant, null, expectedTotal);
 
-        TotalDto totalDto = mock(TotalDto.class);
-        TransactionDto transactionDto = mock(TransactionDto.class);
-        given(transactionDto.sequenceNumber()).willReturn(1L);
-        given(transactionDto.endDateTime()).willReturn(instant.toString());
-        given(transactionDto.items()).willReturn(null);
-        given(transactionDto.total()).willReturn(totalDto);
+        InputTotal inputTotal = mock(InputTotal.class);
+        InputTransaction inputTransaction = mock(InputTransaction.class);
+        given(inputTransaction.sequenceNumber()).willReturn(1L);
+        given(inputTransaction.endDateTime()).willReturn(instant.toString());
+        given(inputTransaction.items()).willReturn(null);
+        given(inputTransaction.total()).willReturn(inputTotal);
 
         uuidGenerator.when(() -> UUID.randomUUID()).thenReturn(uuid);
-        given(totalMapper.map(totalDto)).willReturn(expectedTotal);
+        given(totalMapper.map(inputTotal)).willReturn(expectedTotal);
 
         //when
-        Transaction actual = transactionMapper.map(transactionDto);
+        Transaction actual = transactionMapper.map(inputTransaction);
 
         //then
         assertEquals(expected, actual);
 
-        then(totalMapper).should().map(totalDto);
+        then(totalMapper).should().map(inputTotal);
     }
 
     @Test

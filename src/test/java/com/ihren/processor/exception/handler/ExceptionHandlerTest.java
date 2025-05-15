@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,8 +28,8 @@ class ExceptionHandlerTest {
     @Test
     void should_ApplyFunction_when_InputIsValid() {
         //given
-        String input = "input";
-        String expected = "expected";
+        Message<String> input = MessageBuilder.withPayload("input").build();
+        Message<String> expected = MessageBuilder.withPayload("expected").build();
         Function function = mock();
 
         given(function.apply(input)).willReturn(expected);
@@ -45,7 +47,7 @@ class ExceptionHandlerTest {
     @Test
     void should_ReturnNull_when_RecoverFromException() {
         //given
-        String input = "input";
+        Message<String> input = MessageBuilder.withPayload("input").build();
         Function function = mock();
 
         given(function.apply(input)).willThrow(new RuntimeException("error"));

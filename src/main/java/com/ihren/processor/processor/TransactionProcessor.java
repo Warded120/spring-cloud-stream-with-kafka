@@ -1,6 +1,6 @@
 package com.ihren.processor.processor;
 
-import com.ihren.processor.dto.TransactionDto;
+import com.ihren.processor.dto.InputTransaction;
 import com.ihren.processor.exception.handler.ExceptionHandler;
 import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.model.Transaction;
@@ -14,19 +14,19 @@ import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class TransactionProcessor implements Function<Message<TransactionDto>, Message<Transaction>> {
+public class TransactionProcessor implements Function<Message<InputTransaction>, Message<Transaction>> {
     private final TransactionMapper mapper;
-    private final CommonValidator<TransactionDto> validator;
-    private final ExceptionHandler<TransactionDto, Transaction> exceptionHandler;
+    private final CommonValidator<InputTransaction> validator;
+    private final ExceptionHandler<InputTransaction, Transaction> exceptionHandler;
 
     @Override
-    public Message<Transaction> apply(Message<TransactionDto> message) {
+    public Message<Transaction> apply(Message<InputTransaction> message) {
         return MessageBuilder
                 .withPayload(exceptionHandler.handle(this::processTransaction, message).get())
                 .build();
     }
 
-    private Transaction processTransaction(Message<TransactionDto> item) {
+    private Transaction processTransaction(Message<InputTransaction> item) {
         return Optional.of(item)
                 .map(Message::getPayload)
                 .map(validator::validate)

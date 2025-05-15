@@ -4,7 +4,7 @@ import com.ihren.processor.validation.account.id.AccountId;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record ItemDto(
+public record InputItem(
         @NotNull(message = "item id cannot be null")
         Long id,
         @AccountId

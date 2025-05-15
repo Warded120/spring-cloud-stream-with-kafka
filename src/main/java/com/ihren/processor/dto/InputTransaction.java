@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 //TODO: rename all dto's to have prefix input
-public record TransactionDto(
+public record InputTransaction(
         @Discount
         String discount,
         @NotNull(message = "transaction sequence number cannot be null")
@@ -17,8 +17,8 @@ public record TransactionDto(
         @NotBlank(message = "transaction end date time cannot be blank")
         String endDateTime,
         @NotEmpty(message = "items list must have at least one element")
-        List<@Valid ItemDto> items,
+        List<@Valid InputItem> items,
         @Valid
         @NotNull(message = "total cannot be null")
-        TotalDto total
+        InputTotal total
 ) { }

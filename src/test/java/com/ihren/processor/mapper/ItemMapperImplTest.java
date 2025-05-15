@@ -1,6 +1,6 @@
 package com.ihren.processor.mapper;
 
-import com.ihren.processor.dto.ItemDto;
+import com.ihren.processor.dto.InputItem;
 import com.ihren.processor.mapper.exception.MappingException;
 import com.ihren.processor.model.Item;
 import org.junit.jupiter.api.Test;
@@ -25,19 +25,19 @@ class ItemMapperImplTest {
         //given
         Item expected = new Item(1L, "Main", "beginDateTime", "endDateTime");
 
-        ItemDto itemDto = mock(ItemDto.class);
-        given(itemDto.id()).willReturn(1L);
-        given(itemDto.loyaltyAccountId()).willReturn("1");
-        given(itemDto.beginDateTime()).willReturn("beginDateTime");
-        given(itemDto.endDateTime()).willReturn("endDateTime");
+        InputItem inputItem = mock(InputItem.class);
+        given(inputItem.id()).willReturn(1L);
+        given(inputItem.loyaltyAccountId()).willReturn("1");
+        given(inputItem.beginDateTime()).willReturn("beginDateTime");
+        given(inputItem.endDateTime()).willReturn("endDateTime");
 
         //when
-        Item actual = itemMapper.map(itemDto);
+        Item actual = itemMapper.map(inputItem);
 
         //then
         assertEquals(expected, actual);
 
-        then(itemMapper).should().mapAccount(itemDto.loyaltyAccountId());
+        then(itemMapper).should().mapAccount(inputItem.loyaltyAccountId());
     }
 
     @Test
@@ -49,11 +49,11 @@ class ItemMapperImplTest {
 
     @Test
     void should_ThrowMappingException_when_inputIsInvalid() {
-        ItemDto itemDto = mock(ItemDto.class);
-        given(itemDto.loyaltyAccountId()).willReturn("invalid");
+        InputItem inputItem = mock(InputItem.class);
+        given(inputItem.loyaltyAccountId()).willReturn("invalid");
 
         //when
         //then
-        assertThrows(MappingException.class, () -> itemMapper.map(itemDto));
+        assertThrows(MappingException.class, () -> itemMapper.map(inputItem));
     }
 }
