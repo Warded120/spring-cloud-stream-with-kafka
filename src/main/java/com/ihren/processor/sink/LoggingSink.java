@@ -1,14 +1,15 @@
 package com.ihren.processor.sink;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class LoggingSink implements Sink<String> {
+public class LoggingSink<T> implements Sink<T> {
 
     @Override
-    public void apply(String message, Throwable ex) {
-        log.error(message, ex);
+    public void apply(Message<T> message, Throwable ex) {
+        log.error(message.getPayload().toString(), ex);
     }
 }

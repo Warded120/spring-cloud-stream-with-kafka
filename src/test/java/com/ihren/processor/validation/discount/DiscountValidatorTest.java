@@ -2,7 +2,8 @@ package com.ihren.processor.validation.discount;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class DiscountValidatorTest {
     private final DiscountValidator validator = new DiscountValidator();

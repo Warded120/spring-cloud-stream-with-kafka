@@ -28,7 +28,6 @@ import static org.mockito.Mockito.never;
 class JsonDeserializerTest {
     @Spy
     @InjectMocks
-    //TODO: try Object.class for mocking
     private JsonDeserializer<Object> jsonDeserializer;
 
     @Mock

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mockStatic;
 @ExtendWith(MockitoExtension.class)
 class JsonSerializerTest {
     @InjectMocks
-    private JsonSerializer jsonSerializer;
+    private JsonSerializer<Object> jsonSerializer;
 
     @Mock
     private ObjectMapper objectMapper;

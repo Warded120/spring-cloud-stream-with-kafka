@@ -19,7 +19,7 @@ public class JsonDeserializer<T> implements Deserializer<T> {
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
         String className = (String) configs.get("value.deserializer.target.class");
-        Try.of(() -> this.targetClass = (Class<T>)Class.forName(className))
+        Try.of(() -> this.targetClass = (Class<T>) Class.forName(className))
                 .getOrElseThrow(ex -> new SerializationException("Failed to load target class", ex));
         ObjectMapperConfig.configure(objectMapper);
     }

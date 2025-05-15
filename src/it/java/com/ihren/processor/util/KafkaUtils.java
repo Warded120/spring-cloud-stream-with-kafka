@@ -45,10 +45,6 @@ public class KafkaUtils {
             for (TopicPartitionInfo partitionInfo : topicDescription.partitions()) {
                 TopicPartition topicPartition = new TopicPartition(topic, partitionInfo.partition());
 
-                ListOffsetsResult listOffsetsResult = admin.listOffsets(
-                        Collections.singletonMap(topicPartition, OffsetSpec.latest())
-                );
-
                 recordsToDeleteMap.put(
                         topicPartition,
                         RecordsToDelete.beforeOffset(-1)

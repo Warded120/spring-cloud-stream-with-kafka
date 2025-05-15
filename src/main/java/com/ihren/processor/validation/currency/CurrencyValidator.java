@@ -33,7 +33,8 @@ public class CurrencyValidator implements ConstraintValidator<Currency, String> 
                                             "Value '%s' is not allowed. Allowed values are: %s",
                                             value,
                                             String.join(", ", allowedValues)
-                                    )                            )
+                                    )
+                            )
                             .addConstraintViolation();
 
                     return false;

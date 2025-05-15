@@ -1,6 +1,7 @@
 package com.ihren.processor.sink;
 
+import org.springframework.messaging.Message;
+
 public interface Sink<T> {
-    //TODO: Message<T>
-    void apply(T input, Throwable ex);
+    void apply(Message<T> input, Throwable ex);
 }

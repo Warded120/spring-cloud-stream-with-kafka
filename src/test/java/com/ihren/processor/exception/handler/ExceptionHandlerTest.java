@@ -47,7 +47,7 @@ class ExceptionHandlerTest {
         String input = "input";
         Function function = mock();
 
-        given(function.apply(input)).willThrow(RuntimeException.class);
+        given(function.apply(input)).willThrow(new RuntimeException("error"));
 
         //when
         Try actual = handler.handle(function, input);
@@ -56,6 +56,6 @@ class ExceptionHandlerTest {
         assertEquals(null, actual.get());
 
         then(function).should().apply(input);
-        then(sink).should().apply(any(),any());
+        then(sink).should().apply(any(), any());
     }
 }
