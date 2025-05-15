@@ -1,8 +1,8 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.CurrencyCode;
+import com.ihren.processor.model.output.OutputTotal;
 import com.ihren.processor.model.input.InputTotal;
-import com.ihren.processor.model.Total;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
@@ -23,14 +23,14 @@ class TotalMapperImplTest {
     @Test
     void should_ReturnTotal_when_TotalDtoIsValid() {
         //given
-        Total expected = new Total(BigDecimal.valueOf(360L), CurrencyCode.USD);
+        OutputTotal expected = new OutputTotal(BigDecimal.valueOf(360L), CurrencyCode.USD);
 
         InputTotal inputTotal = mock(InputTotal.class);
         given(inputTotal.amount()).willReturn(BigDecimal.valueOf(360L));
         given(inputTotal.currency()).willReturn("USD");
 
         //when
-        Total actual = totalMapper.map(inputTotal);
+        OutputTotal actual = totalMapper.map(inputTotal);
 
         //then
         assertEquals(expected, actual);

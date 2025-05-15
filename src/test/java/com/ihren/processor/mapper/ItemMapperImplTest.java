@@ -2,7 +2,7 @@ package com.ihren.processor.mapper;
 
 import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.mapper.exception.MappingException;
-import com.ihren.processor.model.Item;
+import com.ihren.processor.model.output.OutputItem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
@@ -23,7 +23,7 @@ class ItemMapperImplTest {
     @Test
     void should_ReturnItem_when_ItemDtoIsValid() {
         //given
-        Item expected = new Item(1L, "Main", "beginDateTime", "endDateTime");
+        OutputItem expected = new OutputItem(1L, "Main", "beginDateTime", "endDateTime");
 
         InputItem inputItem = mock(InputItem.class);
         given(inputItem.id()).willReturn(1L);
@@ -32,7 +32,7 @@ class ItemMapperImplTest {
         given(inputItem.endDateTime()).willReturn("endDateTime");
 
         //when
-        Item actual = itemMapper.map(inputItem);
+        OutputItem actual = itemMapper.map(inputItem);
 
         //then
         assertEquals(expected, actual);

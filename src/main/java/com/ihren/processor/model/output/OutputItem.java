@@ -1,6 +1,6 @@
-package com.ihren.processor.model;
+package com.ihren.processor.model.output;
 
-public record Item(
+public record OutputItem(
         Long id,
         String account,
         String beginDateTime,

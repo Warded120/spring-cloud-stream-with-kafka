@@ -2,7 +2,7 @@ package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.model.input.InputTotal;
-import com.ihren.processor.model.Total;
+import com.ihren.processor.model.output.OutputTotal;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -16,7 +16,7 @@ import org.mapstruct.ReportingPolicy;
 public abstract class TotalMapper {
 
     @Mapping(target = "currency", source = "currency", qualifiedByName = "mapCurrency")
-    public abstract Total map(InputTotal dto);
+    public abstract OutputTotal map(InputTotal dto);
 
     @Named("mapCurrency")
     protected CurrencyCode mapCurrency(String currency) {

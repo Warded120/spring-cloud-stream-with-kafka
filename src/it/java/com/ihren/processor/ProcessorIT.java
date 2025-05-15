@@ -3,12 +3,12 @@ package com.ihren.processor;
 import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
+import com.ihren.processor.model.output.OutputItem;
+import com.ihren.processor.model.output.OutputTotal;
+import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.input.InputTotal;
-import com.ihren.processor.model.Item;
-import com.ihren.processor.model.Total;
-import com.ihren.processor.model.Transaction;
 import com.ihren.processor.util.KafkaUtils;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -39,7 +39,7 @@ public class ProcessorIT {
     private KafkaTemplate<String, InputTransaction> kafkaTemplate;
 
     @Autowired
-    private KafkaConsumer<String, Transaction> kafkaConsumer;
+    private KafkaConsumer<String, OutputTransaction> kafkaConsumer;
 
     @Autowired
     private Admin admin;
@@ -69,28 +69,29 @@ public class ProcessorIT {
 
         String itemBeginDateTime = "2023-04-10T10:00:00Z";
         String ItemEndDateTime = "2023-04-10T12:00:00Z";
-        List<InputItem> items = List.of(
+        List<InputItem> inputItems = List.of(
                 new InputItem(1L, "4", itemBeginDateTime, ItemEndDateTime)
         );
 
         BigDecimal amount = new BigDecimal("150.00");
-        InputTotal total = new InputTotal(amount, "USD");
+        String currency = "USD";
+        InputTotal inputTotal = new InputTotal(amount, currency);
 
         InputTransaction inputTransaction = new InputTransaction(
                 "10.00",
                 1L,
                 endDateTime,
-                items,
-                total
+                inputItems,
+                inputTotal
         );
 
-        List<Item> expectedItems = List.of(
-                new Item(1L, "Total", itemBeginDateTime, ItemEndDateTime)
+        List<OutputItem> expectedItems = List.of(
+                new OutputItem(1L, "Total", itemBeginDateTime, ItemEndDateTime)
         );
 
-        Total expectedTotal = new Total(amount, CurrencyCode.USD);
+        OutputTotal expectedTotal = new OutputTotal(amount, CurrencyCode.USD);
 
-        Transaction expectedTransaction = new Transaction(
+        OutputTransaction expectedTransaction = new OutputTransaction(
             null,
             Constants.SOFTSERVE,
             null,
@@ -103,7 +104,7 @@ public class ProcessorIT {
         kafkaTemplate.send(topicIn, inputTransaction);
 
         //when
-        Transaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3));
+        OutputTransaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3));
 
         //then
         assertAll(
@@ -120,19 +121,19 @@ public class ProcessorIT {
     @Test
     void should_LogError_when_TransactionIsInvalid(CapturedOutput output) {
         //given
-        List<InputItem> items = List.of(
+        List<InputItem> inputItems = List.of(
                 new InputItem(1L, "5", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
                 new InputItem(2L, "2", "2023-04-10T11:00:00Z", "2023-04-10T13:00:00Z")
         );
 
-        InputTotal total = new InputTotal(new BigDecimal("150.00"), "invalid");
+        InputTotal inputTotal = new InputTotal(new BigDecimal("150.00"), "invalid");
 
         InputTransaction inputTransaction = new InputTransaction(
                 "10.00",
                 12345L,
                 "2023-04-10T09:00:00Z",
-                items,
-                total
+                inputItems,
+                inputTotal
         );
         kafkaTemplate.send(topicIn, inputTransaction);
 

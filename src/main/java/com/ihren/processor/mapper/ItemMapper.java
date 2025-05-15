@@ -1,9 +1,9 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Account;
+import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.mapper.exception.MappingException;
-import com.ihren.processor.model.Item;
 import io.vavr.control.Try;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 )
 public abstract class ItemMapper {
     @Mapping(target = "account", source = "loyaltyAccountId", qualifiedByName = "mapAccount")
-    public abstract Item map(InputItem dto);
+    public abstract OutputItem map(InputItem dto);
 
     @Named("mapAccount")
     protected String mapAccount(CharSequence loyaltyAccountId) {
