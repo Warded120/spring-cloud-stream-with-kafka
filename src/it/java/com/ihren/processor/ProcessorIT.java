@@ -10,6 +10,7 @@ import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.input.InputTotal;
 import com.ihren.processor.util.KafkaUtils;
+import com.ihren.processor.util.TestUtils;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
@@ -64,42 +65,9 @@ public class ProcessorIT {
     @Test
     void should_ProcessTransactionDto_when_InputIsValid() {
         //given
-        String endDateTime = "2023-04-10T09:00:00Z";
-        Instant operationDateTime = Instant.parse(endDateTime);
+        InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
 
-        String itemBeginDateTime = "2023-04-10T10:00:00Z";
-        String ItemEndDateTime = "2023-04-10T12:00:00Z";
-        List<InputItem> inputItems = List.of(
-                new InputItem(1L, "4", itemBeginDateTime, ItemEndDateTime)
-        );
-
-        BigDecimal amount = new BigDecimal("150.00");
-        String currency = "USD";
-        InputTotal inputTotal = new InputTotal(amount, currency);
-
-        InputTransaction inputTransaction = new InputTransaction(
-                "10.00",
-                1L,
-                endDateTime,
-                inputItems,
-                inputTotal
-        );
-
-        List<OutputItem> expectedItems = List.of(
-                new OutputItem(1L, "Total", itemBeginDateTime, ItemEndDateTime)
-        );
-
-        OutputTotal expectedTotal = new OutputTotal(amount, CurrencyCode.USD);
-
-        OutputTransaction expectedTransaction = new OutputTransaction(
-            null,
-            Constants.SOFTSERVE,
-            null,
-            1L,
-            operationDateTime,
-            expectedItems,
-            expectedTotal
-        );
+        OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
 
         kafkaTemplate.send(topicIn, inputTransaction);
 
@@ -121,20 +89,8 @@ public class ProcessorIT {
     @Test
     void should_LogError_when_TransactionIsInvalid(CapturedOutput output) {
         //given
-        List<InputItem> inputItems = List.of(
-                new InputItem(1L, "5", "2023-04-10T10:00:00Z", "2023-04-10T12:00:00Z"),
-                new InputItem(2L, "2", "2023-04-10T11:00:00Z", "2023-04-10T13:00:00Z")
-        );
+        InputTransaction inputTransaction = TestUtils.getInvalidInputTransaction();
 
-        InputTotal inputTotal = new InputTotal(new BigDecimal("150.00"), "invalid");
-
-        InputTransaction inputTransaction = new InputTransaction(
-                "10.00",
-                12345L,
-                "2023-04-10T09:00:00Z",
-                inputItems,
-                inputTotal
-        );
         kafkaTemplate.send(topicIn, inputTransaction);
 
         //when

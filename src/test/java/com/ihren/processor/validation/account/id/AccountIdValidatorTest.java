@@ -51,7 +51,11 @@ class AccountIdValidatorTest {
         //given
         CharSequence value = "0";
         Set<String> allowedValues = Set.of("1");
-        String message = "Value '" + value + "' is not allowed. Allowed values are: " + String.join(", ", allowedValues);
+        String message = String.format(
+                "inputItem.loyaltyAccountId value '%s' is not allowed. Allowed values are: %s",
+                value,
+                String.join(", ", allowedValues)
+        );
 
         ReflectionTestUtils.setField(validator, "allowedValues", allowedValues);
         ConstraintValidatorContext context = mock(ConstraintValidatorContext.class);

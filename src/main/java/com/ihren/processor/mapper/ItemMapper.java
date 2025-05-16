@@ -22,10 +22,14 @@ public abstract class ItemMapper {
 
     @Named("mapAccount")
     protected String mapAccount(CharSequence loyaltyAccountId) {
-        return Try.of(() -> Account.getNameById(loyaltyAccountId.toString()))
-                .getOrElseThrow(() ->
+        return Account.getNameById(loyaltyAccountId.toString())
+                .orElseThrow(() ->
                         new MappingException(
-                                "Unexpected value: " + loyaltyAccountId + ". expected values are: " + Arrays.toString(Account.values())
+                                String.format(
+                                        "Unexpected value: %s. Expected values are: %s",
+                                        loyaltyAccountId,
+                                        Arrays.toString(Account.values())
+                                )
                         )
                 );
     }

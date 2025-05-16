@@ -29,7 +29,7 @@ public class AccountIdValidator implements ConstraintValidator<AccountId, CharSe
                     context.disableDefaultConstraintViolation();
                     context.buildConstraintViolationWithTemplate(
                                     String.format(
-                                            "Value '%s' is not allowed. Allowed values are: %s",
+                                            "inputItem.loyaltyAccountId value '%s' is not allowed. Allowed values are: %s",
                                             value,
                                             String.join(", ", allowedValues)
                                     )

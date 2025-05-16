@@ -15,8 +15,14 @@ import java.util.UUID;
         componentModel = ComponentModel.SPRING,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = {ItemMapper.class, TotalMapper.class},
-        imports = {UUID.class, DateTimeUtils.class}
+        uses = {
+                ItemMapper.class,
+                TotalMapper.class
+        },
+        imports = {
+                UUID.class,
+                DateTimeUtils.class
+        }
 )
 public interface TransactionMapper {
     @Mapping(target = "transactionId", expression = "java(UUID.randomUUID())")

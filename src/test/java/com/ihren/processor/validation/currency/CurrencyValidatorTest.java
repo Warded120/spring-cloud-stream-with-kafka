@@ -51,7 +51,11 @@ class CurrencyValidatorTest {
         //given
         String value = CurrencyCode.USD.name();
         Set<String> allowedValues = Set.of("EUR");
-        String message = "Value '" + value + "' is not allowed. Allowed values are: " + String.join(", ", allowedValues);
+        String message = String.format(
+                "inputTransaction.total.currency value '%s' is not allowed. Allowed values are: %s",
+                value,
+                String.join(", ", allowedValues)
+        );
 
         ReflectionTestUtils.setField(validator, "allowedValues", allowedValues);
         ConstraintValidatorContext context = mock(ConstraintValidatorContext.class);

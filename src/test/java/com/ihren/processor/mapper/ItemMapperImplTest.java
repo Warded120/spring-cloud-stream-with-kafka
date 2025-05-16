@@ -54,6 +54,7 @@ class ItemMapperImplTest {
 
         //when
         //then
+        //TODO: why fails
         assertThrows(MappingException.class, () -> itemMapper.map(inputItem));
     }
 }

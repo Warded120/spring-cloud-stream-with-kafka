@@ -2,6 +2,7 @@ package com.ihren.processor.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Getter
@@ -15,11 +16,10 @@ public enum Account {
     private final String id;
     private final String name;
 
-    public static String getNameById(String id) {
+    public static Optional<String> getNameById(String id) {
         return Stream.of(values())
                 .filter(account -> account.id.equals(id))
                 .map(account -> account.name)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown account id: " + id));
+                .findFirst();
     }
 }

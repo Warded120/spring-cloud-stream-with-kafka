@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record InputTotal(
-        @NotNull(message = "total's amount cannot be null")
+        @NotNull(message = "inputTransaction.total.amount cannot be null")
         BigDecimal amount,
         @Currency
         String currency

@@ -2,6 +2,8 @@ package com.ihren.processor.constant;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -13,10 +15,10 @@ class AccountTest {
         String id = "1";
 
         //when
-        String actual = Account.getNameById(id);
+        Optional<String> actual = Account.getNameById(id);
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.orElse(null));
     }
 
     @Test
@@ -26,6 +28,6 @@ class AccountTest {
 
         //when
         //then
-        assertThrows(IllegalArgumentException.class, () -> Account.getNameById(id));
+        assertEquals(Optional.empty(), Account.getNameById(id));
     }
 }

@@ -30,7 +30,7 @@ public class CurrencyValidator implements ConstraintValidator<Currency, String> 
                     context
                             .buildConstraintViolationWithTemplate(
                                     String.format(
-                                            "Value '%s' is not allowed. Allowed values are: %s",
+                                            "inputTransaction.total.currency value '%s' is not allowed. Allowed values are: %s",
                                             value,
                                             String.join(", ", allowedValues)
                                     )
