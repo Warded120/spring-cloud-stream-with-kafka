@@ -21,7 +21,7 @@ class TotalMapperImplTest {
     private final TotalMapper totalMapper = new TotalMapperImpl();
 
     @Test
-    void should_ReturnTotal_when_TotalDtoIsValid() {
+    void should_ReturnOutputTotal_when_InputTotalIsValid() {
         //given
         OutputTotal expected = new OutputTotal(BigDecimal.valueOf(360L), CurrencyCode.USD);
 
@@ -38,7 +38,7 @@ class TotalMapperImplTest {
     }
 
     @Test
-    void should_ReturnNull_when_TotalDtoIsNull() {
+    void should_ReturnNull_when_InputTotalIsNull() {
         //when
         //then
         assertNull(totalMapper.map(null));

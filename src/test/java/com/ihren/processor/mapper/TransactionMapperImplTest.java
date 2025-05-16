@@ -54,7 +54,7 @@ class TransactionMapperImplTest {
     }
 
     @Test
-    void should_ReturnTransaction_when_TransactionDtoIsValid() {
+    void should_ReturnOutputTransaction_when_InputTransactionIsValid() {
         //given
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
@@ -85,7 +85,7 @@ class TransactionMapperImplTest {
     }
 
     @Test
-    void should_ReturnTransactionWithNullItems_when_TransactionDtoItemsIsNull() {
+    void should_ReturnOutputTransactionWithNullItems_when_InputTransactionItemsIsNull() {
         //given
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
@@ -112,7 +112,7 @@ class TransactionMapperImplTest {
     }
 
     @Test
-    void should_ReturnNull_when_TransactionDtoIsNull() {
+    void should_ReturnNull_when_InputTransactionIsNull() {
         //when
         //then
         assertNull(transactionMapper.map(null));

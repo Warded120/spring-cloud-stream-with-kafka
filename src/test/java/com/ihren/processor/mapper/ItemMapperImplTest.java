@@ -21,7 +21,7 @@ class ItemMapperImplTest {
     private final ItemMapper itemMapper = new ItemMapperImpl();
 
     @Test
-    void should_ReturnItem_when_ItemDtoIsValid() {
+    void should_ReturnOutputItem_when_InputItemIsValid() {
         //given
         OutputItem expected = new OutputItem(1L, "Main", "beginDateTime", "endDateTime");
 
@@ -41,20 +41,19 @@ class ItemMapperImplTest {
     }
 
     @Test
-    void should_ReturnNull_when_ItemDtoIsNull() {
+    void should_ReturnNull_when_InputItemIsNull() {
         //when
         //then
         assertNull(itemMapper.map(null));
     }
 
     @Test
-    void should_ThrowMappingException_when_inputIsInvalid() {
+    void should_ThrowMappingException_when_inputItemIsInvalid() {
         InputItem inputItem = mock(InputItem.class);
         given(inputItem.loyaltyAccountId()).willReturn("invalid");
 
         //when
         //then
-        //TODO: why fails
         assertThrows(MappingException.class, () -> itemMapper.map(inputItem));
     }
 }

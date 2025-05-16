@@ -4,7 +4,6 @@ import com.ihren.processor.constant.Account;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.mapper.exception.MappingException;
-import io.vavr.control.Try;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

@@ -63,7 +63,7 @@ public class ProcessorIT {
     }
 
     @Test
-    void should_ProcessTransactionDto_when_InputIsValid() {
+    void should_Process_when_InputTransactionIsValid() {
         //given
         InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
 
@@ -87,7 +87,7 @@ public class ProcessorIT {
     }
 
     @Test
-    void should_LogError_when_TransactionIsInvalid(CapturedOutput output) {
+    void should_LogError_when_InputTransactionIsInvalid(CapturedOutput output) {
         //given
         InputTransaction inputTransaction = TestUtils.getInvalidInputTransaction();
 
