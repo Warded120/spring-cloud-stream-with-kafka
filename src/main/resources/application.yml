@@ -1,0 +1,35 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: processor
+  cloud:
+    function:
+      definition: processTransaction
+    stream:
+      default:
+        consumer:
+          use-native-decoding: true
+        producer:
+          use-native-encoding: true
+      bindings:
+        processTransaction-in-0:
+          destination: transaction
+          group: processTransaction
+        processTransaction-out-0:
+          destination: processed-transaction
+      kafka:
+        binder:
+          brokers: localhost:9092
+          consumer-properties:
+            value.deserializer: com.ihren.processor.serialization.JsonDeserializer
+            value.deserializer.target.class: com.ihren.processor.model.input.InputTransaction
+          producer-properties:
+            value.serializer: com.ihren.processor.serialization.JsonSerializer
+        bindings:
+          processPerson-in-0:
+            consumer:
+              startOffset: earliest
+              configuration:
+                isolation:
+                  level: read_committed
