@@ -15,20 +15,19 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class TransactionProcessor implements Function<Message<InputTransaction>, Message<OutputTransaction>> {
-    private final TransactionMapper mapper;
-    private final CommonValidator<InputTransaction> validator;
     private final ExceptionHandler<InputTransaction, OutputTransaction> exceptionHandler;
+    private final CommonValidator<InputTransaction> validator;
+    private final TransactionMapper mapper;
 
     @Override
     public Message<OutputTransaction> apply(Message<InputTransaction> message) {
         return MessageBuilder
-                .withPayload(exceptionHandler.handle(this::processTransaction, message).get())
+                .withPayload(exceptionHandler.handle(this::processTransaction, message.getPayload()).get())
                 .build();
     }
 
-    private OutputTransaction processTransaction(Message<InputTransaction> item) {
+    private OutputTransaction processTransaction(InputTransaction item) {
         return Optional.of(item)
-                .map(Message::getPayload)
                 .map(validator::validate)
                 .map(mapper::map)
                 .orElse(null);

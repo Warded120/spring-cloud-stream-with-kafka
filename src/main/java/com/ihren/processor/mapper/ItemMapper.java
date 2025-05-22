@@ -1,14 +1,18 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Account;
+import com.ihren.processor.enricher.Enricher;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.mapper.exception.MappingException;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 
 @Mapper(
@@ -16,6 +20,13 @@ import java.util.Arrays;
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public abstract class ItemMapper {
+    private Enricher<OutputItem> enricher;
+
+    @Autowired
+    public void setEnricher(Enricher<OutputItem> enricher) {
+        this.enricher = enricher;
+    }
+
     @Mapping(target = "account", source = "loyaltyAccountId", qualifiedByName = "mapAccount")
     public abstract OutputItem map(InputItem dto);
 
@@ -31,5 +42,11 @@ public abstract class ItemMapper {
                                 )
                         )
                 );
+    }
+
+    //TODO must be void + change OutputItem to class
+    @AfterMapping
+    protected OutputItem enrichItem(@MappingTarget OutputItem outputItem) {
+        return enricher.enrich(outputItem);
     }
 }

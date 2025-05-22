@@ -33,3 +33,6 @@ spring:
               configuration:
                 isolation:
                   level: read_committed
+feign:
+  client:
+    baseUrl: localhost:8080

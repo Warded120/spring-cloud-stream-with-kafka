@@ -1,64 +1,38 @@
-# Integration testing
-There are tasks to learn multi-layered architecture.
+# Spring Cloud Stream with Kafka
+This document outlines the required tasks for understanding and implementing caching, api calling and Proxy pattern.
 
-## Acceptance Criteria
+🧪 To Do:
 
- - Read about multi-layered architecture
- - Create diagrams with potential layers for pipeline and for web application. 
- - Add validation from jakarta.validation.* package
- - Add conversion/mapping with MapStruct library.
+- Item enrichment
+- Item API Client
+- Item Cache
 
-### Structure models
+✅ Acceptance Criteria:
 
-#### Input
+- Enrich item details with calling external API with resource URL /users/{id} where id is Item id from payload
+- API call is implemented in declarative approach with Spring Feign library.
+- External service is not set up. Everything is configured in integration tests with Spring WireMock library.
+- Item is cached for one day with Caffeine library
+- Caching is implemented via Proxy (Dynamic Proxy) pattern
 
-Transaction
+#### Enriched input item
 
-- discount (String) -> A number is up to 100.00. Precision after a point is always 2. Can be null.
-- sequenceNumber (Long) -> Cannot be blank
-- endDateTime (String) -> Cannot be blank
-- items (List<Item>) -> Cannot be empty
-- total (Total) - Cannot be null
+- price (BigDecimal) -> Cannot be null and should be positive.
+- producer (String) -> Cannot be blank
+- description (String) -> Cannot be blank
+- VATRate (BigDecimal) -> Cannot be null and should be be between 0.0 anf 100.00.
+- UOM (String)
+- BarCode (String) -> Cannot be null, can contain only 14 digits
 
-Item
+#### output item
 
-- id (Long) -> Cannot be null
-- loyaltyAccountId (CharSequence)
-- beginDateTime (String) -> Cannot be blank
-- endDateTime (String) -> Cannot be blank
-
-Total
-
-- amount (BigDecimal) -> Cannot be null
-- currency (String) -> Cannot be blank. Should be only (USD, GBP, EUR, CNY, UAH).
-
-
-### Output
-
-Transaction
-
-- transactionId (UUID) -> randomly generated UUID
-- source (String) -> 'Softserve' constant always
-- discount (String) -> to be ignored
-- sequenceNumber (Long)
-- operationDateTime (Instant) -> mapped from endDateTime field
-- items (List<Item>)
-- total (Total)
-
-Item
-
-- id (Long)
-- account (String) -> if account Id 1 -> Main, 2 -> Coupon, 3 -> Base, 4 -> Total. For other cases -> 'Unknown'
-- beginDateTime (String)
-- endDateTime (String)
-
-Total
-
-- amount (BigDecimal)
-- currency (Enum)
-
-UML Diagram: https://www.figma.com/board/3amr00FmlTo52hMEoBAvRy/Architecture-layers?node-id=0-1&p=f<br>
-WEB:<br>
-![img1.png](diagrams/WebDiagram.png)<br>
-Kafka:<br>
-![img2.png](diagrams/KafkaDiagram.png)<br>
+- id
+- account
+- beginDateTime
+- endDateTime
+- price (BigDecimal) -> Cannot be null and should be positive.
+- producer (String) -> Cannot be blank
+- description (String) -> Cannot be blank
+- VATRate (BigDecimal) -> Cannot be null and should be be between 0.0 anf 100.00.
+- UOM (String)
+- BarCode (String) -> Cannot be null, can contain only 14 digits

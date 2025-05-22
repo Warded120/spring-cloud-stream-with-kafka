@@ -51,16 +51,33 @@ public class TestUtils {
     }
 
     public static OutputTransaction getExpectedOutputTransaction() {
+        Long id = 1L;
+        String total = "Total";
         String endDateTime = "2023-04-10T09:00:00Z";
         Instant operationDateTime = Instant.parse(endDateTime);
-
         String itemBeginDateTime = "2023-04-10T10:00:00Z";
         String itemEndDateTime = "2023-04-10T12:00:00Z";
-
         BigDecimal amount = new BigDecimal("150.00");
+        BigDecimal price = new BigDecimal("150.00");
+        String producer = "producer";
+        String description = "description";
+        BigDecimal VATRate = new BigDecimal("99.99");
+        String UOM = "UOM";
+        String BarCode = "12345678901234";
 
         List<OutputItem> expectedItems = List.of(
-                new OutputItem(1L, "Total", itemBeginDateTime, itemEndDateTime)
+                new OutputItem(
+                        id,
+                        total,
+                        itemBeginDateTime,
+                        itemEndDateTime,
+                        price,
+                        producer,
+                        description,
+                        VATRate,
+                        UOM,
+                        BarCode
+                )
         );
 
         OutputTotal expectedTotal = new OutputTotal(amount, CurrencyCode.USD);

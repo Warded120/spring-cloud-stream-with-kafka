@@ -13,10 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.kafka.core.KafkaTemplate;
 import java.time.Duration;
 import java.util.Collections;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @IntegrationTest
+@AutoConfigureWireMock
 public class ProcessorIT {
     @Autowired
     private KafkaTemplate<String, InputTransaction> kafkaTemplate;
@@ -60,6 +66,25 @@ public class ProcessorIT {
 
         OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
 
+        //TODO: rename BarCode to barCode
+        String body = """
+                    {
+                      "price": 150.00,
+                      "producer": "producer",
+                      "description": "description",
+                      "VATRate": 99.99,
+                      "UOM": "UOM",
+                      "BarCode": "12345678901234"
+                    }
+                """;
+        stubFor(get(urlEqualTo("/users/1"))
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                )
+        );
+
         kafkaTemplate.send(topicIn, inputTransaction);
 
         //when
@@ -89,4 +114,6 @@ public class ProcessorIT {
         assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3)));
         assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
     }
+
+
 }
