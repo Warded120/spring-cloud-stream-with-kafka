@@ -1,14 +1,8 @@
 package com.ihren.processor;
 
 import com.ihren.processor.annotation.IntegrationTest;
-import com.ihren.processor.constant.Constants;
-import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.model.output.OutputItem;
-import com.ihren.processor.model.output.OutputTotal;
 import com.ihren.processor.model.output.OutputTransaction;
-import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.model.input.InputTransaction;
-import com.ihren.processor.model.input.InputTotal;
 import com.ihren.processor.util.KafkaUtils;
 import com.ihren.processor.util.TestUtils;
 import org.apache.kafka.clients.admin.Admin;
@@ -20,11 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.kafka.core.KafkaTemplate;
-import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
