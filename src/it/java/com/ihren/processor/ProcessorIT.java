@@ -66,7 +66,6 @@ public class ProcessorIT {
 
         OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
 
-        //TODO: rename BarCode to barCode
         String body = """
                     {
                       "price": 150.00,
@@ -92,13 +91,13 @@ public class ProcessorIT {
 
         //then
         assertAll(
-                () -> assertNotNull(actual.transactionId()),
-                () -> assertEquals(expectedTransaction.source(), actual.source()),
-                () -> assertNull(actual.discount()),
-                () -> assertEquals(expectedTransaction.sequenceNumber(), actual.sequenceNumber()),
-                () -> assertEquals(expectedTransaction.operationDateTime(), actual.operationDateTime()),
-                () -> assertArrayEquals(expectedTransaction.items().toArray(), actual.items().toArray()),
-                () -> assertEquals(expectedTransaction.total(), actual.total())
+                () -> assertNotNull(actual.getTransactionId()),
+                () -> assertEquals(expectedTransaction.getSource(), actual.getSource()),
+                () -> assertNull(actual.getDiscount()),
+                () -> assertEquals(expectedTransaction.getSequenceNumber(), actual.getSequenceNumber()),
+                () -> assertEquals(expectedTransaction.getOperationDateTime(), actual.getOperationDateTime()),
+                () -> assertArrayEquals(expectedTransaction.getItems().toArray(), actual.getItems().toArray()),
+                () -> assertEquals(expectedTransaction.getTotal(), actual.getTotal())
         );
     }
 
@@ -115,5 +114,5 @@ public class ProcessorIT {
         assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
     }
 
-
+    //TODO: create test where enrichment is unsuccessful
 }

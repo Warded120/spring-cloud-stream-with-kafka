@@ -16,7 +16,7 @@ public class ProxyConfig {
         return (OpenFeignClient) Proxy.newProxyInstance(
                 client.getClass().getClassLoader(),
                 client.getClass().getInterfaces(),
-                new OpenFeignClientInvocationHandler(client, cache)
+                new OpenFeignClientInvocationHandler(cache)
         );
     }
 }

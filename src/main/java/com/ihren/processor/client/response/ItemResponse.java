@@ -28,5 +28,5 @@ public record ItemResponse(
 
         @NotNull(message = "itemResponse.barCode cannot be null")
         @Pattern(regexp = "\\d{14}", message = "itemResponse.barCode must contain exactly 14 digits")
-        String BarCode
+        String barCode
 ) { }

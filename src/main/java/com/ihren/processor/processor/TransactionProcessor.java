@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.function.Function;
 
+//TODO: do I need to test it?
 @Component
 @RequiredArgsConstructor
 public class TransactionProcessor implements Function<Message<InputTransaction>, Message<OutputTransaction>> {

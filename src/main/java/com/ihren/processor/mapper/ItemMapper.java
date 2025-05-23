@@ -44,9 +44,8 @@ public abstract class ItemMapper {
                 );
     }
 
-    //TODO must be void + change OutputItem to class
     @AfterMapping
-    protected OutputItem enrichItem(@MappingTarget OutputItem outputItem) {
-        return enricher.enrich(outputItem);
+    protected void enrichItem(@MappingTarget OutputItem outputItem) {
+        enricher.enrich(outputItem);
     }
 }

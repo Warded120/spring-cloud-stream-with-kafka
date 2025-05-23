@@ -3,7 +3,6 @@ package com.ihren.processor.service;
 import com.ihren.processor.client.OpenFeignClient;
 import com.ihren.processor.client.response.ItemResponse;
 import com.ihren.processor.exception.NotFoundException;
-import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.validation.CommonValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,13 +22,13 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 class ClientServiceImplTest {
     @InjectMocks
-    ClientServiceImpl clientService;
+    private ClientServiceImpl clientService;
 
     @Mock
-    OpenFeignClient client;
+    private OpenFeignClient client;
 
     @Mock
-    CommonValidator<ItemResponse> validator;
+    private CommonValidator<ItemResponse> validator;
 
     @Test
     void should_ReturnItemResponse_when_EverythingIsOK() {

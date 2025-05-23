@@ -1,23 +1,32 @@
 package com.ihren.processor.enricher;
 
 import com.ihren.processor.client.response.ItemResponse;
-import com.ihren.processor.converter.ItemConverter;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.service.ClientService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
-@RequiredArgsConstructor
-public class ItemEnricher implements Enricher<OutputItem> {
-    private final ClientService clientService;
-    //TODO: enricher itself must use mapStruct (?)
-    private final ItemConverter converter;
+@Mapper(
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
+public abstract class ItemEnricher implements Enricher<OutputItem> {
+    private ClientService clientService;
+
+    //TODO: do I need to test setter injection?
+    @Autowired
+    public void setClientService(ClientService clientService) {
+        this.clientService = clientService;
+    }
 
     @Override
-    public OutputItem enrich(OutputItem item) {
-        ItemResponse itemResponse = clientService.getByItemId(item.id());
-        //FIXME: why do I need to combine logic from enricher and converter? we had an opposite requirement
-        return converter.convert(item, itemResponse);
+    public void enrich(OutputItem item) {
+        ItemResponse itemResponse = clientService.getByItemId(item.getId());
+        enrich(item, itemResponse);
     }
+
+    protected abstract void enrich(@MappingTarget OutputItem outputItem, ItemResponse itemResponse);
 }

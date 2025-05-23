@@ -25,7 +25,10 @@ public class KafkaUtils {
                     System.out.println(record.value());
                     return record.value();
                 })
-                .recover(ex -> null)
+                .recover(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                })
                 .get();
     }
 
@@ -53,6 +56,6 @@ public class KafkaUtils {
 
             deleteRecordsResult.all().get();
         })
-        .onFailure(ex -> ex.printStackTrace());
+        .onFailure(Throwable::printStackTrace);
     }
 }

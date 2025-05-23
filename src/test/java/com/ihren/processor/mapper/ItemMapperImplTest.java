@@ -10,15 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,7 +64,17 @@ class ItemMapperImplTest {
         given(inputItem.beginDateTime()).willReturn("beginDateTime");
         given(inputItem.endDateTime()).willReturn("endDateTime");
 
-        given(itemMapper.enrichItem(expectedBeforeEnriching)).willReturn(expectedAfterEnriching);
+        willAnswer(invocation -> {
+            OutputItem item = invocation.getArgument(0);
+            item.setPrice(new BigDecimal("150.00"));
+            item.setProducer("producer");
+            item.setDescription("description");
+            item.setVATRate(new BigDecimal("150.00"));
+            item.setUOM("UOM");
+            item.setBarCode("BarCode");
+            return null;
+        }).given(enricher).enrich(expectedBeforeEnriching);
+
 
         //when
         OutputItem actual = itemMapper.map(inputItem);
@@ -91,5 +100,17 @@ class ItemMapperImplTest {
         //when
         //then
         assertThrows(MappingException.class, () -> itemMapper.map(inputItem));
+    }
+
+    @Test
+    void should_CallEnricher() {
+        //given
+        OutputItem outputItem = mock();
+
+        //when
+        itemMapper.enrichItem(outputItem);
+
+        //then
+        then(enricher).should().enrich(outputItem);
     }
 }
