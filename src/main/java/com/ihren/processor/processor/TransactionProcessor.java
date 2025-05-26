@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.function.Function;
 
-//TODO: do I need to test it?
 @Component
 @RequiredArgsConstructor
 public class TransactionProcessor implements Function<Message<InputTransaction>, Message<OutputTransaction>> {
@@ -23,7 +22,12 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
     @Override
     public Message<OutputTransaction> apply(Message<InputTransaction> message) {
         return MessageBuilder
-                .withPayload(exceptionHandler.handle(this::processTransaction, message.getPayload()).get())
+                .withPayload(
+                        exceptionHandler.handle(
+                                this::processTransaction,
+                                message.getPayload()
+                        ).get()
+                )
                 .build();
     }
 

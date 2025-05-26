@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class ItemEnricher implements Enricher<OutputItem> {
     private ClientService clientService;
 
-    //TODO: do I need to test setter injection?
     @Autowired
     public void setClientService(ClientService clientService) {
         this.clientService = clientService;
