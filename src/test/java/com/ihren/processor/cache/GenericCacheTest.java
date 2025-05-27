@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.ihren.processor.client.response.ItemResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Map;
 import java.util.function.Function;
@@ -12,7 +11,9 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.never;
 import static org.mockito.Mockito.mock;
 
 class GenericCacheTest {

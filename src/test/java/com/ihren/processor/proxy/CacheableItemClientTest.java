@@ -2,7 +2,6 @@ package com.ihren.processor.proxy;
 
 import com.ihren.processor.cache.GenericCache;
 import com.ihren.processor.client.CacheableItemClient;
-import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,13 +19,10 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 class CacheableItemClientTest {
     @InjectMocks
-    CacheableItemClient cacheableItemClient;
+    private CacheableItemClient cacheableItemClient;
 
     @Mock
-    ItemClient originalItemClient;
-
-    @Mock
-    GenericCache<Long, ItemResponse> cache;
+    private GenericCache<Long, ItemResponse> cache;
 
     @Test
     void should_GetById_when_EverythingIsOK() {

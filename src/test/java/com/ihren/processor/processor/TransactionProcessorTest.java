@@ -24,7 +24,6 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -34,16 +33,16 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 class TransactionProcessorTest {
     @InjectMocks
-    TransactionProcessor processor;
+    private TransactionProcessor processor;
 
     @Mock
-    ExceptionHandler<InputTransaction, OutputTransaction> exceptionHandler;
+    private ExceptionHandler<InputTransaction, OutputTransaction> exceptionHandler;
 
     @Mock
-    CommonValidator<InputTransaction> validator;
+    private CommonValidator<InputTransaction> validator;
 
     @Mock
-    TransactionMapper mapper;
+    private TransactionMapper mapper;
 
     @Test
     void should_processTransaction_when_EverythingIsOK() {
