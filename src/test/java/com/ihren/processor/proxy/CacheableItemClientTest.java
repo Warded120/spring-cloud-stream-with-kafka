@@ -2,6 +2,7 @@ package com.ihren.processor.proxy;
 
 import com.ihren.processor.cache.GenericCache;
 import com.ihren.processor.client.CacheableItemClient;
+import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,9 @@ import static org.mockito.Mockito.mock;
 class CacheableItemClientTest {
     @InjectMocks
     private CacheableItemClient cacheableItemClient;
+
+    @Mock
+    private ItemClient originalItemClient;
 
     @Mock
     private GenericCache<Long, ItemResponse> cache;
