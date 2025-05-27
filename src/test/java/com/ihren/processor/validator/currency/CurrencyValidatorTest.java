@@ -1,4 +1,4 @@
-package com.ihren.processor.validation.currency;
+package com.ihren.processor.validator.currency;
 
 import com.ihren.processor.constant.CurrencyCode;
 import jakarta.validation.ConstraintValidatorContext;

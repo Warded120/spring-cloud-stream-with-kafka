@@ -4,7 +4,7 @@ import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.exception.handler.ExceptionHandler;
 import com.ihren.processor.mapper.TransactionMapper;
-import com.ihren.processor.validation.CommonValidator;
+import com.ihren.processor.validator.CommonValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;

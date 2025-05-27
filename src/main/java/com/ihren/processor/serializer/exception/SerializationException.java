@@ -1,4 +1,4 @@
-package com.ihren.processor.serialization.exception;
+package com.ihren.processor.serializer.exception;
 
 import lombok.experimental.StandardException;
 

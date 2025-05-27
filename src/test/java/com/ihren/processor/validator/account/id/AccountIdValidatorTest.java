@@ -1,4 +1,4 @@
-package com.ihren.processor.validation.account.id;
+package com.ihren.processor.validator.account.id;
 
 import com.ihren.processor.constant.Account;
 import jakarta.validation.ConstraintValidatorContext;

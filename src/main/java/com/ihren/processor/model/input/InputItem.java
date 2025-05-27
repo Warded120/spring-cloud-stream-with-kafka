@@ -1,6 +1,6 @@
 package com.ihren.processor.model.input;
 
-import com.ihren.processor.validation.account.id.AccountId;
+import com.ihren.processor.validator.account.id.AccountId;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

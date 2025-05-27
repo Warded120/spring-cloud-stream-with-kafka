@@ -3,11 +3,9 @@ package com.ihren.processor.client;
 import com.ihren.processor.cache.GenericCache;
 import com.ihren.processor.client.response.ItemResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-@Primary
-@Component
+@Component("itemClient")
 @RequiredArgsConstructor
 public class CacheableItemClient implements ItemClient {
     private final ItemClient originalItemClient;

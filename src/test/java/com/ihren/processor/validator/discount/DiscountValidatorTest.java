@@ -1,4 +1,4 @@
-package com.ihren.processor.validation.discount;
+package com.ihren.processor.validator.discount;
 
 import org.junit.jupiter.api.Test;
 

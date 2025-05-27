@@ -1,7 +1,7 @@
 package com.ihren.processor.config;
 
 import com.ihren.processor.model.output.OutputTransaction;
-import com.ihren.processor.serialization.JsonDeserializer;
+import com.ihren.processor.serializer.JsonDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;

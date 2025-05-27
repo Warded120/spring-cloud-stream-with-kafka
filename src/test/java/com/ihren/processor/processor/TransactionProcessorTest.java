@@ -8,7 +8,7 @@ import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.output.OutputTotal;
 import com.ihren.processor.model.output.OutputTransaction;
-import com.ihren.processor.validation.CommonValidator;
+import com.ihren.processor.validator.CommonValidator;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +26,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)

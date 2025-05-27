@@ -1,4 +1,4 @@
-package com.ihren.processor.validation.discount;
+package com.ihren.processor.validator.discount;
 
 import io.vavr.control.Try;
 import jakarta.validation.ConstraintValidator;

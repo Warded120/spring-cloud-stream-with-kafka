@@ -1,4 +1,5 @@
-package com.ihren.processor.validation.account.id;
+
+package com.ihren.processor.validator.discount;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -8,10 +9,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
-@Constraint(validatedBy = AccountIdValidator.class)
-public @interface AccountId {
-    String message() default "Value '{validated.value}' is not allowed. Allowed values are: {value}";
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Constraint(validatedBy = DiscountValidator.class)
+public @interface Discount {
+    String message() default "discount must be up to 100.00";
+
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

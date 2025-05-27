@@ -1,4 +1,4 @@
-package com.ihren.processor.validation;
+package com.ihren.processor.validator;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ValidationException;

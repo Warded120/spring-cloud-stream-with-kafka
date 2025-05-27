@@ -12,6 +12,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.BDDMockito.given;
@@ -55,7 +56,7 @@ class ExceptionHandlerTest {
         Try actual = handler.handle(function, input);
 
         //then
-        assertEquals(null, actual.get());
+        assertNull(actual.get());
 
         then(function).should().apply(input);
         then(sink).should().apply(any(), any());

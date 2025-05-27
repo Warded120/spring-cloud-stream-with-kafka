@@ -3,7 +3,7 @@ package com.ihren.processor.service;
 import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import com.ihren.processor.exception.NotFoundException;
-import com.ihren.processor.validation.CommonValidator;
+import com.ihren.processor.validator.CommonValidator;
 import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,8 +1,8 @@
-package com.ihren.processor.serialization;
+package com.ihren.processor.serializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.config.ObjectMapperConfig;
-import com.ihren.processor.serialization.exception.SerializationException;
+import com.ihren.processor.serializer.exception.SerializationException;
 import io.vavr.control.Try;
 import org.apache.kafka.common.serialization.Serializer;
 import java.util.Map;
