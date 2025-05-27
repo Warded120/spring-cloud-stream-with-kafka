@@ -1,30 +1,24 @@
 package com.ihren.processor.service;
 
-import com.ihren.processor.client.OpenFeignClient;
+import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import com.ihren.processor.exception.NotFoundException;
 import com.ihren.processor.validation.CommonValidator;
-import org.springframework.beans.factory.annotation.Qualifier;
+import io.vavr.control.Try;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
-    private final OpenFeignClient client;
+    private final ItemClient client;
     private final CommonValidator<ItemResponse> validator;
-
-    public ClientServiceImpl(
-            @Qualifier("openFeignClientProxy") OpenFeignClient client,
-            CommonValidator<ItemResponse> validator
-    ) {
-        this.client = client;
-        this.validator = validator;
-    }
 
     @Override
     public ItemResponse getByItemId(Long id) {
-        return client.getById(id)
+        return Try.of(() -> client.getById(id))
                 .map(validator::validate)
-                .orElseThrow(() -> new NotFoundException("not found by item.id: " + id));
+                .getOrElseThrow(() -> new NotFoundException("not found by item.id: " + id));
     }
 }

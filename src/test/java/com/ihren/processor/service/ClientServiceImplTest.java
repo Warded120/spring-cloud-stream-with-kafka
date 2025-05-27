@@ -1,9 +1,10 @@
 package com.ihren.processor.service;
 
-import com.ihren.processor.client.OpenFeignClient;
+import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import com.ihren.processor.exception.NotFoundException;
 import com.ihren.processor.validation.CommonValidator;
+import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +26,7 @@ class ClientServiceImplTest {
     private ClientServiceImpl clientService;
 
     @Mock
-    private OpenFeignClient client;
+    private ItemClient client;
 
     @Mock
     private CommonValidator<ItemResponse> validator;
@@ -37,7 +38,7 @@ class ClientServiceImplTest {
 
         ItemResponse expected = mock();
 
-        given(client.getById(id)).willReturn(Optional.of(expected));
+        given(client.getById(id)).willReturn(expected);
         given(validator.validate(expected)).willReturn(expected);
 
         //when
@@ -55,7 +56,7 @@ class ClientServiceImplTest {
         //given
         Long id = 1L;
 
-        given(client.getById(id)).willReturn(Optional.empty());
+        given(client.getById(id)).willThrow(FeignException.class);
 
         //when
         assertThrows(NotFoundException.class, () -> clientService.getByItemId(id));

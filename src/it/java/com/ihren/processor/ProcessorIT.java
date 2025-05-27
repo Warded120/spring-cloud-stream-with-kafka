@@ -1,6 +1,10 @@
 package com.ihren.processor;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.ihren.processor.annotation.IntegrationTest;
+import com.ihren.processor.cache.GenericCache;
+import com.ihren.processor.client.ItemClient;
+import com.ihren.processor.client.response.ItemResponse;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.util.KafkaUtils;
@@ -10,18 +14,25 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
+import org.mockito.verification.VerificationMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,9 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.BDDMockito.*;
 
 @IntegrationTest
-@AutoConfigureWireMock
 public class ProcessorIT {
     @Autowired
     private KafkaTemplate<String, InputTransaction> kafkaTemplate;
@@ -39,8 +50,15 @@ public class ProcessorIT {
     @Autowired
     private KafkaConsumer<String, OutputTransaction> kafkaConsumer;
 
+    @MockitoSpyBean
+    @Qualifier("nonCacheableItemClient")
+    private ItemClient itemClient;
+
     @Autowired
     private Admin admin;
+
+    @Autowired
+    private GenericCache<Long, ItemResponse> cache;
 
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.destination}")
     private String topicIn;
@@ -50,13 +68,16 @@ public class ProcessorIT {
 
     @BeforeEach
     public void init() {
-        KafkaUtils.purgeAllRecords(admin, topicIn);
         kafkaConsumer.subscribe(Collections.singletonList(topicOut));
     }
 
     @AfterEach
     public void clean() {
+        KafkaUtils.purgeAllRecords(admin, topicIn);
+        KafkaUtils.purgeAllRecords(admin, topicOut);
         kafkaConsumer.unsubscribe();
+        cache.clearCache();
+        WireMock.reset();
     }
 
     @Test
@@ -73,7 +94,7 @@ public class ProcessorIT {
                       "description": "description",
                       "VATRate": 99.99,
                       "UOM": "UOM",
-                      "BarCode": "12345678901234"
+                      "barCode": "12345678901234"
                     }
                 """;
         stubFor(get(urlEqualTo("/users/1"))
@@ -114,5 +135,60 @@ public class ProcessorIT {
         assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
     }
 
-    //TODO: create test where enrichment is unsuccessful
+    @Test
+    void should_LogError_when_EnrichmentFailed(CapturedOutput output) {
+        //given
+        InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
+
+        stubFor(get(urlEqualTo("/users/1"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(404)
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("Not Found by id: 1")
+                )
+        );
+
+        kafkaTemplate.send(topicIn, inputTransaction);
+
+        //when
+        //then
+        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3)));
+        assertTrue(output.getOut().contains("com.ihren.processor.exception.NotFoundException"));
+    }
+
+    @Test
+    //TODO: remove it
+    void should_CallApiOnce_when_ClientCalledTwice() {
+        InputTransaction inputTransaction1 = TestUtils.getValidInputTransaction();
+        InputTransaction inputTransaction2 = TestUtils.getValidInputTransaction();
+
+        String body = """
+                    {
+                      "price": 150.00,
+                      "producer": "producer",
+                      "description": "description",
+                      "VATRate": 99.99,
+                      "UOM": "UOM",
+                      "barCode": "12345678901234"
+                    }
+                """;
+        stubFor(get(urlEqualTo("/users/1"))
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                )
+        );
+
+        kafkaTemplate.send(topicIn, inputTransaction1);
+        kafkaTemplate.send(topicIn, inputTransaction2);
+
+        //when
+        List<OutputTransaction> actual = KafkaUtils.getRecords(kafkaConsumer, topicOut, Duration.ofSeconds(3), 2);
+
+        //then
+        assertEquals(2, actual.size());
+        then(itemClient).should(times(1)).getById(1L);
+    }
 }

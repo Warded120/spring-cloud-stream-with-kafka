@@ -8,6 +8,7 @@ import com.ihren.processor.config.KafkaTemplateConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,5 +41,6 @@ import java.lang.annotation.Target;
         KafkaAdminClientConfig.class
 })
 @ExtendWith(OutputCaptureExtension.class)
+@AutoConfigureWireMock
 public @interface IntegrationTest {
 }

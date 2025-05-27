@@ -21,14 +21,18 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
 
     @Override
     public Message<OutputTransaction> apply(Message<InputTransaction> message) {
-        return MessageBuilder
-                .withPayload(
-                        exceptionHandler.handle(
+        return constructMessage(
+                exceptionHandler.handle(
                                 this::processTransaction,
                                 message.getPayload()
-                        ).get()
-                )
-                .build();
+                ).get()
+        );
+    }
+
+    private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction) {
+        return Optional.ofNullable(outputTransaction)
+                .map(transaction -> MessageBuilder.withPayload(transaction).build())
+                .orElse(null);
     }
 
     private OutputTransaction processTransaction(InputTransaction item) {

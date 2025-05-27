@@ -44,7 +44,7 @@ public class KafkaInitializer implements ApplicationContextInitializer<Configura
 
     @Override
     public void afterTestMethod(TestContext testContext) {
-        if(DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD == getTestIsolationLevel(testContext.getTestClass())) {
+        if(DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD == getTestIsolationLevel(testContext.getTestClass())) {
             kafkaDockerContainer.destroy();
         }
     }
