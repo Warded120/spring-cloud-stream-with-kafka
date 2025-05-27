@@ -12,6 +12,8 @@ import com.ihren.processor.validation.CommonValidator;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,12 +46,18 @@ class TransactionProcessorTest {
     @Mock
     private TransactionMapper mapper;
 
+    @Captor
+    private ArgumentCaptor<Function<InputTransaction, OutputTransaction>> captor;
+
     @Test
     void should_processTransaction_when_EverythingIsOK() {
         //given
         InputTransaction inputTransaction = mock(InputTransaction.class);
+
         Message<InputTransaction> inputTransactionMessage = mock(Message.class);
         given(inputTransactionMessage.getPayload()).willReturn(inputTransaction);
+
+        Try<OutputTransaction> outputTransactionTry = mock(Try.class);
 
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
@@ -74,21 +82,22 @@ class TransactionProcessorTest {
                 .withPayload(expectedTransaction)
                 .build();
 
+        given(outputTransactionTry.get()).willReturn(expectedTransaction);
         given(validator.validate(inputTransaction)).willReturn(inputTransaction);
         given(mapper.map(inputTransaction)).willReturn(expectedTransaction);
 
-        given(exceptionHandler.handle(any(Function.class), eq(inputTransaction)))
-                .willAnswer(invocation -> {
-                    Function<InputTransaction, OutputTransaction> processTransactionFunction = invocation.getArgument(0);
-                    OutputTransaction result = processTransactionFunction.apply(inputTransaction);
-                    return Try.success(result);
-                });
+        given(exceptionHandler.handle(captor.capture(), eq(inputTransaction)))
+                .willReturn(outputTransactionTry);
+
         //when
         Message<OutputTransaction> actual = processor.apply(inputTransactionMessage);
 
         //then
         assertEquals(expected.getPayload(), actual.getPayload());
 
-        then(exceptionHandler).should().handle(any(Function.class), eq(inputTransaction));
+        Function<InputTransaction, OutputTransaction> captured = captor.getValue();
+
+        OutputTransaction applied = captured.apply(inputTransaction);
+        assertEquals(expectedTransaction, applied);
     }
 }

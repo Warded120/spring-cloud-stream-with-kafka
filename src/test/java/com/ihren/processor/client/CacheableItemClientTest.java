@@ -1,11 +1,11 @@
-package com.ihren.processor.proxy;
+package com.ihren.processor.client;
 
 import com.ihren.processor.cache.GenericCache;
-import com.ihren.processor.client.CacheableItemClient;
-import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,20 +28,28 @@ class CacheableItemClientTest {
     @Mock
     private GenericCache<Long, ItemResponse> cache;
 
+    @Captor
+    private ArgumentCaptor<Function<Long, ItemResponse>> captor;
+
     @Test
     void should_GetById_when_EverythingIsOK() {
         //given
+        Long id = 1L;
         Function loadingFunction = mock(Function.class);
         ItemResponse expected = mock(ItemResponse.class);
 
-        given(cache.of(any(Function.class))).willReturn(loadingFunction);
-        given(loadingFunction.apply(1L)).willReturn(expected);
+        given(cache.of(captor.capture())).willReturn(loadingFunction);
+        given(loadingFunction.apply(id)).willReturn(expected);
+        given(originalItemClient.getById(id)).willReturn(expected);
 
         //when
-        ItemResponse actual = cacheableItemClient.getById(1L);
+        ItemResponse actual = cacheableItemClient.getById(id);
 
         //then
         assertEquals(expected, actual);
-        then(loadingFunction).should().apply(1L);
+        then(loadingFunction).should().apply(id);
+
+        ItemResponse applied = captor.getValue().apply(id);
+        assertEquals(expected, applied);
     }
 }
