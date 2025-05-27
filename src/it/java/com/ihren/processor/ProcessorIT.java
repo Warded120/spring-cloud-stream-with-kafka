@@ -48,7 +48,7 @@ public class ProcessorIT {
 
     @MockitoSpyBean
     @Qualifier("nonCacheableItemClient")
-    private ItemClient itemClient;
+    private ItemClient nonCacheableItemClient;
 
     @Autowired
     private Admin admin;
@@ -184,6 +184,6 @@ public class ProcessorIT {
 
         //then
         assertEquals(2, actual.size());
-        then(itemClient).should(times(1)).getById(1L);
+        then(nonCacheableItemClient).should(times(1)).getById(1L);
     }
 }
