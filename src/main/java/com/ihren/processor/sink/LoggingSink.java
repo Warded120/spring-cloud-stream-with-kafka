@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LoggingSink<T> implements Sink<T> {
     @Override
-    public void apply(T message, Throwable ex) {
-        log.error(ex.getMessage(), ex);
+    public void apply(T message, Throwable cause) {
+        log.error(cause.getMessage(), cause);
     }
 }
