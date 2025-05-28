@@ -46,6 +46,7 @@ public class ProcessorIT {
     @Autowired
     private KafkaConsumer<String, OutputTransaction> kafkaConsumer;
 
+
     @MockitoSpyBean
     @Qualifier("nonCacheableItemClient")
     private ItemClient nonCacheableItemClient;
