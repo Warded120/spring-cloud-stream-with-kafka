@@ -10,7 +10,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class ExceptionHandler<I, O> {
 
-    private final Sink<I> sink;
+    protected final Sink<I> sink;
 
     public Try<O> handle(Function<I, O> function, I input) {
         return Try.of(() -> function.apply(input))

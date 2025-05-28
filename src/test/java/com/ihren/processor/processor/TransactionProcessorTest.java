@@ -2,7 +2,7 @@ package com.ihren.processor.processor;
 
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.exception.handler.ExceptionHandler;
+import com.ihren.processor.exception.handler.MessageExceptionHandler;
 import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.output.OutputItem;
@@ -36,7 +36,7 @@ class TransactionProcessorTest {
     private TransactionProcessor processor;
 
     @Mock
-    private ExceptionHandler<InputTransaction, OutputTransaction> exceptionHandler;
+    private MessageExceptionHandler<InputTransaction, OutputTransaction> exceptionHandler;
 
     @Mock
     private CommonValidator<InputTransaction> validator;
@@ -45,7 +45,7 @@ class TransactionProcessorTest {
     private TransactionMapper mapper;
 
     @Captor
-    private ArgumentCaptor<Function<InputTransaction, OutputTransaction>> captor;
+    private ArgumentCaptor<Function<Message<InputTransaction>, Message<OutputTransaction>>> captor;
 
     @Test
     void should_processTransaction_when_EverythingIsOK() {
@@ -54,8 +54,6 @@ class TransactionProcessorTest {
 
         Message<InputTransaction> inputTransactionMessage = mock(Message.class);
         given(inputTransactionMessage.getPayload()).willReturn(inputTransaction);
-
-        Try<OutputTransaction> outputTransactionTry = mock(Try.class);
 
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
@@ -75,17 +73,18 @@ class TransactionProcessorTest {
         OutputTotal expectedTotal = new OutputTotal(BigDecimal.valueOf(360L), CurrencyCode.USD);
         OutputTransaction expectedTransaction = new OutputTransaction(uuid, Constants.SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
 
-
         Message<OutputTransaction> expected = MessageBuilder
                 .withPayload(expectedTransaction)
                 .build();
 
-        given(outputTransactionTry.get()).willReturn(expectedTransaction);
+        Try<Message<OutputTransaction>> outputTransactionMessageTry = mock(Try.class);
+        given(outputTransactionMessageTry.get()).willReturn(expected);
+
         given(validator.validate(inputTransaction)).willReturn(inputTransaction);
         given(mapper.map(inputTransaction)).willReturn(expectedTransaction);
 
-        given(exceptionHandler.handle(captor.capture(), eq(inputTransaction)))
-                .willReturn(outputTransactionTry);
+        given(exceptionHandler.handle(captor.capture(), eq(inputTransactionMessage)))
+                .willReturn(outputTransactionMessageTry);
 
         //when
         Message<OutputTransaction> actual = processor.apply(inputTransactionMessage);
@@ -93,9 +92,8 @@ class TransactionProcessorTest {
         //then
         assertEquals(expected.getPayload(), actual.getPayload());
 
-        Function<InputTransaction, OutputTransaction> captured = captor.getValue();
-
-        OutputTransaction applied = captured.apply(inputTransaction);
-        assertEquals(expectedTransaction, applied);
+        Function<Message<InputTransaction>, Message<OutputTransaction>> captured = captor.getValue();
+        Message<OutputTransaction> applied = captured.apply(inputTransactionMessage);
+        assertEquals(expectedTransaction, applied.getPayload());
     }
 }
