@@ -2,6 +2,7 @@ package com.ihren.processor.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.ihren.processor.exception.CacheException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -9,18 +10,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
-* Generic cache solution
-*/
+ * Generic cache solution
+ */
 public class GenericCache<K, V> {
     private final Cache<K, V> cache;
-
-    /**
-     * Create Cache without expiration
-     */
-    public GenericCache() {
-        this.cache = Caffeine.newBuilder()
-                .build();
-    }
 
     /**
      * Create Cache with expiration
@@ -51,11 +44,15 @@ public class GenericCache<K, V> {
      */
     public Function<K, V> of(Function<K, V> fn) {
         return key -> Optional.ofNullable(key)
-                .map(cache::getIfPresent)
-                .orElseGet(() -> {
-                    V applied = fn.apply(key);
-                    cache.put(key, applied);
-                    return applied;
-                });
+                .map(k ->
+                        Optional.of(key)
+                                .map(cache::getIfPresent)
+                                .orElseGet(() -> {
+                                    V applied = fn.apply(key);
+                                    cache.put(key, applied);
+                                    return applied;
+                                })
+                )
+                .orElseThrow(() -> new CacheException("key is null"));
     }
 }

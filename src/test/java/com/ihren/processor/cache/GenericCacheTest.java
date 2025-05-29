@@ -2,6 +2,7 @@ package com.ihren.processor.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.ihren.processor.client.response.ItemResponse;
+import com.ihren.processor.exception.CacheException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -11,7 +12,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.never;
@@ -96,22 +99,39 @@ class GenericCacheTest {
     @Test
     void should_CallOriginalFunction_when_CacheIsExpired() throws InterruptedException {
         //given
-        String expected = "data";
+        ItemResponse expected = mock(ItemResponse.class);
 
         Function function = mock(Function.class);
         given(function.apply(1)).willReturn(expected);
 
-        Function function1 = genericCache.of(function);
+        Function loadingFunction = genericCache.of(function);
 
         //when
-        Object firstCall = function1.apply(1);
+        ItemResponse firstCall = (ItemResponse) loadingFunction.apply(1);
         Thread.sleep(EXPIRATION_DURATION.toMillis());
-        Object secondCall = function1.apply(1);
+        ItemResponse secondCall = (ItemResponse) loadingFunction.apply(1);
 
         //then
         assertEquals(expected, firstCall);
         assertEquals(expected, secondCall);
 
         then(function).should(times(2)).apply(1);
+    }
+
+    @Test
+    void should_ThrowCacheException_when_KeyIsNull() {
+        //given
+        ItemResponse expected = mock(ItemResponse.class);
+
+        Function function = mock(Function.class);
+        given(function.apply(null)).willReturn(expected);
+
+        Function loadingFunction = genericCache.of(function);
+
+        //when
+        assertThrows(CacheException.class, () -> loadingFunction.apply(null));
+
+        //then
+        then(function).should(never()).apply(any());
     }
 }

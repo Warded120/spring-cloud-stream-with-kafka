@@ -37,9 +37,8 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
     }
 
     private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction) {
-        return Optional.of(outputTransaction)
-                .map(transaction -> MessageBuilder.withPayload(transaction).build())
-                //TODO: throw exception (?)
-                .orElse(null);
+        return MessageBuilder
+                .withPayload(outputTransaction)
+                .build();
     }
 }
