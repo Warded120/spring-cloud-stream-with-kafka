@@ -2,9 +2,9 @@ package com.ihren.processor.processor;
 
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
-import com.ihren.processor.exception.handler.MessageExceptionHandler;
 import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.validator.CommonValidator;
+import com.ihren.processor.exception.handler.ExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class TransactionProcessor implements Function<Message<InputTransaction>, Message<OutputTransaction>> {
-    private final MessageExceptionHandler<InputTransaction, OutputTransaction> messageExceptionHandler;
+    private final ExceptionHandler messageExceptionHandler;
     private final CommonValidator<InputTransaction> validator;
     private final TransactionMapper mapper;
 
@@ -37,8 +37,9 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
     }
 
     private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction) {
-        return Optional.ofNullable(outputTransaction)
+        return Optional.of(outputTransaction)
                 .map(transaction -> MessageBuilder.withPayload(transaction).build())
+                //TODO: throw exception (?)
                 .orElse(null);
     }
 }

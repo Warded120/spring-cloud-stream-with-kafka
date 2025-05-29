@@ -40,6 +40,8 @@ import static org.mockito.BDDMockito.then;
 
 @IntegrationTest
 public class ProcessorIT {
+    private static final Duration TIME_TO_WAIT = Duration.ofMillis(1500);
+
     @Autowired
     private KafkaTemplate<String, InputTransaction> kafkaTemplate;
 
@@ -105,17 +107,17 @@ public class ProcessorIT {
         kafkaTemplate.send(topicIn, inputTransaction);
 
         //when
-        OutputTransaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3));
+        OutputTransaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
 
         //then
         assertAll(
-                () -> assertNotNull(actual.getTransactionId()),
-                () -> assertEquals(expectedTransaction.getSource(), actual.getSource()),
-                () -> assertNull(actual.getDiscount()),
-                () -> assertEquals(expectedTransaction.getSequenceNumber(), actual.getSequenceNumber()),
-                () -> assertEquals(expectedTransaction.getOperationDateTime(), actual.getOperationDateTime()),
-                () -> assertArrayEquals(expectedTransaction.getItems().toArray(), actual.getItems().toArray()),
-                () -> assertEquals(expectedTransaction.getTotal(), actual.getTotal())
+                () -> assertNotNull(actual.transactionId()),
+                () -> assertEquals(expectedTransaction.source(), actual.source()),
+                () -> assertNull(actual.discount()),
+                () -> assertEquals(expectedTransaction.sequenceNumber(), actual.sequenceNumber()),
+                () -> assertEquals(expectedTransaction.operationDateTime(), actual.operationDateTime()),
+                () -> assertArrayEquals(expectedTransaction.items().toArray(), actual.items().toArray()),
+                () -> assertEquals(expectedTransaction.total(), actual.total())
         );
     }
 
@@ -128,7 +130,7 @@ public class ProcessorIT {
 
         //when
         //then
-        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3)));
+        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, TIME_TO_WAIT));
         assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
     }
 
@@ -150,7 +152,7 @@ public class ProcessorIT {
 
         //when
         //then
-        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, Duration.ofSeconds(3)));
+        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, TIME_TO_WAIT));
         assertTrue(output.getOut().contains("com.ihren.processor.exception.NotFoundException"));
     }
 
@@ -181,7 +183,7 @@ public class ProcessorIT {
         kafkaTemplate.send(topicIn, inputTransaction2);
 
         //when
-        List<OutputTransaction> actual = KafkaUtils.getRecords(kafkaConsumer, topicOut, Duration.ofSeconds(3), 2);
+        List<OutputTransaction> actual = KafkaUtils.getRecords(kafkaConsumer, topicOut, TIME_TO_WAIT, 2);
 
         //then
         assertEquals(2, actual.size());

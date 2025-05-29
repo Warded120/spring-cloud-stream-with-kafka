@@ -36,3 +36,5 @@ spring:
 feign:
   client:
     baseUrl: localhost:8080
+cache:
+  ttl: 1d

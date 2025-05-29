@@ -1,6 +1,10 @@
 package com.ihren.processor.exception;
 
-import lombok.experimental.StandardException;
-
-@StandardException
-public class SerializationException extends RuntimeException { }
+public class SerializationException extends RuntimeException {
+    public SerializationException(final String message, final Throwable cause) {
+        super(message);
+        if (cause != null) {
+            super.initCause(cause);
+        }
+    }
+}

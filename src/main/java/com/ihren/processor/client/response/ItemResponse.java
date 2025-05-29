@@ -19,6 +19,7 @@ public record ItemResponse(
         @NotBlank(message = "itemResponse.description cannot be blank")
         String description,
 
+        //TODO: why checkstyle doesn't see the violation? (ask on a daily call)
         @NotNull(message = "itemResponse.VATRate cannot be null")
         @DecimalMin(value = "0.0", message = "itemResponse.VATRate must be at least 0.0")
         @DecimalMax(value = "100.0", message = "itemResponse.VATRate must be at most 100.0")

@@ -2,7 +2,7 @@ package com.ihren.processor.mapper;
 
 import com.ihren.processor.enricher.Enricher;
 import com.ihren.processor.model.input.InputItem;
-import com.ihren.processor.mapper.exception.MappingException;
+import com.ihren.processor.exception.MappingException;
 import com.ihren.processor.model.output.OutputItem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

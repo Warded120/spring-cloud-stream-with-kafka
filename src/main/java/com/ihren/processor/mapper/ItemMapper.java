@@ -4,7 +4,7 @@ import com.ihren.processor.constant.Account;
 import com.ihren.processor.enricher.Enricher;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.input.InputItem;
-import com.ihren.processor.mapper.exception.MappingException;
+import com.ihren.processor.exception.MappingException;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

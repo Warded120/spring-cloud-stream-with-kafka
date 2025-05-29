@@ -2,7 +2,7 @@ package com.ihren.processor.processor;
 
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.exception.handler.MessageExceptionHandler;
+import com.ihren.processor.exception.handler.ExceptionHandler;
 import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.output.OutputItem;
@@ -36,7 +36,7 @@ class TransactionProcessorTest {
     private TransactionProcessor processor;
 
     @Mock
-    private MessageExceptionHandler<InputTransaction, OutputTransaction> exceptionHandler;
+    private ExceptionHandler exceptionHandler;
 
     @Mock
     private CommonValidator<InputTransaction> validator;

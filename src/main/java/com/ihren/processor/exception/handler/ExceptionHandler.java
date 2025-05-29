@@ -8,11 +8,11 @@ import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class ExceptionHandler<I, O> {
+public class ExceptionHandler {
 
-    protected final Sink<I> sink;
+    private final Sink sink;
 
-    public Try<O> handle(Function<I, O> function, I input) {
+    public<I, O> Try<O> handle(Function<I, O> function, I input) {
         return Try.of(() -> function.apply(input))
             .recover(ex -> {
                 sink.apply(input, ex);

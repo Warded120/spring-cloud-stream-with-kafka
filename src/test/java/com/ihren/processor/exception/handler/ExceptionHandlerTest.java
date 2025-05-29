@@ -24,7 +24,7 @@ class ExceptionHandlerTest {
     private ExceptionHandler handler;
 
     @Mock
-    private Sink<String> sink;
+    private Sink sink;
 
     @Test
     void should_ApplyFunction_when_InputIsValid() {

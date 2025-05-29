@@ -2,7 +2,7 @@ package com.ihren.processor.serializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.config.ObjectMapperConfig;
-import com.ihren.processor.serializer.exception.SerializationException;
+import com.ihren.processor.exception.SerializationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
