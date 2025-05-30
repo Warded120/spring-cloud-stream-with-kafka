@@ -34,7 +34,7 @@ spring:
                 isolation:
                   level: read_committed
 api:
-  itemClient:
+  product:
     url: localhost:8080
 cache:
   item:
