@@ -1,6 +1,6 @@
 package com.ihren.processor.model.input;
 
-import com.ihren.processor.validation.discount.Discount;
+import com.ihren.processor.validator.discount.Discount;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

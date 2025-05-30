@@ -3,17 +3,16 @@ package com.ihren.processor.exception.handler;
 import com.ihren.processor.sink.Sink;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
-public class ExceptionHandler<I, O> {
+public class ExceptionHandler {
 
-    private final Sink<I> sink;
+    private final Sink sink;
 
-    public Try<O> handle(Function<Message<I>, O> function, Message<I> input) {
+    public<I, O> Try<O> handle(Function<I, O> function, I input) {
         return Try.of(() -> function.apply(input))
             .recover(ex -> {
                 sink.apply(input, ex);

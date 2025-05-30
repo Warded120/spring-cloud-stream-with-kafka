@@ -58,7 +58,18 @@ class TransactionMapperImplTest {
         //given
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
-        OutputItem expectedItem = new OutputItem(1L, "Main", "beginDateTime", "endDateTime");
+        OutputItem expectedItem = new OutputItem(
+                1L,
+                "Main",
+                "beginDateTime",
+                "endDateTime",
+                new BigDecimal("150.00"),
+                "producer",
+                "description",
+                new BigDecimal("150.00"),
+                "UOM",
+                "12345678901234"
+        );
         OutputTotal expectedTotal = new OutputTotal(BigDecimal.valueOf(360L), CurrencyCode.USD);
         OutputTransaction expectedTransaction = new OutputTransaction(uuid, Constants.SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
 

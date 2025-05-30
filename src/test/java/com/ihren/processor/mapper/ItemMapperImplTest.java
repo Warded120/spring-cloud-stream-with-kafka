@@ -1,29 +1,62 @@
 package com.ihren.processor.mapper;
 
+import com.ihren.processor.enricher.Enricher;
 import com.ihren.processor.model.input.InputItem;
-import com.ihren.processor.mapper.exception.MappingException;
+import com.ihren.processor.exception.MappingException;
 import com.ihren.processor.model.output.OutputItem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class ItemMapperImplTest {
     @Spy
+    @InjectMocks
     private final ItemMapper itemMapper = new ItemMapperImpl();
+
+    @Mock
+    private Enricher<OutputItem> enricher;
 
     @Test
     void should_ReturnOutputItem_when_InputItemIsValid() {
         //given
-        OutputItem expected = new OutputItem(1L, "Main", "beginDateTime", "endDateTime");
+        OutputItem expectedAfterEnriching = new OutputItem(
+                1L,
+                "Main",
+                "beginDateTime",
+                "endDateTime",
+                new BigDecimal("150.00"),
+                "producer",
+                "description",
+                new BigDecimal("150.00"),
+                "UOM",
+                "BarCode"
+        );
+
+        OutputItem expectedBeforeEnriching = new OutputItem(
+                1L,
+                "Main",
+                "beginDateTime",
+                "endDateTime",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
 
         InputItem inputItem = mock(InputItem.class);
         given(inputItem.id()).willReturn(1L);
@@ -31,11 +64,23 @@ class ItemMapperImplTest {
         given(inputItem.beginDateTime()).willReturn("beginDateTime");
         given(inputItem.endDateTime()).willReturn("endDateTime");
 
+        willAnswer(invocation -> {
+            OutputItem item = invocation.getArgument(0);
+            item.setPrice(new BigDecimal("150.00"));
+            item.setProducer("producer");
+            item.setDescription("description");
+            item.setVATRate(new BigDecimal("150.00"));
+            item.setUOM("UOM");
+            item.setBarCode("BarCode");
+            return null;
+        }).given(enricher).enrich(expectedBeforeEnriching);
+
+
         //when
         OutputItem actual = itemMapper.map(inputItem);
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(expectedAfterEnriching, actual);
 
         then(itemMapper).should().mapAccount(inputItem.loyaltyAccountId());
     }
@@ -55,5 +100,17 @@ class ItemMapperImplTest {
         //when
         //then
         assertThrows(MappingException.class, () -> itemMapper.map(inputItem));
+    }
+
+    @Test
+    void should_CallEnricher() {
+        //given
+        OutputItem outputItem = mock();
+
+        //when
+        itemMapper.enrichItem(outputItem);
+
+        //then
+        then(enricher).should().enrich(outputItem);
     }
 }
