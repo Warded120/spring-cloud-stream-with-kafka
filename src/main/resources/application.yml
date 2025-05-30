@@ -33,8 +33,9 @@ spring:
               configuration:
                 isolation:
                   level: read_committed
-feign:
-  client:
-    baseUrl: localhost:8080
+api:
+  itemClient:
+    url: localhost:8080
 cache:
-  ttl: 1d
+  item:
+    expiration: 1d

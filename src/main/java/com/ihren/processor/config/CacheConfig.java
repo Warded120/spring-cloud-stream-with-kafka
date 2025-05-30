@@ -10,7 +10,7 @@ import java.time.Duration;
 @Configuration
 public class CacheConfig {
 
-    @Value("${cache.ttl}")
+    @Value("${cache.item.expiration}")
     private Duration ttl;
 
     @Bean
