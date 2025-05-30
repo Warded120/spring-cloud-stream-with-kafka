@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "nonCacheableItemClient",
-        url = "${api.itemClient.url}",
+        url = "${api.product.url}",
         primary = false,
         qualifiers = "nonCacheableItemClient"
 )
