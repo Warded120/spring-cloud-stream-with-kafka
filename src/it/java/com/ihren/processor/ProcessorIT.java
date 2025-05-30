@@ -86,21 +86,11 @@ public class ProcessorIT {
 
         OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
 
-        String body = """
-                    {
-                      "price": 150.00,
-                      "producer": "producer",
-                      "description": "description",
-                      "VATRate": 99.99,
-                      "UOM": "UOM",
-                      "barCode": "12345678901234"
-                    }
-                """;
         stubFor(get(urlEqualTo("/users/1"))
                 .willReturn(
                         aResponse()
                                 .withHeader("Content-Type", "application/json")
-                                .withBody(body)
+                                .withBodyFile("item-response.json")
                 )
         );
 
@@ -161,21 +151,11 @@ public class ProcessorIT {
         InputTransaction inputTransaction1 = TestUtils.getValidInputTransaction();
         InputTransaction inputTransaction2 = TestUtils.getValidInputTransaction();
 
-        String body = """
-                    {
-                      "price": 150.00,
-                      "producer": "producer",
-                      "description": "description",
-                      "VATRate": 99.99,
-                      "UOM": "UOM",
-                      "barCode": "12345678901234"
-                    }
-                """;
         stubFor(get(urlEqualTo("/users/1"))
                 .willReturn(
                         aResponse()
                                 .withHeader("Content-Type", "application/json")
-                                .withBody(body)
+                                .withBodyFile("item-response.json")
                 )
         );
 
