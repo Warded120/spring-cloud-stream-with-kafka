@@ -12,3 +12,4 @@ This document outlines the required tasks for understanding what is Dead Letter 
 - Implement Replay mechanism
 - Implement REST Controller to trigger manually replay mechanism
 - Error code and message are added to headers
+- Send messages with a custom header (isDLT or so) and check if the header exists after it goes to dlt topic

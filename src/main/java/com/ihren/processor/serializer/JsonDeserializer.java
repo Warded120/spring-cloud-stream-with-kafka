@@ -7,10 +7,6 @@ import io.vavr.control.Try;
 import org.apache.kafka.common.serialization.Deserializer;
 import java.util.Map;
 
-//TODO: implement sink to send message to dlt add 2 headers: errorCode (Enum) and message
-//TODO: Handle exceptions and send message to DLT (inject exceptionHandler bean with ApplicationContextAware)
-//TODO: OR
-//TODO: Move de/serialization to processor so that processor takes bytes and de/serialize it inside to avoid static field from spring context
 public class JsonDeserializer<T> implements Deserializer<T> {
 
     private final ObjectMapper objectMapper;

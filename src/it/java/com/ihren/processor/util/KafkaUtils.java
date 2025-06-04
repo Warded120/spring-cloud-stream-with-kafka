@@ -31,6 +31,14 @@ public class KafkaUtils {
                 .get();
     }
 
+    public<K, V> ConsumerRecord<K, V> getRecordd(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+        return Try.of(() ->
+                    KafkaTestUtils.getSingleRecord(consumer, topic, timeout)
+                )
+                .recover(ex -> null)
+                .get();
+    }
+
     public<K, V> List<V> getRecords(KafkaConsumer<K, V> consumer, String topic, Duration timeout, int minRecords) {
         return Try.of(() -> {
                     ConsumerRecords<K, V> records = KafkaTestUtils.getRecords(consumer, timeout, minRecords);
