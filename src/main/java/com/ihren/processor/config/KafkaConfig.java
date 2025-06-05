@@ -41,7 +41,6 @@ public class KafkaConfig {
         return dlpr;
     }
 
-    //TODO: does it work without it?
     @Bean
     public BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver() {
         return (record, ex) -> new TopicPartition(record.topic().concat(".dlt"), 0);

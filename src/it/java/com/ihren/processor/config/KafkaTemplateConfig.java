@@ -34,9 +34,8 @@ public class KafkaTemplateConfig {
         return new KafkaTemplate<>(factory);
     }
 
-    //TODO: remove later (?)
     @Bean
-    public ProducerFactory<String, String> producerFactoryS() {
+    public ProducerFactory<String, String> stringProducerFactory() {
         Map<String, Object> config = Map.of(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
@@ -46,9 +45,8 @@ public class KafkaTemplateConfig {
         return new DefaultKafkaProducerFactory<>(config);
     }
 
-    //TODO: remove later (?)
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplateS(ProducerFactory<String, String> factory) {
+    public KafkaTemplate<String, String> stringKafkaTemplate(ProducerFactory<String, String> factory) {
         return new KafkaTemplate<>(factory);
     }
 }
