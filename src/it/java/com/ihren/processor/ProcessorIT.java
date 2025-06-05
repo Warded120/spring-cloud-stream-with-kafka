@@ -5,6 +5,7 @@ import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.cache.GenericCache;
 import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
+import com.ihren.processor.constant.CustomKafkaHeaders;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.util.KafkaUtils;
@@ -12,9 +13,6 @@ import com.ihren.processor.util.TestUtils;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.header.Headers;
-import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,20 +45,16 @@ import static org.mockito.BDDMockito.then;
 
 @IntegrationTest
 public class ProcessorIT {
-    private static final Duration TIME_TO_WAIT = Duration.ofMillis(1500);
+    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
 
     @Autowired
     private KafkaTemplate<String, InputTransaction> kafkaTemplate;
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplateString;
-
-    @Autowired
     private KafkaConsumer<String, OutputTransaction> kafkaConsumer;
 
     @Autowired
-    private KafkaConsumer<String, String> kafkaConsumerS;
-
+    private KafkaConsumer<String, InputTransaction> dltKafkaConsumer;
 
     @MockitoSpyBean
     @Qualifier("nonCacheableItemClient")
@@ -81,14 +75,16 @@ public class ProcessorIT {
     @BeforeEach
     public void init() {
         kafkaConsumer.subscribe(Collections.singletonList(topicOut));
-        kafkaConsumerS.subscribe(Collections.singletonList("test.dlt"));
+        dltKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
     }
 
     @AfterEach
     public void clean() {
         KafkaUtils.purgeAllRecords(admin, topicIn);
+        KafkaUtils.purgeAllRecords(admin, topicIn.concat(".dlt"));
         KafkaUtils.purgeAllRecords(admin, topicOut);
         kafkaConsumer.unsubscribe();
+        dltKafkaConsumer.unsubscribe();
         cache.clearCache();
         WireMock.reset();
     }
@@ -111,7 +107,7 @@ public class ProcessorIT {
         kafkaTemplate.send(topicIn, inputTransaction);
 
         //when
-        OutputTransaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
+        OutputTransaction actual = KafkaUtils.getRecordValue(kafkaConsumer, topicOut, TIME_TO_WAIT);
 
         //then
         assertAll(
@@ -126,16 +122,23 @@ public class ProcessorIT {
     }
 
     @Test
-    void should_LogError_when_InputTransactionIsInvalid(CapturedOutput output) {
+    void should_LogError_when_InputTransactionIsInvalid() {
         //given
         InputTransaction inputTransaction = TestUtils.getInvalidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, "test")
+                .setHeader(KafkaHeaders.PARTITION, null)
+                .setHeader(KafkaHeaders.KEY, null)
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .build();
 
-        kafkaTemplate.send(topicIn, inputTransaction);
+        kafkaTemplate.send(message);
 
         //when
         //then
-        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, TIME_TO_WAIT));
-        assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+        assertNotNull(record);
     }
 
     @Test
@@ -182,25 +185,5 @@ public class ProcessorIT {
         //then
         assertEquals(2, actual.size());
         then(nonCacheableItemClient).should(times(1)).getById(1L);
-    }
-
-    //TODO: remove later
-    @Test
-    void should_handleDeserializationException() {
-        Message<String> message = MessageBuilder
-                .withPayload("invalid")
-                .setHeader(KafkaHeaders.TOPIC, "test")
-                .setHeader(KafkaHeaders.PARTITION, null)
-                .setHeader(KafkaHeaders.KEY, null)
-                .setHeader("isReply", false)
-                .build();
-
-        kafkaTemplate.send(message);
-
-        ConsumerRecord<String, String> record = KafkaUtils.getRecordd(kafkaConsumerS, "test.dlt", Duration.ofSeconds(10));
-        assertNotNull(record);
-        assertNotNull(record.headers().lastHeader("exception"));
-        System.out.println("isReply: " + new String(record.headers().lastHeader("isReply").value()));
-        assertTrue(Boolean.valueOf(new String(record.headers().lastHeader("isReply").value())));
     }
 }

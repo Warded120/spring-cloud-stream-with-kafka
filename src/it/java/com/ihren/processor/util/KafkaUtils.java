@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
 
 @UtilityClass
 public class KafkaUtils {
-    public<K, V> V getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+    public<K, V> V getRecordValue(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() -> {
                     ConsumerRecord<K, V> record = KafkaTestUtils.getSingleRecord(consumer, topic, timeout);
                     return record.value();
@@ -31,7 +31,7 @@ public class KafkaUtils {
                 .get();
     }
 
-    public<K, V> ConsumerRecord<K, V> getRecordd(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+    public<K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() ->
                     KafkaTestUtils.getSingleRecord(consumer, topic, timeout)
                 )
@@ -52,7 +52,7 @@ public class KafkaUtils {
     }
 
     public <K, V> boolean hasRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
-        return getRecord(consumer, topic, timeout) != null;
+        return getRecordValue(consumer, topic, timeout) != null;
     }
 
     public void purgeAllRecords(Admin admin, String topic) {

@@ -7,7 +7,6 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.cloud.stream.binder.kafka.ListenerContainerWithDlqAndRetryCustomizer;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.listener.CommonErrorHandler;
-import org.springframework.lang.Nullable;
 import org.springframework.util.backoff.BackOff;
 import java.util.function.BiFunction;
 

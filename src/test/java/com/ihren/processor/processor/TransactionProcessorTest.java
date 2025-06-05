@@ -47,6 +47,7 @@ class TransactionProcessorTest {
     @Captor
     private ArgumentCaptor<Function<Message<InputTransaction>, Message<OutputTransaction>>> captor;
 
+    //TODO: update the test
     @Test
     void should_processTransaction_when_EverythingIsOK() {
         //given

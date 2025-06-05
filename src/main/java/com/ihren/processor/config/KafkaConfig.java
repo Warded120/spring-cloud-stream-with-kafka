@@ -1,5 +1,7 @@
 package com.ihren.processor.config;
 
+import com.ihren.processor.constant.CustomKafkaHeaders;
+import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.dlt.customizer.CommonDltCustomizer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
@@ -25,18 +27,17 @@ public class KafkaConfig {
     @Bean
     public CommonErrorHandler errorHandler(DeadLetterPublishingRecoverer dlpr, BackOff backOff) {
         return new DefaultErrorHandler(dlpr, backOff);
-//        return new MyErrorHandler(dlpr, backOff);
     }
 
     @Bean
     public DeadLetterPublishingRecoverer dlpr(KafkaTemplate<?, ?> kafkaTemplate, BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
         DeadLetterPublishingRecoverer dlpr = new DeadLetterPublishingRecoverer(kafkaTemplate, dlqDestinationResolver);
         dlpr.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
-            //TODO: set errorCode header and keep existing headers
-            kafkaHeaders.add("exception", exception.getMessage().getBytes());
+            kafkaHeaders.add(CustomKafkaHeaders.ERROR_CODE, ErrorCode.from(exception).name().getBytes());
+            kafkaHeaders.add(CustomKafkaHeaders.EXCEPTION_MESSAGE, exception.getMessage().getBytes());
 
-            kafkaHeaders.remove("isReply");
-            kafkaHeaders.add("isReply", "true".getBytes());
+            kafkaHeaders.remove(CustomKafkaHeaders.IS_DLT);
+            kafkaHeaders.add(CustomKafkaHeaders.IS_DLT, "true".getBytes());
         });
         return dlpr;
     }
