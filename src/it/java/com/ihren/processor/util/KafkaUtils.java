@@ -26,7 +26,6 @@ import java.util.stream.StreamSupport;
 public class KafkaUtils {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    //FIXME: is it OK?
     static {
         ObjectMapperConfig.configure(MAPPER);
     }
@@ -58,11 +57,6 @@ public class KafkaUtils {
                 })
                 .recover(ex -> null)
                 .get();
-    }
-
-    //TODO: maybe remove
-    public <K, V> boolean hasRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
-        return getRecordValue(consumer, topic, timeout) != null;
     }
 
     public void purgeAllRecords(Admin admin, String topic) {

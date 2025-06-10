@@ -6,6 +6,7 @@ import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.validator.CommonValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
@@ -23,12 +24,14 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
                 .map(Message::getPayload)
                 .map(validator::validate)
                 .map(mapper::map)
-                .map(this::constructMessage)
-                .orElse(null);    }
+                .map(outputTransaction -> constructMessage(outputTransaction, message.getHeaders()))
+                .orElse(null);
+    }
 
-    private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction) {
+    private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction, MessageHeaders headers) {
         return MessageBuilder
                 .withPayload(outputTransaction)
+                .copyHeadersIfAbsent(headers)
                 .build();
     }
 }

@@ -37,6 +37,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -103,7 +104,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, KafkaUtils.write(false))
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
                 .build();
 
         OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
@@ -119,9 +120,11 @@ public class ProcessorIT {
         kafkaTemplate.send(message);
 
         //when
-        OutputTransaction actual = KafkaUtils.getRecordValue(kafkaConsumer, topicOut, TIME_TO_WAIT);
+        ConsumerRecord<String, OutputTransaction> record = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
+        OutputTransaction actual = record.value();
 
         //then
+        assertFalse(KafkaUtils.read(record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(), Boolean.class));
         assertAll(
                 () -> assertNotNull(actual.transactionId()),
                 () -> assertEquals(expectedTransaction.source(), actual.source()),
@@ -140,7 +143,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, KafkaUtils.write(false))
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
                 .build();
 
         kafkaTemplate.send(message);
@@ -149,6 +152,7 @@ public class ProcessorIT {
         ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
 
         //then
+        assertNotNull(record);
         assertTrue(
                 KafkaUtils.read(
                         record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
@@ -177,7 +181,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, KafkaUtils.write(false))
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
                 .build();
 
         stubFor(get(urlEqualTo("/users/1"))
@@ -192,9 +196,9 @@ public class ProcessorIT {
         kafkaTemplate.send(message);
 
         //when
-        //then
         ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
-        //TODO: do I need to check for notNull?
+
+        //then
         assertNotNull(record);
         assertTrue(
                 KafkaUtils.read(
@@ -223,7 +227,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, KafkaUtils.write(false))
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
                 .build();
 
         stubFor(get(urlEqualTo("/users/1"))
@@ -247,15 +251,20 @@ public class ProcessorIT {
 
     @Test
     void should_SendToDlt_when_DeserializationFailed() {
+        //given
         Message<String> message = MessageBuilder
                 .withPayload("invalid")
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, KafkaUtils.write(false))
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
                 .build();
 
         kafkaTemplate.send(message);
 
+        //when
         ConsumerRecord<String, String> record = KafkaUtils.getRecord(stringKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+
+        //then
+        assertNotNull(record);
         assertTrue(
                 KafkaUtils.read(
                         record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
@@ -276,4 +285,6 @@ public class ProcessorIT {
                 )
         );
     }
+
+    //TODO: create test where I send to dlt directly and trigger replay mechanism
 }

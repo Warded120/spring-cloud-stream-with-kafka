@@ -43,7 +43,7 @@ public class KafkaConfig {
                 kafkaHeaders.add(CustomKafkaHeaders.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exception.getMessage()));
 
                 kafkaHeaders.add(CustomKafkaHeaders.IS_DLT, mapper.writeValueAsBytes(true));
-            }).getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex)); //TODO: is it OK?
+            }).getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
         });
         return recoverer;
     }
@@ -64,15 +64,5 @@ public class KafkaConfig {
                 .map(ErrorCode::from)
                 .findFirst()
                 .orElse(ErrorCode.UNKNOWN_EXCEPTION);
-        //TODO: are these the same solutions?
-//        Exception cause = exception;
-//        while (ErrorCode.from(cause) == ErrorCode.UNKNOWN_EXCEPTION) {
-//            if(cause.getCause() != null) {
-//                cause = (Exception) cause.getCause();
-//            } else {
-//                break;
-//            }
-//        }
-//        return cause;
     }
 }
