@@ -1,15 +1,19 @@
 package com.ihren.processor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.cache.GenericCache;
 import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
+import com.ihren.processor.constant.CustomKafkaHeaders;
+import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.util.KafkaUtils;
 import com.ihren.processor.util.TestUtils;
 import org.apache.kafka.clients.admin.Admin;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import java.time.Duration;
 import java.util.Collections;
@@ -40,7 +46,7 @@ import static org.mockito.BDDMockito.then;
 
 @IntegrationTest
 public class ProcessorIT {
-    private static final Duration TIME_TO_WAIT = Duration.ofMillis(1500);
+    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
 
     @Autowired
     private KafkaTemplate<String, InputTransaction> kafkaTemplate;
@@ -48,6 +54,11 @@ public class ProcessorIT {
     @Autowired
     private KafkaConsumer<String, OutputTransaction> kafkaConsumer;
 
+    @Autowired
+    private KafkaConsumer<String, InputTransaction> dltKafkaConsumer;
+
+    @Autowired
+    private KafkaConsumer<String, String> stringKafkaConsumer;
 
     @MockitoSpyBean
     @Qualifier("nonCacheableItemClient")
@@ -59,6 +70,9 @@ public class ProcessorIT {
     @Autowired
     private GenericCache<Long, ItemResponse> cache;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.destination}")
     private String topicIn;
 
@@ -68,13 +82,17 @@ public class ProcessorIT {
     @BeforeEach
     public void init() {
         kafkaConsumer.subscribe(Collections.singletonList(topicOut));
+        dltKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
+        stringKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
     }
 
     @AfterEach
     public void clean() {
         KafkaUtils.purgeAllRecords(admin, topicIn);
+        KafkaUtils.purgeAllRecords(admin, topicIn.concat(".dlt"));
         KafkaUtils.purgeAllRecords(admin, topicOut);
         kafkaConsumer.unsubscribe();
+        dltKafkaConsumer.unsubscribe();
         cache.clearCache();
         WireMock.reset();
     }
@@ -83,6 +101,11 @@ public class ProcessorIT {
     void should_Process_when_InputTransactionIsValid() {
         //given
         InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, topicIn)
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .build();
 
         OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
 
@@ -94,12 +117,14 @@ public class ProcessorIT {
                 )
         );
 
-        kafkaTemplate.send(topicIn, inputTransaction);
+        kafkaTemplate.send(message);
 
         //when
-        OutputTransaction actual = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
+        ConsumerRecord<String, OutputTransaction> record = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
+        OutputTransaction actual = record.value();
 
         //then
+        assertFalse(KafkaUtils.read(record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(), Boolean.class));
         assertAll(
                 () -> assertNotNull(actual.transactionId()),
                 () -> assertEquals(expectedTransaction.source(), actual.source()),
@@ -112,22 +137,52 @@ public class ProcessorIT {
     }
 
     @Test
-    void should_LogError_when_InputTransactionIsInvalid(CapturedOutput output) {
+    void should_SendToDltWithHeaders_when_InputTransactionIsInvalid() {
         //given
         InputTransaction inputTransaction = TestUtils.getInvalidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, topicIn)
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .build();
 
-        kafkaTemplate.send(topicIn, inputTransaction);
+        kafkaTemplate.send(message);
 
         //when
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+
         //then
-        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, TIME_TO_WAIT));
-        assertTrue(output.getOut().contains("jakarta.validation.ValidationException"));
+        assertNotNull(record);
+        assertTrue(
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
+                        Boolean.class
+                )
+        );
+        assertEquals(
+                ErrorCode.VALIDATION_EXCEPTION,
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.ERROR_CODE).value(),
+                        ErrorCode.class
+                )
+        );
+        assertNotNull(
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.EXCEPTION_MESSAGE).value(),
+                        String.class
+                )
+        );
     }
 
     @Test
-    void should_LogError_when_EnrichmentFailed(CapturedOutput output) {
+    void should_SendToDltWithHeaders_when_EnrichmentFailed() {
         //given
         InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, topicIn)
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .build();
 
         stubFor(get(urlEqualTo("/users/1"))
                 .willReturn(
@@ -138,18 +193,42 @@ public class ProcessorIT {
                 )
         );
 
-        kafkaTemplate.send(topicIn, inputTransaction);
+        kafkaTemplate.send(message);
 
         //when
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+
         //then
-        assertFalse(KafkaUtils.hasRecord(kafkaConsumer, topicOut, TIME_TO_WAIT));
-        assertTrue(output.getOut().contains("com.ihren.processor.exception.NotFoundException"));
+        assertNotNull(record);
+        assertTrue(
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
+                        Boolean.class
+                )
+        );
+        assertEquals(
+                ErrorCode.NOT_FOUND_EXCEPTION,
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.ERROR_CODE).value(),
+                        ErrorCode.class
+                )
+        );
+        assertNotNull(
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.EXCEPTION_MESSAGE).value(),
+                        String.class
+                )
+        );
     }
 
     @Test
     void should_CallApiOnce_when_ClientCalledTwice() {
-        InputTransaction inputTransaction1 = TestUtils.getValidInputTransaction();
-        InputTransaction inputTransaction2 = TestUtils.getValidInputTransaction();
+        InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, topicIn)
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .build();
 
         stubFor(get(urlEqualTo("/users/1"))
                 .willReturn(
@@ -159,8 +238,8 @@ public class ProcessorIT {
                 )
         );
 
-        kafkaTemplate.send(topicIn, inputTransaction1);
-        kafkaTemplate.send(topicIn, inputTransaction2);
+        kafkaTemplate.send(message);
+        kafkaTemplate.send(message);
 
         //when
         List<OutputTransaction> actual = KafkaUtils.getRecords(kafkaConsumer, topicOut, TIME_TO_WAIT, 2);
@@ -169,4 +248,43 @@ public class ProcessorIT {
         assertEquals(2, actual.size());
         then(nonCacheableItemClient).should(times(1)).getById(1L);
     }
+
+    @Test
+    void should_SendToDlt_when_DeserializationFailed() {
+        //given
+        Message<String> message = MessageBuilder
+                .withPayload("invalid")
+                .setHeader(KafkaHeaders.TOPIC, topicIn)
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .build();
+
+        kafkaTemplate.send(message);
+
+        //when
+        ConsumerRecord<String, String> record = KafkaUtils.getRecord(stringKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+
+        //then
+        assertNotNull(record);
+        assertTrue(
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
+                        Boolean.class
+                )
+        );
+        assertEquals(
+                ErrorCode.SERIALIZATION_EXCEPTION,
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.ERROR_CODE).value(),
+                        ErrorCode.class
+                )
+        );
+        assertNotNull(
+                KafkaUtils.read(
+                        record.headers().lastHeader(CustomKafkaHeaders.EXCEPTION_MESSAGE).value(),
+                        String.class
+                )
+        );
+    }
+
+    //TODO: create test where I send to dlt directly and trigger replay mechanism
 }

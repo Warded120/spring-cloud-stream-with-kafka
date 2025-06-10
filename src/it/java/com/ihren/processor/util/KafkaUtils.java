@@ -1,5 +1,7 @@
 package com.ihren.processor.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ihren.processor.config.ObjectMapperConfig;
 import io.vavr.control.Try;
 import lombok.experimental.UtilityClass;
 import org.apache.kafka.clients.admin.Admin;
@@ -22,11 +24,25 @@ import java.util.stream.StreamSupport;
 
 @UtilityClass
 public class KafkaUtils {
-    public<K, V> V getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    static {
+        ObjectMapperConfig.configure(MAPPER);
+    }
+
+    public<K, V> V getRecordValue(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() -> {
                     ConsumerRecord<K, V> record = KafkaTestUtils.getSingleRecord(consumer, topic, timeout);
                     return record.value();
                 })
+                .recover(ex -> null)
+                .get();
+    }
+
+    public<K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+        return Try.of(() ->
+                    KafkaTestUtils.getSingleRecord(consumer, topic, timeout)
+                )
                 .recover(ex -> null)
                 .get();
     }
@@ -41,10 +57,6 @@ public class KafkaUtils {
                 })
                 .recover(ex -> null)
                 .get();
-    }
-
-    public <K, V> boolean hasRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
-        return getRecord(consumer, topic, timeout) != null;
     }
 
     public void purgeAllRecords(Admin admin, String topic) {
@@ -68,5 +80,15 @@ public class KafkaUtils {
             deleteRecordsResult.all().get();
         })
         .onFailure(Throwable::printStackTrace);
+    }
+
+    public<T> T read(byte[] bytes, Class<T> clazz) {
+        return Try.of(() -> MAPPER.readValue(bytes, clazz))
+                .getOrElseThrow(ex -> new IllegalStateException("Cannot read bytes to " + clazz.getName(), ex));
+    }
+
+    public byte[] write(Object t) {
+        return Try.of(() -> MAPPER.writeValueAsBytes(t))
+                .getOrElseThrow(ex -> new IllegalStateException("Cannot write " + t, ex));
     }
 }

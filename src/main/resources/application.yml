@@ -22,12 +22,13 @@ spring:
         binder:
           brokers: localhost:9092
           consumer-properties:
-            value.deserializer: com.ihren.processor.serializer.JsonDeserializer
+            value.deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+            spring.deserializer.value.delegate.class: com.ihren.processor.serializer.JsonDeserializer
             value.deserializer.target.class: com.ihren.processor.model.input.InputTransaction
           producer-properties:
             value.serializer: com.ihren.processor.serializer.JsonSerializer
         bindings:
-          processPerson-in-0:
+          processTransaction-in-0:
             consumer:
               startOffset: earliest
               configuration:

@@ -1,6 +1,7 @@
 package com.ihren.processor.config;
 
 import com.ihren.processor.model.input.InputTransaction;
+import com.ihren.processor.serializer.JsonDeserializer;
 import com.ihren.processor.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -30,7 +31,7 @@ public class KafkaTemplateConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, InputTransaction> kafkaTemplate(ProducerFactory<String, InputTransaction> factory) {
+    public KafkaTemplate<String, ?> kafkaTemplate(ProducerFactory<String, InputTransaction> factory) {
         return new KafkaTemplate<>(factory);
     }
 }

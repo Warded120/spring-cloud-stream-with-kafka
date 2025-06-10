@@ -6,3 +6,4 @@ spring:
           destination: test
         processTransaction-out-0:
           destination: processed-test
+

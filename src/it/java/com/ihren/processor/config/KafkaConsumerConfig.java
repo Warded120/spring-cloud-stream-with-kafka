@@ -1,5 +1,6 @@
 package com.ihren.processor.config;
 
+import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.serializer.JsonDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -27,6 +28,33 @@ public class KafkaConsumerConfig {
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
                 "value.deserializer.target.class", OutputTransaction.class.getName()
+        );
+
+        return new KafkaConsumer<>(configs);
+    }
+
+    @Bean
+    public KafkaConsumer<String, InputTransaction> dltKafkaConsumer() {
+        Map<String, Object> configs = Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                ConsumerConfig.GROUP_ID_CONFIG, groupId,
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
+                "value.deserializer.target.class", InputTransaction.class.getName()
+        );
+
+        return new KafkaConsumer<>(configs);
+    }
+
+    @Bean
+    public KafkaConsumer<String, String> stringKafkaConsumer() {
+        Map<String, Object> configs = Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                ConsumerConfig.GROUP_ID_CONFIG, groupId,
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class
         );
 
         return new KafkaConsumer<>(configs);

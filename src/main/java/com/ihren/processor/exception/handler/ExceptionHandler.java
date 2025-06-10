@@ -12,7 +12,7 @@ public class ExceptionHandler {
 
     private final Sink sink;
 
-    public<I, O> Try<O> handle(Function<I, O> function, I input) {
+    public <I, O> Try<O> handle(Function<I, O> function, I input) {
         return Try.of(() -> function.apply(input))
             .recover(ex -> {
                 sink.apply(input, ex);
