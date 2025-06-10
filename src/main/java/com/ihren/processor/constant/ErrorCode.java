@@ -23,7 +23,7 @@ public enum ErrorCode {
 
     public static ErrorCode from(Exception e) {
         return Arrays.stream(ErrorCode.values())
-                .filter(value -> value.exceptionClass.isInstance(e) )
+                .filter(value -> value.exceptionClass.isInstance(e))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Unknown exception: " + e.getMessage()));
     }

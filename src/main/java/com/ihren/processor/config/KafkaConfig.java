@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 public class KafkaConfig {
 
     @Bean
-    public ListenerContainerWithDlqAndRetryCustomizer DltCustomizer(CommonErrorHandler errorHandler) {
+    public ListenerContainerWithDlqAndRetryCustomizer dltCustomizer(CommonErrorHandler errorHandler) {
         return new CommonDltCustomizer(errorHandler);
     }
 
@@ -35,7 +35,11 @@ public class KafkaConfig {
     }
 
     @Bean
-    public DeadLetterPublishingRecoverer recoverer(KafkaTemplate<?, ?> kafkaTemplate, BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver, ObjectMapper mapper) {
+    public DeadLetterPublishingRecoverer recoverer(
+            KafkaTemplate<?, ?> kafkaTemplate,
+            BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver,
+            ObjectMapper mapper
+    ) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate, dlqDestinationResolver);
         recoverer.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
             Try.run(() -> {
