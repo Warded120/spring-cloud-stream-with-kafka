@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.function.Function;
 
-//TODO: remove exception handler and use ErrorHandler with ContainerCustomizer
 @Component
 @RequiredArgsConstructor
 public class TransactionProcessor implements Function<Message<InputTransaction>, Message<OutputTransaction>> {

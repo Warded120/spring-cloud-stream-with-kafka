@@ -5,8 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class ObjectMapperConfig {
+
+    //TODO: do I need it?
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        configure(mapper);
+        return mapper;
+    }
+
     public static void configure(ObjectMapper objectMapper) {
         objectMapper
                 .registerModule(new JavaTimeModule())

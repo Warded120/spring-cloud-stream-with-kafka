@@ -1,8 +1,11 @@
 package com.ihren.processor.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.constant.CustomKafkaHeaders;
 import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.dlt.customizer.CommonDltCustomizer;
+import com.ihren.processor.exception.SerializationException;
+import io.vavr.control.Try;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.cloud.stream.binder.kafka.ListenerContainerWithDlqAndRetryCustomizer;
@@ -14,7 +17,9 @@ import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.FixedBackOff;
+import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 @Configuration
 public class KafkaConfig {
@@ -30,16 +35,17 @@ public class KafkaConfig {
     }
 
     @Bean
-    public DeadLetterPublishingRecoverer dlpr(KafkaTemplate<?, ?> kafkaTemplate, BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
-        DeadLetterPublishingRecoverer dlpr = new DeadLetterPublishingRecoverer(kafkaTemplate, dlqDestinationResolver);
-        dlpr.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
-            kafkaHeaders.add(CustomKafkaHeaders.ERROR_CODE, ErrorCode.from(exception).name().getBytes());
-            kafkaHeaders.add(CustomKafkaHeaders.EXCEPTION_MESSAGE, exception.getMessage().getBytes());
+    public DeadLetterPublishingRecoverer recoverer(KafkaTemplate<?, ?> kafkaTemplate, BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver, ObjectMapper mapper) {
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate, dlqDestinationResolver);
+        recoverer.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
+            Try.run(() -> {
+                kafkaHeaders.add(CustomKafkaHeaders.ERROR_CODE, mapper.writeValueAsBytes(getCauseFromException(exception)));
+                kafkaHeaders.add(CustomKafkaHeaders.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exception.getMessage()));
 
-            kafkaHeaders.remove(CustomKafkaHeaders.IS_DLT);
-            kafkaHeaders.add(CustomKafkaHeaders.IS_DLT, "true".getBytes());
+                kafkaHeaders.add(CustomKafkaHeaders.IS_DLT, mapper.writeValueAsBytes(true));
+            }).getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex)); //TODO: is it OK?
         });
-        return dlpr;
+        return recoverer;
     }
 
     @Bean
@@ -50,5 +56,23 @@ public class KafkaConfig {
     @Bean
     public BackOff backOff() {
         return new FixedBackOff(1000L, 1);
+    }
+
+    private ErrorCode getCauseFromException(Exception exception) {
+        return Stream.iterate(exception, Objects::nonNull, ex -> (Exception) ex.getCause())
+                .filter(cause -> ErrorCode.from(cause) != ErrorCode.UNKNOWN_EXCEPTION)
+                .map(ErrorCode::from)
+                .findFirst()
+                .orElse(ErrorCode.UNKNOWN_EXCEPTION);
+        //TODO: are these the same solutions?
+//        Exception cause = exception;
+//        while (ErrorCode.from(cause) == ErrorCode.UNKNOWN_EXCEPTION) {
+//            if(cause.getCause() != null) {
+//                cause = (Exception) cause.getCause();
+//            } else {
+//                break;
+//            }
+//        }
+//        return cause;
     }
 }

@@ -1,5 +1,7 @@
 package com.ihren.processor.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ihren.processor.config.ObjectMapperConfig;
 import io.vavr.control.Try;
 import lombok.experimental.UtilityClass;
 import org.apache.kafka.clients.admin.Admin;
@@ -22,6 +24,13 @@ import java.util.stream.StreamSupport;
 
 @UtilityClass
 public class KafkaUtils {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    //FIXME: is it OK?
+    static {
+        ObjectMapperConfig.configure(MAPPER);
+    }
+
     public<K, V> V getRecordValue(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() -> {
                     ConsumerRecord<K, V> record = KafkaTestUtils.getSingleRecord(consumer, topic, timeout);
@@ -51,6 +60,7 @@ public class KafkaUtils {
                 .get();
     }
 
+    //TODO: maybe remove
     public <K, V> boolean hasRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return getRecordValue(consumer, topic, timeout) != null;
     }
@@ -76,5 +86,15 @@ public class KafkaUtils {
             deleteRecordsResult.all().get();
         })
         .onFailure(Throwable::printStackTrace);
+    }
+
+    public<T> T read(byte[] bytes, Class<T> clazz) {
+        return Try.of(() -> MAPPER.readValue(bytes, clazz))
+                .getOrElseThrow(ex -> new IllegalStateException("Cannot read bytes to " + clazz.getName(), ex));
+    }
+
+    public byte[] write(Object t) {
+        return Try.of(() -> MAPPER.writeValueAsBytes(t))
+                .getOrElseThrow(ex -> new IllegalStateException("Cannot write " + t, ex));
     }
 }
