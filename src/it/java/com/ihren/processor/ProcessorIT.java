@@ -21,12 +21,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,6 +66,9 @@ public class ProcessorIT {
 
     @Autowired
     private KafkaConsumer<String, String> stringKafkaConsumer;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @MockitoSpyBean
     @Qualifier("nonCacheableItemClient")
@@ -287,4 +297,30 @@ public class ProcessorIT {
     }
 
     //TODO: create test where I send to dlt directly and trigger replay mechanism
+
+    @Test
+    void should_ProcessTransaction_when_ReplayMechanismTriggered() {
+        //given
+        InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, topicIn.concat(".replay"))
+                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .build();
+
+        kafkaTemplate.send(message);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        //TODO: why connection refused?
+        ResponseEntity<Integer> response = restTemplate.exchange(
+                "http://localhost:8081/replay/all",
+                HttpMethod.POST,
+                requestEntity,
+                Integer.class
+        );
+    }
 }
