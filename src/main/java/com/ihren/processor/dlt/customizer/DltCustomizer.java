@@ -7,12 +7,14 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.cloud.stream.binder.kafka.ListenerContainerWithDlqAndRetryCustomizer;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.listener.CommonErrorHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.util.backoff.BackOff;
 import java.util.function.BiFunction;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class CommonDltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer {
+public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer {
 
     private final CommonErrorHandler errorHandler;
 

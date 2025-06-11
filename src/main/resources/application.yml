@@ -5,7 +5,7 @@ spring:
     name: processor
   cloud:
     function:
-      definition: processTransaction
+      definition: processTransaction;reprocessTransaction
     stream:
       default:
         consumer:
@@ -18,6 +18,11 @@ spring:
           group: processTransaction
         processTransaction-out-0:
           destination: processed-transaction
+        reprocessTransaction-in-0:
+          destination: transaction.replay
+          group: reprocessTransaction
+        reprocessTransaction-out-0:
+          destination: transaction
       kafka:
         binder:
           brokers: localhost:9092
@@ -29,6 +34,12 @@ spring:
             value.serializer: com.ihren.processor.serializer.JsonSerializer
         bindings:
           processTransaction-in-0:
+            consumer:
+              startOffset: earliest
+              configuration:
+                isolation:
+                  level: read_committed
+          reprocessTransaction-in-0:
             consumer:
               startOffset: earliest
               configuration:

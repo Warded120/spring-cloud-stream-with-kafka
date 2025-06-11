@@ -7,6 +7,7 @@ import com.ihren.processor.ProcessorApplication;
 import com.ihren.processor.config.KafkaConsumerConfig;
 import com.ihren.processor.config.KafkaTemplateConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -44,5 +45,6 @@ import java.lang.annotation.Target;
 })
 @ExtendWith(OutputCaptureExtension.class)
 @AutoConfigureWireMock
+@AutoConfigureMockMvc
 public @interface IntegrationTest {
 }

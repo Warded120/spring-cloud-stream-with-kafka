@@ -26,7 +26,7 @@ import java.util.UUID;
 )
 public interface TransactionMapper {
     @Mapping(target = "transactionId", expression = "java(UUID.randomUUID())")
-    @Mapping(target = "source", constant = Constants.SOFTSERVE)
+    @Mapping(target = "source", constant = Constants.Model.SOFTSERVE)
     @Mapping(target = "discount", ignore = true)
     @Mapping(target = "operationDateTime", expression = "java(DateTimeUtils.parseInstant(dto.endDateTime()))")
     OutputTransaction map(InputTransaction dto);

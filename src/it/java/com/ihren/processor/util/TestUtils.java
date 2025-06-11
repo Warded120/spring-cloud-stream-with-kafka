@@ -105,7 +105,7 @@ public class TestUtils {
 
         return new OutputTransaction(
                 null,
-                Constants.SOFTSERVE,
+                Constants.Model.SOFTSERVE,
                 null,
                 1L,
                 operationDateTime,

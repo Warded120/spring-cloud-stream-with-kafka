@@ -59,7 +59,7 @@ class TransactionProcessorTest {
                 "12345678901234"
         );
         OutputTotal expectedTotal = new OutputTotal(BigDecimal.valueOf(360L), CurrencyCode.USD);
-        OutputTransaction expectedTransaction = new OutputTransaction(uuid, Constants.SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
+        OutputTransaction expectedTransaction = new OutputTransaction(uuid, Constants.Model.SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
 
         Message<OutputTransaction> expected = MessageBuilder
                 .withPayload(expectedTransaction)

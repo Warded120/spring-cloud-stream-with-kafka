@@ -28,6 +28,7 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
                 .orElse(null);
     }
 
+    //TODO: don't copy all headers, only necessary (idDlt)
     private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction, MessageHeaders headers) {
         return MessageBuilder
                 .withPayload(outputTransaction)

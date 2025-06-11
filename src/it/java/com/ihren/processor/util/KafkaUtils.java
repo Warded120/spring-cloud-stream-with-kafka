@@ -3,7 +3,6 @@ package com.ihren.processor.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.config.ObjectMapperConfig;
 import io.vavr.control.Try;
-import lombok.experimental.UtilityClass;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.DeleteRecordsResult;
 import org.apache.kafka.clients.admin.DescribeTopicsResult;
@@ -22,15 +21,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 
-@UtilityClass
-public class KafkaUtils {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+public final class KafkaUtils {
+    //FIXME: is it OK?
+    //TODO: move to resourceUtils and inject it as a bean
+    private static final ObjectMapper mapper = getObjectMapper();
 
-    static {
-        ObjectMapperConfig.configure(MAPPER);
+    //FIXME: is it OK?
+    private static ObjectMapper getObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapperConfig.configure(mapper);
+        return mapper;
     }
 
-    public<K, V> V getRecordValue(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+    public static <K, V> V getRecordValue(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() -> {
                     ConsumerRecord<K, V> record = KafkaTestUtils.getSingleRecord(consumer, topic, timeout);
                     return record.value();
@@ -39,7 +42,7 @@ public class KafkaUtils {
                 .get();
     }
 
-    public<K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
+    public static <K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() ->
                     KafkaTestUtils.getSingleRecord(consumer, topic, timeout)
                 )
@@ -47,7 +50,7 @@ public class KafkaUtils {
                 .get();
     }
 
-    public<K, V> List<V> getRecords(KafkaConsumer<K, V> consumer, String topic, Duration timeout, int minRecords) {
+    public static <K, V> List<V> getRecords(KafkaConsumer<K, V> consumer, String topic, Duration timeout, int minRecords) {
         return Try.of(() -> {
                     ConsumerRecords<K, V> records = KafkaTestUtils.getRecords(consumer, timeout, minRecords);
                     Iterable<ConsumerRecord<K, V>> topicRecords = records.records(topic);
@@ -59,7 +62,7 @@ public class KafkaUtils {
                 .get();
     }
 
-    public void purgeAllRecords(Admin admin, String topic) {
+    public static void purgeAllRecords(Admin admin, String topic) {
         Try.run(() -> {
             DescribeTopicsResult describeTopicsResult = admin.describeTopics(Collections.singletonList(topic));
             TopicDescription topicDescription = describeTopicsResult.allTopicNames().get().get(topic);
@@ -82,13 +85,14 @@ public class KafkaUtils {
         .onFailure(Throwable::printStackTrace);
     }
 
-    public<T> T read(byte[] bytes, Class<T> clazz) {
-        return Try.of(() -> MAPPER.readValue(bytes, clazz))
+    //TODO: move to resourceUtils
+    public static <T> T read(byte[] bytes, Class<T> clazz) {
+        return Try.of(() -> mapper.readValue(bytes, clazz))
                 .getOrElseThrow(ex -> new IllegalStateException("Cannot read bytes to " + clazz.getName(), ex));
     }
 
-    public byte[] write(Object t) {
-        return Try.of(() -> MAPPER.writeValueAsBytes(t))
+    public static byte[] write(Object t) {
+        return Try.of(() -> mapper.writeValueAsBytes(t))
                 .getOrElseThrow(ex -> new IllegalStateException("Cannot write " + t, ex));
     }
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.function.Function;
 
+//TODO: do I need it?
 @Component
 @RequiredArgsConstructor
 public class ExceptionHandler {

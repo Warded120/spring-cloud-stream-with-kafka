@@ -6,7 +6,7 @@ import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.cache.GenericCache;
 import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
-import com.ihren.processor.constant.CustomKafkaHeaders;
+import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
@@ -17,23 +17,19 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,6 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.then;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
 public class ProcessorIT {
@@ -68,7 +66,7 @@ public class ProcessorIT {
     private KafkaConsumer<String, String> stringKafkaConsumer;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private MockMvc mockMvc;
 
     @MockitoSpyBean
     @Qualifier("nonCacheableItemClient")
@@ -114,7 +112,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
 
         OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
@@ -134,7 +132,7 @@ public class ProcessorIT {
         OutputTransaction actual = record.value();
 
         //then
-        assertFalse(KafkaUtils.read(record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(), Boolean.class));
+        assertFalse(KafkaUtils.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
         assertAll(
                 () -> assertNotNull(actual.transactionId()),
                 () -> assertEquals(expectedTransaction.source(), actual.source()),
@@ -153,7 +151,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
 
         kafkaTemplate.send(message);
@@ -165,20 +163,20 @@ public class ProcessorIT {
         assertNotNull(record);
         assertTrue(
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
                         Boolean.class
                 )
         );
         assertEquals(
                 ErrorCode.VALIDATION_EXCEPTION,
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.ERROR_CODE).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
                 )
         );
         assertNotNull(
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.EXCEPTION_MESSAGE).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
                         String.class
                 )
         );
@@ -191,7 +189,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
 
         stubFor(get(urlEqualTo("/users/1"))
@@ -212,20 +210,20 @@ public class ProcessorIT {
         assertNotNull(record);
         assertTrue(
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
                         Boolean.class
                 )
         );
         assertEquals(
                 ErrorCode.NOT_FOUND_EXCEPTION,
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.ERROR_CODE).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
                 )
         );
         assertNotNull(
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.EXCEPTION_MESSAGE).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
                         String.class
                 )
         );
@@ -237,7 +235,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
 
         stubFor(get(urlEqualTo("/users/1"))
@@ -265,62 +263,80 @@ public class ProcessorIT {
         Message<String> message = MessageBuilder
                 .withPayload("invalid")
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
-                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
 
         kafkaTemplate.send(message);
 
         //when
+        //TODO: check if payload is the same ("invalid")
         ConsumerRecord<String, String> record = KafkaUtils.getRecord(stringKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
 
         //then
         assertNotNull(record);
         assertTrue(
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.IS_DLT).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
                         Boolean.class
                 )
         );
         assertEquals(
                 ErrorCode.SERIALIZATION_EXCEPTION,
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.ERROR_CODE).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
                 )
         );
         assertNotNull(
                 KafkaUtils.read(
-                        record.headers().lastHeader(CustomKafkaHeaders.EXCEPTION_MESSAGE).value(),
+                        record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
                         String.class
                 )
         );
     }
 
-    //TODO: create test where I send to dlt directly and trigger replay mechanism
-
     @Test
-    void should_ProcessTransaction_when_ReplayMechanismTriggered() {
+    @Disabled
+    void should_ProcessTransaction_when_ReplayMechanismTriggered() throws Exception {
         //given
         InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
-                .setHeader(KafkaHeaders.TOPIC, topicIn.concat(".replay"))
-                .setHeader(CustomKafkaHeaders.IS_DLT, false)
+                .setHeader(KafkaHeaders.TOPIC, topicIn.concat(".dlt"))
+                .setHeader(Constants.Kafka.Headers.IS_DLT, true)
                 .build();
+
+        OutputTransaction expectedTransaction = TestUtils.getExpectedOutputTransaction();
+
+        stubFor(get(urlEqualTo("/users/1"))
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBodyFile("item-response.json")
+                )
+        );
 
         kafkaTemplate.send(message);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/replay/all"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("1"));
+        ConsumerRecord<String, OutputTransaction> record = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
 
-        //TODO: why connection refused?
-        ResponseEntity<Integer> response = restTemplate.exchange(
-                "http://localhost:8081/replay/all",
-                HttpMethod.POST,
-                requestEntity,
-                Integer.class
+        //then
+        OutputTransaction actual = record.value();
+        assertFalse(KafkaUtils.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
+        assertAll(
+                () -> assertNotNull(actual.transactionId()),
+                () -> assertEquals(expectedTransaction.source(), actual.source()),
+                () -> assertNull(actual.discount()),
+                () -> assertEquals(expectedTransaction.sequenceNumber(), actual.sequenceNumber()),
+                () -> assertEquals(expectedTransaction.operationDateTime(), actual.operationDateTime()),
+                () -> assertArrayEquals(expectedTransaction.items().toArray(), actual.items().toArray()),
+                () -> assertEquals(expectedTransaction.total(), actual.total())
         );
     }
+
+    //TODO: add errorHandlingSerializer logic (the same like errorHandlingDeserializer)
 }

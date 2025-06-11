@@ -15,9 +15,6 @@ public class ReplayService {
     private final KafkaConsumer<String, InputTransaction> consumer;
     private final StreamBridge streamBridge;
 
-    @Value("${spring.cloud.stream.bindings.processTransaction-in-0.destination}")
-    private String topicIn;
-
     public ReplayService(
             KafkaConsumer<String, InputTransaction> consumer,
             StreamBridge streamBridge
@@ -27,12 +24,17 @@ public class ReplayService {
     }
 
     public Integer replayAll() {
-        consumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
+        //TODO: retrieve from config
+        consumer.subscribe(Collections.singletonList("test.dlt"));
 
-        ConsumerRecords<String, InputTransaction> records = consumer.poll(Duration.ofSeconds(1));
-        return Stream.iterate(records, ConsumerRecords::isEmpty, recs -> consumer.poll(Duration.ofSeconds(1)))
+        ConsumerRecords<String, InputTransaction> records = consumer.poll(Duration.ofSeconds(3));
+        return Stream.iterate(records, (recs) -> !recs.isEmpty(), recs -> consumer.poll(Duration.ofSeconds(1)))
                 //TODO: is it okay to use peek?
-                .peek(rs -> streamBridge.send(topicIn.concat(".replay"), rs))
+                .peek(rs ->
+                    rs.forEach(r ->
+                            streamBridge.send("reprocessTransaction-in-0", r.value())
+                    )
+                )
                 .map(ConsumerRecords::count)
                 .reduce(Integer::sum)
                 .orElse(0);

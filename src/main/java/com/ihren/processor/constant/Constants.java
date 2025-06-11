@@ -4,5 +4,14 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
-    public static final String SOFTSERVE = "Softserve";
+    public static final class Model {
+        public static final String SOFTSERVE = "Softserve";
+    }
+    public static final class Kafka {
+        public static final class Headers {
+            public static final String IS_DLT = "is-dlt";
+            public static final String EXCEPTION_MESSAGE = "exception-message";
+            public static final String ERROR_CODE = "error-code";
+        }
+    }
 }
