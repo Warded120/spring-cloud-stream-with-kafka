@@ -3,6 +3,7 @@ package com.ihren.processor.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.ErrorCode;
+import com.ihren.processor.exception.ApplicationException;
 import com.ihren.processor.exception.SerializationException;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.serializer.JsonDeserializer;
@@ -13,6 +14,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -22,18 +24,22 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.FixedBackOff;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.stream.Stream;
 
 @Configuration
 public class ErrorHandlerConfig {
 
+    private final DefaultsBindHandlerAdvisor.MappingsProvider mappingsProvider;
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.group}")
     private String groupId;
+
+    public ErrorHandlerConfig(DefaultsBindHandlerAdvisor.MappingsProvider mappingsProvider) {
+        this.mappingsProvider = mappingsProvider;
+    }
 
     @Bean
     public CommonErrorHandler errorHandler(DeadLetterPublishingRecoverer dlpr, BackOff backOff) {
@@ -50,14 +56,16 @@ public class ErrorHandlerConfig {
         //TODO: add recovery function to serialize a broken message (in dlt it has to be stored in the same form as it was before sending)
         recoverer.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
             Try.run(() -> {
-                kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(getCauseFromException(exception)));
+                kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(getErrorCodeFrom(exception)));
                 kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exception.getMessage()));
 
                 kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
-            }).getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
+            }).getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex, ErrorCode.SERIALIZATION_EXCEPTION));
         });
         //TODO: investigate and maybe use this instead of setExceptionHeadersCreator
         //recoverer.setHeadersFunction();
+        //TODO: (Investigate) do this instead of manually copying headers in TransactionProcessor.constructMessage()
+        //recoverer.setAppendOriginalHeaders(true);
         return recoverer;
     }
 
@@ -73,13 +81,17 @@ public class ErrorHandlerConfig {
         return new FixedBackOff(1000L, 1);
     }
 
-    //TODO: create ApplicationException(with ErrorCode) and inherit all my exceptions
-    private ErrorCode getCauseFromException(Exception exception) {
-        return Stream.iterate(exception, Objects::nonNull, ex -> (Exception) ex.getCause())
-                .filter(cause -> ErrorCode.from(cause) != ErrorCode.UNKNOWN_EXCEPTION)
-                .map(ErrorCode::from)
-                .findFirst()
-                .orElse(ErrorCode.UNKNOWN_EXCEPTION);
+    private ErrorCode getErrorCodeFrom(Exception exception) {
+        return Optional.of(exception)
+                .filter(e1 -> e1 instanceof ApplicationException)
+                .map(e2 -> (ApplicationException) e2)
+                .map(ApplicationException::getErrorCode)
+                .orElseGet(() ->
+                        Optional.of(exception)
+                                .map(e4 -> (Exception) e4.getCause())
+                                .map(this::getErrorCodeFrom)
+                                .orElse(ErrorCode.UNKNOWN_EXCEPTION)
+                );
     }
 
     @Bean

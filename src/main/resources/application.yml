@@ -31,6 +31,7 @@ spring:
             spring.deserializer.value.delegate.class: com.ihren.processor.serializer.JsonDeserializer
             value.deserializer.target.class: com.ihren.processor.model.input.InputTransaction
           producer-properties:
+            #TODO: add errorHandlingSerializer logic (the same like errorHandlingDeserializer)
             value.serializer: com.ihren.processor.serializer.JsonSerializer
         bindings:
           processTransaction-in-0:

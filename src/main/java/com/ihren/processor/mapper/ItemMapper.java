@@ -1,6 +1,7 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Account;
+import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.enricher.Enricher;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.input.InputItem;
@@ -39,7 +40,8 @@ public abstract class ItemMapper {
                                         "Unexpected value: %s. Expected values are: %s",
                                         loyaltyAccountId,
                                         Arrays.toString(Account.values())
-                                )
+                                ),
+                                ErrorCode.MAPPING_EXCEPTION
                         )
                 );
     }

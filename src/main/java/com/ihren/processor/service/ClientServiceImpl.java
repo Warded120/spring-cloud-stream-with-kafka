@@ -2,6 +2,7 @@ package com.ihren.processor.service;
 
 import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
+import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.exception.NotFoundException;
 import com.ihren.processor.validator.CommonValidator;
 import io.vavr.control.Try;
@@ -19,6 +20,10 @@ public class ClientServiceImpl implements ClientService {
     public ItemResponse getByItemId(Long id) {
         return Try.of(() -> itemClient.getById(id))
                 .map(validator::validate)
-                .getOrElseThrow(() -> new NotFoundException("not found by item.id: " + id));
+                .getOrElseThrow(() -> new NotFoundException(
+                                "not found by item.id: " + id,
+                                ErrorCode.NOT_FOUND_EXCEPTION
+                        )
+                );
     }
 }

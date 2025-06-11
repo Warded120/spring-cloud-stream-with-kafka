@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @IntegrationTest
 public class ProcessorIT {
-    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
+    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(5);
 
     @Autowired
     private KafkaTemplate<String, InputTransaction> kafkaTemplate;
@@ -337,6 +337,4 @@ public class ProcessorIT {
                 () -> assertEquals(expectedTransaction.total(), actual.total())
         );
     }
-
-    //TODO: add errorHandlingSerializer logic (the same like errorHandlingDeserializer)
 }
