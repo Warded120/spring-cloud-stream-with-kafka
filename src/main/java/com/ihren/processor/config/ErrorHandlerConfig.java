@@ -47,13 +47,11 @@ public class ErrorHandlerConfig {
 
     @Bean
     public DeadLetterPublishingRecoverer recoverer(
-            //TODO: maybe create these beans in application, not in test package
             KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate,
             KafkaTemplate<String, byte[]> byteArrayKafkaTemplate,
             BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver,
             ObjectMapper mapper
     ) {
-        //TODO: use constructor for kafkaTemplateResolver
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
                 (producerRecord ->
                         producerRecord.value() instanceof InputTransaction
@@ -62,7 +60,6 @@ public class ErrorHandlerConfig {
                 ),
                 dlqDestinationResolver
         );
-        //TODO: add recovery function to serialize a broken message (in dlt it has to be stored in the same form as it was before sending)
         recoverer.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
             Try.run(() -> {
                 kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(getErrorCodeFrom(exception)));
@@ -76,9 +73,10 @@ public class ErrorHandlerConfig {
         return recoverer;
     }
 
-    //TODO: configure via application.yml and don't assign partitions
+    //TODO: configure via application.yml
     @Bean
     public BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver() {
+        //TODO: don't assign hardcoded partitions (usually dlt-topic partitiond count is smaller that topic partition count)
         return (record, ex) -> new TopicPartition(record.topic().concat(".dlt"), record.partition());
     }
 

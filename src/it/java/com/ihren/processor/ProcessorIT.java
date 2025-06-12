@@ -65,7 +65,6 @@ public class ProcessorIT {
     @Autowired
     private KafkaConsumer<String, InputTransaction> dltKafkaConsumer;
 
-    //TODO: replace with byteArray
     @Autowired
     private KafkaConsumer<String, byte[]> byteArrayKafkaConsumer;
 
@@ -263,6 +262,44 @@ public class ProcessorIT {
 
     @Test
     void should_SendToDlt_when_DeserializationFailed() {
+        //given
+        String invalidData = "invalid";
+        Message<byte[]> message = MessageBuilder
+                .withPayload(invalidData.getBytes())
+                .setHeader(KafkaHeaders.TOPIC, topicIn)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, false)
+                .build();
+
+        byteArrayKafkaTemplate.send(message);
+
+        //when
+        ConsumerRecord<String, byte[]> record = KafkaUtils.getRecord(byteArrayKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+
+        //then
+        assertArrayEquals(invalidData.getBytes(), record.value());
+        assertTrue(
+                KafkaUtils.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
+                        Boolean.class
+                )
+        );
+        assertEquals(
+                ErrorCode.SERIALIZATION_EXCEPTION,
+                KafkaUtils.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
+                        ErrorCode.class
+                )
+        );
+        assertNotNull(
+                KafkaUtils.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
+                        String.class
+                )
+        );
+    }
+
+    @Test
+    void should_SendToDlt_when_SerializationFailed() {
         //given
         String invalidData = "invalid";
         Message<byte[]> message = MessageBuilder

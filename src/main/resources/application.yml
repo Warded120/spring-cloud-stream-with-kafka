@@ -27,12 +27,14 @@ spring:
         binder:
           brokers: localhost:9092
           consumer-properties:
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value.deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
             spring.deserializer.value.delegate.class: com.ihren.processor.serializer.JsonDeserializer
             value.deserializer.target.class: com.ihren.processor.model.input.InputTransaction
           producer-properties:
-            #TODO: add errorHandlingSerializer logic (the same like errorHandlingDeserializer)
-            value.serializer: com.ihren.processor.serializer.JsonSerializer
+            key.serializer: org.apache.kafka.common.serialization.StringSerializer
+            value.serializer: org.springframework.kafka.support.serializer.ErrorHandlingSerializer
+            spring.serializer.value.delegate.class: com.ihren.processor.serializer.JsonSerializer
         bindings:
           processTransaction-in-0:
             consumer:
