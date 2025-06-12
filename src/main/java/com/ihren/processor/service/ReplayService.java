@@ -1,6 +1,7 @@
 package com.ihren.processor.service;
 
 import com.ihren.processor.model.input.InputTransaction;
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,17 +12,10 @@ import java.util.Collections;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class ReplayService {
     private final KafkaConsumer<String, InputTransaction> consumer;
     private final StreamBridge streamBridge;
-
-    public ReplayService(
-            KafkaConsumer<String, InputTransaction> consumer,
-            StreamBridge streamBridge
-    ) {
-        this.consumer = consumer;
-        this.streamBridge = streamBridge;
-    }
 
     public Integer replayAll() {
         //TODO: retrieve from config

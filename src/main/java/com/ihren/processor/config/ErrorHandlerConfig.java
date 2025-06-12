@@ -7,15 +7,20 @@ import com.ihren.processor.exception.ApplicationException;
 import com.ihren.processor.exception.SerializationException;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.serializer.JsonDeserializer;
+import com.ihren.processor.serializer.JsonSerializer;
 import io.vavr.control.Try;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
@@ -108,5 +113,33 @@ public class ErrorHandlerConfig {
         );
 
         return new KafkaConsumer<>(configs);
+    }
+
+    @Bean
+    public KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate() {
+        DefaultKafkaProducerFactory<String, InputTransaction> factory =
+                new DefaultKafkaProducerFactory<>(
+                        Map.of(
+                                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
+                                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class
+                        )
+                );
+
+        return new KafkaTemplate<>(factory);
+    }
+
+    @Bean
+    public KafkaTemplate<String, byte[]> byteArrayKafkaTemplate() {
+        DefaultKafkaProducerFactory<String, byte[]> factory =
+                new DefaultKafkaProducerFactory<>(
+                        Map.of(
+                                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
+                                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class
+                        )
+                );
+
+        return new KafkaTemplate<>(factory);
     }
 }

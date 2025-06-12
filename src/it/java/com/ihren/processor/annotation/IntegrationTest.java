@@ -5,7 +5,6 @@ import com.ihren.processor.config.WireMockConfig;
 import com.ihren.processor.initializer.KafkaInitializer;
 import com.ihren.processor.ProcessorApplication;
 import com.ihren.processor.config.KafkaConsumerConfig;
-import com.ihren.processor.config.KafkaTemplateConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +37,6 @@ import java.lang.annotation.Target;
         classMode = DirtiesContext.ClassMode.BEFORE_CLASS
 )
 @Import({
-        KafkaTemplateConfig.class,
         KafkaConsumerConfig.class,
         KafkaAdminClientConfig.class,
         WireMockConfig.class
