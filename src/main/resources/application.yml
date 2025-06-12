@@ -33,8 +33,7 @@ spring:
             value.deserializer.target.class: com.ihren.processor.model.input.InputTransaction
           producer-properties:
             key.serializer: org.apache.kafka.common.serialization.StringSerializer
-            value.serializer: org.springframework.kafka.support.serializer.ErrorHandlingSerializer
-            spring.serializer.value.delegate.class: com.ihren.processor.serializer.JsonSerializer
+            value.serializer: com.ihren.processor.serializer.JsonSerializer
         bindings:
           processTransaction-in-0:
             consumer:

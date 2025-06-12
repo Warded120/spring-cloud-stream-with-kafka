@@ -60,14 +60,15 @@ public class ErrorHandlerConfig {
                 ),
                 dlqDestinationResolver
         );
-        recoverer.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
-            Try.run(() -> {
-                kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(getErrorCodeFrom(exception)));
-                kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exception.getMessage()));
+        recoverer.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) ->
+                Try.run(() -> {
+                            kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(getErrorCodeFrom(exception)));
+                            kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exception.getMessage()));
 
-                kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
-            }).getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex, ErrorCode.SERIALIZATION_EXCEPTION));
-        });
+                            kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
+                        })
+                        .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex, ErrorCode.SERIALIZATION_EXCEPTION))
+        );
         //TODO: investigate and maybe use this instead of setExceptionHeadersCreator
         //recoverer.setHeadersFunction();
         return recoverer;
@@ -76,7 +77,7 @@ public class ErrorHandlerConfig {
     //TODO: configure via application.yml
     @Bean
     public BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver() {
-        //TODO: don't assign hardcoded partitions (usually dlt-topic partitiond count is smaller that topic partition count)
+        //TODO: don't assign hardcoded partitions (usually dlt-topic partition count is smaller that topic partition count)
         return (record, ex) -> new TopicPartition(record.topic().concat(".dlt"), record.partition());
     }
 
