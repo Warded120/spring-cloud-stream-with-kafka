@@ -1,7 +1,5 @@
 package com.ihren.processor.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ihren.processor.config.ObjectMapperConfig;
 import io.vavr.control.Try;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.DeleteRecordsResult;
@@ -22,15 +20,6 @@ import java.util.Map;
 import java.util.stream.StreamSupport;
 
 public final class KafkaUtils {
-    //TODO: move to resourceUtils and inject it as a bean
-    private static final ObjectMapper mapper = getObjectMapper();
-    private static ObjectMapper getObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectMapperConfig.configure(mapper);
-        return mapper;
-    }
-    ///
-
     public static <K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() ->
                     KafkaTestUtils.getSingleRecord(consumer, topic, timeout)
@@ -72,16 +61,5 @@ public final class KafkaUtils {
             deleteRecordsResult.all().get();
         })
         .onFailure(Throwable::printStackTrace);
-    }
-
-    //TODO: move to resourceUtils
-    public static <T> T read(byte[] bytes, Class<T> clazz) {
-        return Try.of(() -> mapper.readValue(bytes, clazz))
-                .getOrElseThrow(ex -> new IllegalStateException("Cannot read bytes to " + clazz.getName(), ex));
-    }
-
-    public static byte[] write(Object t) {
-        return Try.of(() -> mapper.writeValueAsBytes(t))
-                .getOrElseThrow(ex -> new IllegalStateException("Cannot write " + t, ex));
     }
 }

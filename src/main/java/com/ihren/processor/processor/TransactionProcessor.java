@@ -32,7 +32,6 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
     private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction, MessageHeaders headers) {
         return MessageBuilder
                 .withPayload(outputTransaction)
-                //TODO: don't copy all headers, only necessary (idDlt for now) like this?
                 .setHeader(Constants.Kafka.Headers.IS_DLT, headers.get(Constants.Kafka.Headers.IS_DLT, Boolean.class))
                 .build();
     }

@@ -74,7 +74,7 @@ public class ErrorHandlerConfig {
         return recoverer;
     }
 
-    //TODO: configure via application.yml
+    //TODO: configure in application.yml
     @Bean
     public BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver() {
         //TODO: don't assign hardcoded partitions (usually dlt-topic partition count is smaller that topic partition count)
