@@ -22,31 +22,20 @@ import java.util.Map;
 import java.util.stream.StreamSupport;
 
 public final class KafkaUtils {
-    //FIXME: is it OK?
     //TODO: move to resourceUtils and inject it as a bean
     private static final ObjectMapper mapper = getObjectMapper();
-
-    //FIXME: is it OK?
     private static ObjectMapper getObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         ObjectMapperConfig.configure(mapper);
         return mapper;
     }
-
-    public static <K, V> V getRecordValue(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
-        return Try.of(() -> {
-                    ConsumerRecord<K, V> record = KafkaTestUtils.getSingleRecord(consumer, topic, timeout);
-                    return record.value();
-                })
-                .recover(ex -> null)
-                .get();
-    }
+    ///
 
     public static <K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
         return Try.of(() ->
                     KafkaTestUtils.getSingleRecord(consumer, topic, timeout)
                 )
-                .recover(ex -> null)
+                .onFailure(Throwable::printStackTrace)
                 .get();
     }
 
@@ -58,7 +47,7 @@ public final class KafkaUtils {
                             .map(ConsumerRecord::value)
                             .toList();
                 })
-                .recover(ex -> null)
+                .onFailure(Throwable::printStackTrace)
                 .get();
     }
 

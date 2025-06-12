@@ -64,8 +64,6 @@ public class ErrorHandlerConfig {
         });
         //TODO: investigate and maybe use this instead of setExceptionHeadersCreator
         //recoverer.setHeadersFunction();
-        //TODO: (Investigate) do this instead of manually copying headers in TransactionProcessor.constructMessage()
-        //recoverer.setAppendOriginalHeaders(true);
         return recoverer;
     }
 

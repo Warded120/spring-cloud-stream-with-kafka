@@ -160,7 +160,7 @@ public class ProcessorIT {
         ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
 
         //then
-        assertNotNull(record);
+        assertEquals(inputTransaction, record.value());
         assertTrue(
                 KafkaUtils.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
@@ -207,7 +207,7 @@ public class ProcessorIT {
         ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
 
         //then
-        assertNotNull(record);
+        assertEquals(inputTransaction, record.value());
         assertTrue(
                 KafkaUtils.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
@@ -260,8 +260,9 @@ public class ProcessorIT {
     @Test
     void should_SendToDlt_when_DeserializationFailed() {
         //given
+        String invalidData = "invalid";
         Message<String> message = MessageBuilder
-                .withPayload("invalid")
+                .withPayload(invalidData)
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
                 .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
@@ -273,7 +274,8 @@ public class ProcessorIT {
         ConsumerRecord<String, String> record = KafkaUtils.getRecord(stringKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
 
         //then
-        assertNotNull(record);
+        //TODO: why record.value() is serialized twice?
+        assertEquals(invalidData, record.value());
         assertTrue(
                 KafkaUtils.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
