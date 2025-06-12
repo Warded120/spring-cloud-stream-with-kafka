@@ -14,7 +14,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -30,16 +29,11 @@ import java.util.function.BiFunction;
 @Configuration
 public class ErrorHandlerConfig {
 
-    private final DefaultsBindHandlerAdvisor.MappingsProvider mappingsProvider;
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.group}")
     private String groupId;
-
-    public ErrorHandlerConfig(DefaultsBindHandlerAdvisor.MappingsProvider mappingsProvider) {
-        this.mappingsProvider = mappingsProvider;
-    }
 
     @Bean
     public CommonErrorHandler errorHandler(DeadLetterPublishingRecoverer dlpr, BackOff backOff) {
@@ -48,11 +42,21 @@ public class ErrorHandlerConfig {
 
     @Bean
     public DeadLetterPublishingRecoverer recoverer(
-            KafkaTemplate<?, ?> kafkaTemplate,
+            //TODO: maybe create these beans in application, not in test package
+            KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate,
+            KafkaTemplate<String, byte[]> byteArrayKafkaTemplate,
             BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver,
             ObjectMapper mapper
     ) {
-        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate, dlqDestinationResolver);
+        //TODO: use constructor for kafkaTemplateResolver
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
+                (producerRecord ->
+                        producerRecord.value() instanceof InputTransaction
+                                ? inputTransactionKafkaTemplate
+                                : byteArrayKafkaTemplate
+                ),
+                dlqDestinationResolver
+        );
         //TODO: add recovery function to serialize a broken message (in dlt it has to be stored in the same form as it was before sending)
         recoverer.setExceptionHeadersCreator((kafkaHeaders, exception, isKey, headerNames) -> {
             Try.run(() -> {
@@ -70,7 +74,7 @@ public class ErrorHandlerConfig {
     //TODO: configure via application.yml and don't assign partitions
     @Bean
     public BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver() {
-        return (record, ex) -> new TopicPartition(record.topic().concat(".dlt"), 0);
+        return (record, ex) -> new TopicPartition(record.topic().concat(".dlt"), record.partition());
     }
 
     //TODO: configure in application.yml

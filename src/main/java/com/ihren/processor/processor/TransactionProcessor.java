@@ -1,5 +1,6 @@
 package com.ihren.processor.processor;
 
+import com.ihren.processor.constant.Constants;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.mapper.TransactionMapper;
@@ -28,11 +29,11 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
                 .orElse(null);
     }
 
-    //TODO: don't copy all headers, only necessary (idDlt)
     private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction, MessageHeaders headers) {
         return MessageBuilder
                 .withPayload(outputTransaction)
-                .copyHeadersIfAbsent(headers)
+                //TODO: don't copy all headers, only necessary (idDlt for now) like this?
+                .setHeader(Constants.Kafka.Headers.IS_DLT, headers.get(Constants.Kafka.Headers.IS_DLT, Boolean.class))
                 .build();
     }
 }

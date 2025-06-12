@@ -54,7 +54,10 @@ public class ProcessorIT {
     private static final Duration TIME_TO_WAIT = Duration.ofSeconds(5);
 
     @Autowired
-    private KafkaTemplate<String, InputTransaction> kafkaTemplate;
+    private KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate;
+
+    @Autowired
+    private KafkaTemplate<String, byte[]> byteArrayKafkaTemplate;
 
     @Autowired
     private KafkaConsumer<String, OutputTransaction> kafkaConsumer;
@@ -62,8 +65,9 @@ public class ProcessorIT {
     @Autowired
     private KafkaConsumer<String, InputTransaction> dltKafkaConsumer;
 
+    //TODO: replace with byteArray
     @Autowired
-    private KafkaConsumer<String, String> stringKafkaConsumer;
+    private KafkaConsumer<String, byte[]> byteArrayKafkaConsumer;
 
     @Autowired
     private MockMvc mockMvc;
@@ -91,7 +95,7 @@ public class ProcessorIT {
     public void init() {
         kafkaConsumer.subscribe(Collections.singletonList(topicOut));
         dltKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
-        stringKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
+        byteArrayKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
     }
 
     @AfterEach
@@ -125,7 +129,7 @@ public class ProcessorIT {
                 )
         );
 
-        kafkaTemplate.send(message);
+        inputTransactionKafkaTemplate.send(message);
 
         //when
         ConsumerRecord<String, OutputTransaction> record = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
@@ -154,7 +158,7 @@ public class ProcessorIT {
                 .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
 
-        kafkaTemplate.send(message);
+        inputTransactionKafkaTemplate.send(message);
 
         //when
         ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
@@ -201,7 +205,7 @@ public class ProcessorIT {
                 )
         );
 
-        kafkaTemplate.send(message);
+        inputTransactionKafkaTemplate.send(message);
 
         //when
         ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
@@ -246,8 +250,8 @@ public class ProcessorIT {
                 )
         );
 
-        kafkaTemplate.send(message);
-        kafkaTemplate.send(message);
+        inputTransactionKafkaTemplate.send(message);
+        inputTransactionKafkaTemplate.send(message);
 
         //when
         List<OutputTransaction> actual = KafkaUtils.getRecords(kafkaConsumer, topicOut, TIME_TO_WAIT, 2);
@@ -261,21 +265,19 @@ public class ProcessorIT {
     void should_SendToDlt_when_DeserializationFailed() {
         //given
         String invalidData = "invalid";
-        Message<String> message = MessageBuilder
-                .withPayload(invalidData)
+        Message<byte[]> message = MessageBuilder
+                .withPayload(invalidData.getBytes())
                 .setHeader(KafkaHeaders.TOPIC, topicIn)
                 .setHeader(Constants.Kafka.Headers.IS_DLT, false)
                 .build();
 
-        kafkaTemplate.send(message);
+        byteArrayKafkaTemplate.send(message);
 
         //when
-        //TODO: check if payload is the same ("invalid")
-        ConsumerRecord<String, String> record = KafkaUtils.getRecord(stringKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+        ConsumerRecord<String, byte[]> record = KafkaUtils.getRecord(byteArrayKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
 
         //then
-        //TODO: why record.value() is serialized twice?
-        assertEquals(invalidData, record.value());
+        assertArrayEquals(invalidData.getBytes(), record.value());
         assertTrue(
                 KafkaUtils.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
@@ -318,7 +320,7 @@ public class ProcessorIT {
                 )
         );
 
-        kafkaTemplate.send(message);
+        inputTransactionKafkaTemplate.send(message);
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/replay/all"))
