@@ -1,7 +1,6 @@
 package com.ihren.processor.dlt.customizer;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.cloud.stream.binder.kafka.ListenerContainerWithDlqAndRetryCustomizer;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.backoff.BackOff;
 import java.util.function.BiFunction;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer {
