@@ -31,7 +31,6 @@ spring:
       kafka:
         binder:
           brokers: localhost:9092
-          #TODO: maybe configure this for every binding separately
           consumer-properties:
             key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value.deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer

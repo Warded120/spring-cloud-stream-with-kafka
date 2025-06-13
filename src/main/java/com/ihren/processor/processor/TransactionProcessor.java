@@ -32,7 +32,7 @@ public class TransactionProcessor implements Function<Message<InputTransaction>,
     private Message<OutputTransaction> constructMessage(OutputTransaction outputTransaction, MessageHeaders headers) {
         return MessageBuilder
                 .withPayload(outputTransaction)
-                .setHeader(Constants.Kafka.Headers.IS_DLT, headers.get(Constants.Kafka.Headers.IS_DLT, Boolean.class))
+                .setHeader(Constants.Kafka.Headers.IS_DLT, headers.get(Constants.Kafka.Headers.IS_DLT))
                 .build();
     }
 }

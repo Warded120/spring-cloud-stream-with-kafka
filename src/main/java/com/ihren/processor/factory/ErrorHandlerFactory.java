@@ -1,4 +1,4 @@
-package com.ihren.processor;
+package com.ihren.processor.factory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,12 +64,12 @@ public class ErrorHandlerFactory {
 
     private ErrorCode getErrorCodeFrom(Exception exception) {
         return Optional.of(exception)
-                .filter(e1 -> e1 instanceof ApplicationException)
-                .map(e2 -> (ApplicationException) e2)
+                .filter(ex -> ex instanceof ApplicationException)
+                .map(ex -> (ApplicationException) ex)
                 .map(ApplicationException::getErrorCode)
                 .orElseGet(() ->
                         Optional.of(exception)
-                                .map(e4 -> (Exception) e4.getCause())
+                                .map(ex -> (Exception) ex.getCause())
                                 .map(this::getErrorCodeFrom)
                                 .orElse(ErrorCode.UNKNOWN_EXCEPTION)
                 );

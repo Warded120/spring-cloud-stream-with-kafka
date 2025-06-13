@@ -33,6 +33,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -304,7 +306,6 @@ public class ProcessorIT {
     }
 
     @Test
-    @Disabled
     void should_ProcessTransaction_when_ReplayMechanismTriggered() throws Exception {
         //given
         InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
@@ -334,7 +335,7 @@ public class ProcessorIT {
 
         //then
         OutputTransaction actual = record.value();
-        assertFalse(MapperUtils.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
+        assertTrue(MapperUtils.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
         assertAll(
                 () -> assertNotNull(actual.transactionId()),
                 () -> assertEquals(expectedTransaction.source(), actual.source()),
