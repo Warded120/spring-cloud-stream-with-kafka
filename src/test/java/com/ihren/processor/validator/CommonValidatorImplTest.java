@@ -1,6 +1,6 @@
 package com.ihren.processor.validator;
 
-import jakarta.validation.ValidationException;
+import com.ihren.processor.exception.ValidationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;

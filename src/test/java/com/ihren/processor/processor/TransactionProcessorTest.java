@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -43,6 +44,10 @@ class TransactionProcessorTest {
         Message<InputTransaction> inputTransactionMessage = mock(Message.class);
         given(inputTransactionMessage.getPayload()).willReturn(inputTransaction);
 
+        MessageHeaders messageHeaders = mock(MessageHeaders.class);
+        given(inputTransactionMessage.getHeaders()).willReturn(messageHeaders);
+        given(messageHeaders.get(Constants.Kafka.Headers.IS_DLT)).willReturn(Boolean.FALSE);
+
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
 
@@ -63,6 +68,7 @@ class TransactionProcessorTest {
 
         Message<OutputTransaction> expected = MessageBuilder
                 .withPayload(expectedTransaction)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, Boolean.FALSE)
                 .build();
 
         given(validator.validate(inputTransaction)).willReturn(inputTransaction);
@@ -73,5 +79,6 @@ class TransactionProcessorTest {
 
         //then
         assertEquals(expected.getPayload(), actual.getPayload());
+        assertEquals(expected.getHeaders().get(Constants.Kafka.Headers.IS_DLT), actual.getHeaders().get(Constants.Kafka.Headers.IS_DLT));
     }
 }
