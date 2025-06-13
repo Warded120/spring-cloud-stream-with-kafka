@@ -10,3 +10,8 @@ spring:
           destination: test.replay
         reprocessTransaction-out-0:
           destination: processed-test
+      kafka:
+        bindings:
+          processTransaction-in-0:
+            consumer:
+              dlq-name: test.dlt

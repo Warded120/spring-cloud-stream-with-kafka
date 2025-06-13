@@ -16,9 +16,13 @@ spring:
         processTransaction-in-0:
           destination: transaction
           group: processTransaction
+          consumer:
+            max-attempts: 2
+            back-off-initial-interval: 1000
+            back-off-max-interval: 2000
+            back-off-multiplier: 2.0
         processTransaction-out-0:
           destination: processed-transaction
-        #TODO: is it necessary?
         reprocessTransaction-in-0:
           destination: transaction.replay
           group: reprocessTransaction
@@ -27,6 +31,7 @@ spring:
       kafka:
         binder:
           brokers: localhost:9092
+          #TODO: maybe configure this for every binding separately
           consumer-properties:
             key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value.deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
@@ -38,6 +43,8 @@ spring:
         bindings:
           processTransaction-in-0:
             consumer:
+              enable-dlq: true
+              dlq-name: transaction.dlt
               startOffset: earliest
               configuration:
                 isolation:

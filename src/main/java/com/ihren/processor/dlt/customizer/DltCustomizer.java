@@ -1,11 +1,11 @@
 package com.ihren.processor.dlt.customizer;
 
+import com.ihren.processor.ErrorHandlerFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.cloud.stream.binder.kafka.ListenerContainerWithDlqAndRetryCustomizer;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
-import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.backoff.BackOff;
 import java.util.function.BiFunction;
@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor
 public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer {
 
-    private final CommonErrorHandler errorHandler;
+    private final ErrorHandlerFactory errorHandlerFactory;
 
     @Override
     public void configure(
@@ -23,7 +23,9 @@ public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer
             String group,
             BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver,
             BackOff backOff) {
-        container.setCommonErrorHandler(errorHandler);
+        container.setCommonErrorHandler(
+                errorHandlerFactory.createErrorHandler(dlqDestinationResolver, backOff)
+        );
     }
 
     @Override

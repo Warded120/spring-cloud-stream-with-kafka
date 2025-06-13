@@ -91,17 +91,21 @@ public class ProcessorIT {
     @Value("${spring.cloud.stream.bindings.processTransaction-out-0.destination}")
     private String topicOut;
 
+    @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
+    private String topicDlt;
+
+
     @BeforeEach
     public void init() {
         kafkaConsumer.subscribe(Collections.singletonList(topicOut));
-        dltKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
-        byteArrayKafkaConsumer.subscribe(Collections.singletonList(topicIn.concat(".dlt")));
+        dltKafkaConsumer.subscribe(Collections.singletonList(topicDlt));
+        byteArrayKafkaConsumer.subscribe(Collections.singletonList(topicDlt));
     }
 
     @AfterEach
     public void clean() {
         KafkaUtils.purgeAllRecords(admin, topicIn);
-        KafkaUtils.purgeAllRecords(admin, topicIn.concat(".dlt"));
+        KafkaUtils.purgeAllRecords(admin, topicDlt);
         KafkaUtils.purgeAllRecords(admin, topicOut);
         kafkaConsumer.unsubscribe();
         dltKafkaConsumer.unsubscribe();
@@ -161,7 +165,7 @@ public class ProcessorIT {
         inputTransactionKafkaTemplate.send(message);
 
         //when
-        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicDlt, TIME_TO_WAIT);
 
         //then
         assertEquals(inputTransaction, record.value());
@@ -208,7 +212,7 @@ public class ProcessorIT {
         inputTransactionKafkaTemplate.send(message);
 
         //when
-        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicDlt, TIME_TO_WAIT);
 
         //then
         assertEquals(inputTransaction, record.value());
@@ -274,7 +278,7 @@ public class ProcessorIT {
         byteArrayKafkaTemplate.send(message);
 
         //when
-        ConsumerRecord<String, byte[]> record = KafkaUtils.getRecord(byteArrayKafkaConsumer, topicIn.concat(".dlt"), TIME_TO_WAIT);
+        ConsumerRecord<String, byte[]> record = KafkaUtils.getRecord(byteArrayKafkaConsumer, topicDlt, TIME_TO_WAIT);
 
         //then
         assertArrayEquals(invalidData.getBytes(), record.value());
@@ -306,7 +310,7 @@ public class ProcessorIT {
         InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
-                .setHeader(KafkaHeaders.TOPIC, topicIn.concat(".dlt"))
+                .setHeader(KafkaHeaders.TOPIC, topicDlt)
                 .setHeader(Constants.Kafka.Headers.IS_DLT, true)
                 .build();
 
