@@ -30,7 +30,9 @@ import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class ReplayServiceImplTest {
-    public static final String TOPIC_DLT = "test.dlt";
+    private static final int MINIMUM_ITERATIONS = 10;
+    private static final Duration TIME_TO_WAIT = Duration.ofMillis(500);
+    private static final String BINDING_NAME = "reprocessTransaction-in-0";
 
     @InjectMocks
     private ReplayServiceImpl replayService;
@@ -41,10 +43,7 @@ class ReplayServiceImplTest {
     @Mock
     private StreamBridge streamBridge;
 
-    //TODO: define these constants with the same values like in tested class, don't read them (if these constants are changed then tests will fail and you'll understand whether you have to change tests or logic)
-    private final String BINDING_NAME = (String) ReflectionTestUtils.getField(ReplayServiceImpl.class, "BINDING_NAME");
-    private final Duration TIME_TO_WAIT = (Duration) ReflectionTestUtils.getField(ReplayServiceImpl.class, "TIME_TO_WAIT");
-    private final Integer MINIMUM_ITERATIONS = (Integer) ReflectionTestUtils.getField(ReplayServiceImpl.class, "MINIMUM_ITERATIONS");
+    public final String TOPIC_DLT = "test.dlt";
 
     @BeforeEach
     void setUp() {

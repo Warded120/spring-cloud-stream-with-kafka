@@ -40,10 +40,8 @@ public class ErrorHandler {
     }
 
     private DeadLetterPublishingRecoverer createRecoverer(BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
-        //TODO: can I use StreamBridge instead of KafkaTemplate to send records
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(this::templateResolver, dlqDestinationResolver);
-        //TODO: crate interface implementation of ExceptionHeadersCreator (it's a functional interface)
-        recoverer.setExceptionHeadersCreator(this::headersCreator);
+        recoverer.setExceptionHeadersCreator(this::createHeaders);
         return recoverer;
     }
 
@@ -53,7 +51,7 @@ public class ErrorHandler {
                 : byteArrayKafkaTemplate;
     }
 
-    private void headersCreator(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
+    private void createHeaders(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
         Try.run(() -> addHeaders(kafkaHeaders, exception))
                 .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
     }

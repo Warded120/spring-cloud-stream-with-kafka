@@ -38,6 +38,7 @@ public class KafkaConfig {
         return new KafkaConsumer<>(configs);
     }
 
+    //TODO: configure kafkaTemplate in application.yml
     @Bean
     public KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate() {
         DefaultKafkaProducerFactory<String, InputTransaction> factory =
