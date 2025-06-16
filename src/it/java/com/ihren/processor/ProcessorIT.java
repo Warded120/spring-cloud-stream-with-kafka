@@ -174,7 +174,7 @@ public class ProcessorIT {
                 )
         );
         assertEquals(
-                ErrorCode.VALIDATION_EXCEPTION,
+                ErrorCode.VALIDATION,
                 MapperUtils.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
@@ -221,7 +221,7 @@ public class ProcessorIT {
                 )
         );
         assertEquals(
-                ErrorCode.NOT_FOUND_EXCEPTION,
+                ErrorCode.NOT_FOUND,
                 MapperUtils.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
@@ -287,7 +287,7 @@ public class ProcessorIT {
                 )
         );
         assertEquals(
-                ErrorCode.SERIALIZATION_EXCEPTION,
+                ErrorCode.SERIALIZATION,
                 MapperUtils.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class

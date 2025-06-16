@@ -4,6 +4,6 @@ import com.ihren.processor.constant.ErrorCode;
 
 public class SerializationException extends ApplicationException {
     public SerializationException(String message, Throwable cause) {
-        super(message, cause, ErrorCode.SERIALIZATION_EXCEPTION);
+        super(message, cause, ErrorCode.SERIALIZATION);
     }
 }

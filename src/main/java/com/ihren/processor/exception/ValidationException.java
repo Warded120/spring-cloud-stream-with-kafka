@@ -4,6 +4,6 @@ import com.ihren.processor.constant.ErrorCode;
 
 public class ValidationException extends ApplicationException {
     public ValidationException(String message) {
-        super(message, ErrorCode.VALIDATION_EXCEPTION);
+        super(message, ErrorCode.VALIDATION);
     }
 }

@@ -1,10 +1,10 @@
 package com.ihren.processor.constant;
 
 public enum ErrorCode {
-    CACHE_EXCEPTION,
-    MAPPING_EXCEPTION,
-    NOT_FOUND_EXCEPTION,
-    SERIALIZATION_EXCEPTION,
-    VALIDATION_EXCEPTION,
-    UNKNOWN_EXCEPTION
+    CACHE,
+    MAPPING,
+    NOT_FOUND,
+    SERIALIZATION,
+    VALIDATION,
+    UNKNOWN
 }
