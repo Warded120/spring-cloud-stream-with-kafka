@@ -1,6 +1,6 @@
 package com.ihren.processor.dlt.customizer;
 
-import com.ihren.processor.factory.ErrorHandlerFactory;
+import com.ihren.processor.factory.ErrorHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor
 public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer {
 
-    private final ErrorHandlerFactory errorHandlerFactory;
+    private final ErrorHandler errorHandler;
 
     @Override
     public void configure(
@@ -24,7 +24,7 @@ public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer
             BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver,
             BackOff backOff) {
         container.setCommonErrorHandler(
-                errorHandlerFactory.createErrorHandler(dlqDestinationResolver, backOff)
+                errorHandler.createErrorHandler(dlqDestinationResolver, backOff)
         );
     }
 

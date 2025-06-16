@@ -26,7 +26,7 @@ import java.util.function.BiFunction;
 
 @Component
 @RequiredArgsConstructor
-public class ErrorHandlerFactory {
+public class ErrorHandler {
     private final KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate;
     private final KafkaTemplate<String, byte[]> byteArrayKafkaTemplate;
     private final ObjectMapper mapper;

@@ -1,6 +1,6 @@
 package com.ihren.processor.dlt.customizer;
 
-import com.ihren.processor.factory.ErrorHandlerFactory;
+import com.ihren.processor.factory.ErrorHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ class DltCustomizerTest {
     private DltCustomizer dltCustomizer;
 
     @Mock
-    private ErrorHandlerFactory errorHandlerFactory;
+    private ErrorHandler errorHandler;
 
     @Test
     void should_ConfigureContainer_when_Configured() {
@@ -33,7 +33,7 @@ class DltCustomizerTest {
         BiFunction dlqDestinationResolver = mock(BiFunction.class);
         BackOff backOff = mock(BackOff.class);
 
-        given(errorHandlerFactory.createErrorHandler(dlqDestinationResolver, backOff)).willReturn(errorHandler);
+        given(this.errorHandler.createErrorHandler(dlqDestinationResolver, backOff)).willReturn(errorHandler);
 
         //when
         dltCustomizer.configure(container, destinationName, group, dlqDestinationResolver, backOff);
