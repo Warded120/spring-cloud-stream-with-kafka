@@ -6,6 +6,7 @@ import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.exception.ApplicationException;
 import com.ihren.processor.exception.SerializationException;
+import com.ihren.processor.exception.model.ExceptionDetails;
 import com.ihren.processor.model.input.InputTransaction;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
@@ -57,21 +58,22 @@ public class ErrorHandlerFactory {
     }
 
     private void addHeaders(Headers kafkaHeaders, Exception exception) throws JsonProcessingException {
-        kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(getErrorCodeFrom(exception)));
-        kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exception.getMessage()));
+        ExceptionDetails exceptionDetails = getExceptionDetailsFrom(exception);
+        kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(exceptionDetails.errorCode()));
+        kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exceptionDetails.message()));
         kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
     }
 
-    private ErrorCode getErrorCodeFrom(Exception exception) {
+    private ExceptionDetails getExceptionDetailsFrom(Exception exception) {
         return Optional.of(exception)
                 .filter(ex -> ex instanceof ApplicationException)
                 .map(ex -> (ApplicationException) ex)
-                .map(ApplicationException::getErrorCode)
+                .map(ApplicationException::getExceptionDetails)
                 .orElseGet(() ->
                         Optional.of(exception)
                                 .map(ex -> (Exception) ex.getCause())
-                                .map(this::getErrorCodeFrom)
-                                .orElse(ErrorCode.UNKNOWN_EXCEPTION)
+                                .map(this::getExceptionDetailsFrom)
+                                .orElse(new ExceptionDetails(ErrorCode.UNKNOWN_EXCEPTION, exception.getMessage()))
                 );
     }
 }
