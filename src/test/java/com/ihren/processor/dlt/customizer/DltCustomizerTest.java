@@ -1,6 +1,6 @@
 package com.ihren.processor.dlt.customizer;
 
-import com.ihren.processor.factory.ErrorHandler;
+import com.ihren.processor.exception.handler.ErrorHandler;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

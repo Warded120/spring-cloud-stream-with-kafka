@@ -15,6 +15,7 @@ public class ApplicationException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    //TODO: remove
     public ExceptionDetails getExceptionDetails() {
         return new ExceptionDetails(errorCode, super.getMessage());
     }

@@ -54,6 +54,6 @@ public class GenericCache<K, V> {
                                     return applied;
                                 })
                 )
-                .orElseThrow(() -> new CacheException("key is null", ErrorCode.CACHE_EXCEPTION));
+                .orElseThrow(() -> new CacheException("key is null"));
     }
 }

@@ -21,14 +21,14 @@ public class JsonDeserializer<T> implements Deserializer<T> {
     public void configure(Map<String, ?> configs, boolean isKey) {
         String className = (String) configs.get("value.deserializer.target.class");
         Try.of(() -> this.targetClass = (Class<T>) Class.forName(className))
-                .getOrElseThrow(ex -> new SerializationException("Failed to load target class", ErrorCode.SERIALIZATION_EXCEPTION));
+                .getOrElseThrow(ex -> new SerializationException("Failed to load target class", ex));
         ObjectMapperConfig.configure(objectMapper);
     }
 
     @Override
     public T deserialize(String s, byte[] bytes) {
-            return Try.of(() -> objectMapper.readValue(bytes, targetClass))
-                    //TODO: pass original exception everywhere
-                .getOrElseThrow(e -> new SerializationException("failed to deserialize " + targetClass, ErrorCode.SERIALIZATION_EXCEPTION));
+        return Try.of(() -> objectMapper.readValue(bytes, targetClass))
+                //TODO: pass original exception everywhere
+                .getOrElseThrow(ex -> new SerializationException("failed to deserialize " + targetClass, ex));
     }
 }

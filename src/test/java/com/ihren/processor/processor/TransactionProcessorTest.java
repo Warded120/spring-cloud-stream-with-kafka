@@ -3,6 +3,7 @@ package com.ihren.processor.processor;
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.mapper.TransactionMapper;
+import com.ihren.processor.messaging.CustomMessageBuilder;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.output.OutputTotal;
@@ -36,6 +37,9 @@ class TransactionProcessorTest {
     @Mock
     private TransactionMapper mapper;
 
+    @Mock
+    private CustomMessageBuilder messageBuilder;
+
     @Test
     void should_processTransaction_when_EverythingIsOK() {
         //given
@@ -46,7 +50,6 @@ class TransactionProcessorTest {
 
         MessageHeaders messageHeaders = mock(MessageHeaders.class);
         given(inputTransactionMessage.getHeaders()).willReturn(messageHeaders);
-        given(messageHeaders.get(Constants.Kafka.Headers.IS_DLT)).willReturn(Boolean.FALSE);
 
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
@@ -73,6 +76,7 @@ class TransactionProcessorTest {
 
         given(validator.validate(inputTransaction)).willReturn(inputTransaction);
         given(mapper.map(inputTransaction)).willReturn(expectedTransaction);
+        given(messageBuilder.build(expectedTransaction, messageHeaders)).willReturn(expected);
 
         //when
         Message<OutputTransaction> actual = processor.apply(inputTransactionMessage);

@@ -1,6 +1,6 @@
 package com.ihren.processor.dlt.customizer;
 
-import com.ihren.processor.factory.ErrorHandler;
+import com.ihren.processor.exception.handler.ErrorHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;

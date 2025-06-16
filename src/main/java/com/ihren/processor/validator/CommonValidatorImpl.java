@@ -24,9 +24,7 @@ public class CommonValidatorImpl<T> implements CommonValidator<T> {
                             errors.stream()
                                 .map(ConstraintViolation::getMessage)
                                 .toArray(String[]::new)
-                    ),
-                    //TODO: don't pass like this
-                    ErrorCode.VALIDATION_EXCEPTION
+                    )
             );
         }
         return t;

@@ -20,9 +20,10 @@ public class ClientServiceImpl implements ClientService {
     public ItemResponse getByItemId(Long id) {
         return Try.of(() -> itemClient.getById(id))
                 .map(validator::validate)
-                .getOrElseThrow(() -> new NotFoundException(
+                .getOrElseThrow(ex ->
+                        new NotFoundException(
                                 "not found by item.id: " + id,
-                                ErrorCode.NOT_FOUND_EXCEPTION
+                                ex
                         )
                 );
     }

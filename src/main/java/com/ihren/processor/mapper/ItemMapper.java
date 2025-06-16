@@ -40,8 +40,7 @@ public abstract class ItemMapper {
                                         "Unexpected value: %s. Expected values are: %s",
                                         loyaltyAccountId,
                                         Arrays.toString(Account.values())
-                                ),
-                                ErrorCode.MAPPING_EXCEPTION
+                                )
                         )
                 );
     }

@@ -56,7 +56,7 @@ public class ErrorHandler {
 
     private void headersCreator(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
         Try.run(() -> addHeaders(kafkaHeaders, exception))
-                .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex, ErrorCode.SERIALIZATION_EXCEPTION));
+                .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
     }
 
     private void addHeaders(Headers kafkaHeaders, Exception exception) throws JsonProcessingException {
