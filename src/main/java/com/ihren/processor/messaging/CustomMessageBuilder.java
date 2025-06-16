@@ -8,17 +8,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomMessageBuilder {
-
     public <T> Message<T> build(T payload, MessageHeaders headers) {
         MessageBuilder<T> builder = MessageBuilder
                 .withPayload(payload);
 
-        setCustomHeadersIfExist(builder, headers);
+        setCustomHeadersIfTheyExist(builder, headers);
 
         return builder.build();
     }
 
-    private <T> void setCustomHeadersIfExist(MessageBuilder<T> builder, MessageHeaders original) {
+    private <T> void setCustomHeadersIfTheyExist(MessageBuilder<T> builder, MessageHeaders original) {
         if (original.containsKey(Constants.Kafka.Headers.IS_DLT)) {
             builder.setHeader(Constants.Kafka.Headers.IS_DLT, original.get(Constants.Kafka.Headers.IS_DLT));
         }

@@ -44,15 +44,11 @@ spring:
             consumer:
               enable-dlq: true
               dlq-name: transaction.dlt
-              #TODO: maybe remove this
-              startOffset: earliest
               configuration:
                 isolation:
                   level: read_committed
           reprocessTransaction-in-0:
             consumer:
-              #TODO: maybe remove this
-              startOffset: earliest
               configuration:
                 isolation:
                   level: read_committed
