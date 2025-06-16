@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,28 +26,32 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class ReplayServiceImpl implements ReplayService {
-    @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
-    private String topicDlt;
+    private static final int MINIMUM_ITERATIONS = 10;
+    private static final Duration TIME_TO_WAIT = Duration.ofMillis(500);
+    private static final String BINDING_NAME = "reprocessTransaction-in-0";
 
     private final KafkaConsumer<String, InputTransaction> consumer;
     private final StreamBridge streamBridge;
 
+    @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
+    private String topicDlt;
+
     public Integer replayAll() {
         consumer.subscribe(Collections.singletonList(topicDlt));
-
         AtomicInteger iteration = new AtomicInteger(0);
         return Try.of(() ->
-                    Stream.generate(() -> {
-                                //TODO: refactor
-                                iteration.incrementAndGet();
-                                return consumer.poll(Duration.ofMillis(500));
-                            })
-                        .takeWhile(recs -> recs.count() > 0 || iteration.get() < 10)
-                        .peek(recs -> recs.forEach(record ->
-                                streamBridge.send("reprocessTransaction-in-0", messageOf(record))
-                        ))
-                        .mapToInt(ConsumerRecords::count)
-                        .sum())
+                        Stream.generate(() -> {
+                                    iteration.incrementAndGet();
+                                    return consumer.poll(TIME_TO_WAIT);
+                                })
+                                .takeWhile(recs -> recs.count() > 0 || iteration.get() < MINIMUM_ITERATIONS)
+                                .peek(recs ->
+                                        recs.forEach(record ->
+                                                streamBridge.send(BINDING_NAME, messageOf(record))
+                                        )
+                                )
+                                .mapToInt(ConsumerRecords::count)
+                                .sum())
                 .andFinally(consumer::unsubscribe)
                 .get();
     }
@@ -59,16 +64,17 @@ public class ReplayServiceImpl implements ReplayService {
     }
 
     private Map<String, Object> mapOf(Headers headers) {
-        if (headers == null) {
-            return new HashMap<>();
-        }
-
-        return StreamSupport.stream(headers.spliterator(), false)
-                .collect(Collectors.toMap(
-                        Header::key,
-                        Header::value,
-                        (oldValue, newValue) -> newValue,
-                        HashMap::new
-                ));
+        return Optional.ofNullable(headers)
+                .map(hs ->
+                        StreamSupport.stream(hs.spliterator(), false)
+                                .collect(Collectors.toMap(
+                                                Header::key,
+                                                Header::value,
+                                                (oldValue, newValue) -> newValue,
+                                                () -> new HashMap<String, Object>()
+                                        )
+                                )
+                )
+                .orElseGet(HashMap::new);
     }
 }

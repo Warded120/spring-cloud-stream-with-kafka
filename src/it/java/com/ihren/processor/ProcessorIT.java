@@ -1,6 +1,5 @@
 package com.ihren.processor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.ihren.processor.annotation.IntegrationTest;
 import com.ihren.processor.cache.GenericCache;
@@ -18,7 +17,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,8 +31,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -84,9 +80,6 @@ public class ProcessorIT {
     @Autowired
     private GenericCache<Long, ItemResponse> cache;
 
-    @Autowired
-    private ObjectMapper mapper;
-
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.destination}")
     private String topicIn;
 
@@ -96,6 +89,8 @@ public class ProcessorIT {
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
     private String topicDlt;
 
+    @Value("${spring.cloud.stream.bindings.reprocessTransaction-in-0.destination}")
+    private String topicReplay;
 
     @BeforeEach
     public void init() {
@@ -109,6 +104,7 @@ public class ProcessorIT {
         KafkaUtils.purgeAllRecords(admin, topicIn);
         KafkaUtils.purgeAllRecords(admin, topicDlt);
         KafkaUtils.purgeAllRecords(admin, topicOut);
+        KafkaUtils.purgeAllRecords(admin, topicReplay);
         kafkaConsumer.unsubscribe();
         dltKafkaConsumer.unsubscribe();
         cache.clearCache();

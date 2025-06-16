@@ -27,7 +27,7 @@ spring:
           destination: transaction.replay
           group: reprocessTransaction
         reprocessTransaction-out-0:
-          destination: transaction
+          destination: processed-transaction
       kafka:
         binder:
           brokers: localhost:9092
@@ -60,3 +60,6 @@ api:
 cache:
   item:
     expiration: 1d
+logging:
+  level:
+    org.springframework.boot.context.config: DEBUG
