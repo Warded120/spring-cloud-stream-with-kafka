@@ -89,7 +89,7 @@ public class ProcessorIT {
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
     private String topicDlt;
 
-    @Value("${spring.cloud.stream.bindings.reprocessTransaction-in-0.destination}")
+    @Value("${spring.cloud.stream.bindings.replayTransaction-in-0.destination}")
     private String topicReplay;
 
     @BeforeEach

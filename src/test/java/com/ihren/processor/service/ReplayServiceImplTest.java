@@ -32,7 +32,7 @@ import static org.mockito.Mockito.times;
 class ReplayServiceImplTest {
     private static final int MINIMUM_ITERATIONS = 10;
     private static final Duration TIME_TO_WAIT = Duration.ofMillis(500);
-    private static final String BINDING_NAME = "reprocessTransaction-in-0";
+    private static final String BINDING_NAME = "replayTransaction-in-0";
 
     @InjectMocks
     private ReplayServiceImpl replayService;

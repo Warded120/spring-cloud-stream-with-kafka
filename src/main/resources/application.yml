@@ -5,7 +5,7 @@ spring:
     name: processor
   cloud:
     function:
-      definition: processTransaction;reprocessTransaction
+      definition: processTransaction;replayTransaction
     stream:
       default:
         consumer:
@@ -23,10 +23,10 @@ spring:
             back-off-multiplier: 2.0
         processTransaction-out-0:
           destination: processed-transaction
-        reprocessTransaction-in-0:
+        replayTransaction-in-0:
           destination: transaction.replay
-          group: reprocessTransaction
-        reprocessTransaction-out-0:
+          group: replayTransaction
+        replayTransaction-out-0:
           destination: processed-transaction
       kafka:
         binder:
@@ -47,7 +47,7 @@ spring:
               configuration:
                 isolation:
                   level: read_committed
-          reprocessTransaction-in-0:
+          replayTransaction-in-0:
             consumer:
               configuration:
                 isolation:
@@ -58,6 +58,3 @@ api:
 cache:
   item:
     expiration: 1d
-logging:
-  level:
-    org.springframework.boot.context.config: DEBUG

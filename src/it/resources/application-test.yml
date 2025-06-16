@@ -6,9 +6,9 @@ spring:
           destination: test
         processTransaction-out-0:
           destination: processed-test
-        reprocessTransaction-in-0:
+        replayTransaction-in-0:
           destination: test.replay
-        reprocessTransaction-out-0:
+        replayTransaction-out-0:
           destination: processed-test
       kafka:
         bindings:

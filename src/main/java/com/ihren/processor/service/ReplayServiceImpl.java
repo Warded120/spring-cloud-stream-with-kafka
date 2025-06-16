@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
 public class ReplayServiceImpl implements ReplayService {
     private static final int MINIMUM_ITERATIONS = 10;
     private static final Duration TIME_TO_WAIT = Duration.ofMillis(500);
-    private static final String BINDING_NAME = "reprocessTransaction-in-0";
+    private static final String BINDING_NAME = "replayTransaction-in-0";
 
     private final KafkaConsumer<String, InputTransaction> consumer;
     private final StreamBridge streamBridge;
