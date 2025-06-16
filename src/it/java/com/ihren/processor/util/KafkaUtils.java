@@ -21,45 +21,37 @@ import java.util.stream.StreamSupport;
 
 public final class KafkaUtils {
     public static <K, V> ConsumerRecord<K, V> getRecord(KafkaConsumer<K, V> consumer, String topic, Duration timeout) {
-        return Try.of(() ->
-                    KafkaTestUtils.getSingleRecord(consumer, topic, timeout)
-                )
-                .onFailure(Throwable::printStackTrace)
-                .get();
+        return KafkaTestUtils.getSingleRecord(consumer, topic, timeout);
     }
 
     public static <K, V> List<V> getRecords(KafkaConsumer<K, V> consumer, String topic, Duration timeout, int minRecords) {
-        return Try.of(() -> {
-                    ConsumerRecords<K, V> records = KafkaTestUtils.getRecords(consumer, timeout, minRecords);
-                    Iterable<ConsumerRecord<K, V>> topicRecords = records.records(topic);
-                    return StreamSupport.stream(topicRecords.spliterator(), false)
-                            .map(ConsumerRecord::value)
-                            .toList();
-                })
-                .onFailure(Throwable::printStackTrace)
-                .get();
+        ConsumerRecords<K, V> records = KafkaTestUtils.getRecords(consumer, timeout, minRecords);
+        Iterable<ConsumerRecord<K, V>> topicRecords = records.records(topic);
+        return StreamSupport.stream(topicRecords.spliterator(), false)
+                .map(ConsumerRecord::value)
+                .toList();
     }
 
     public static void purgeAllRecords(Admin admin, String topic) {
         Try.run(() -> {
-            DescribeTopicsResult describeTopicsResult = admin.describeTopics(Collections.singletonList(topic));
-            TopicDescription topicDescription = describeTopicsResult.allTopicNames().get().get(topic);
+                    DescribeTopicsResult describeTopicsResult = admin.describeTopics(Collections.singletonList(topic));
+                    TopicDescription topicDescription = describeTopicsResult.allTopicNames().get().get(topic);
 
-            Map<TopicPartition, RecordsToDelete> recordsToDeleteMap = new HashMap<>();
+                    Map<TopicPartition, RecordsToDelete> recordsToDeleteMap = new HashMap<>();
 
-            for (TopicPartitionInfo partitionInfo : topicDescription.partitions()) {
-                TopicPartition topicPartition = new TopicPartition(topic, partitionInfo.partition());
+                    for (TopicPartitionInfo partitionInfo : topicDescription.partitions()) {
+                        TopicPartition topicPartition = new TopicPartition(topic, partitionInfo.partition());
 
-                recordsToDeleteMap.put(
-                        topicPartition,
-                        RecordsToDelete.beforeOffset(-1)
-                );
-            }
+                        recordsToDeleteMap.put(
+                                topicPartition,
+                                RecordsToDelete.beforeOffset(-1)
+                        );
+                    }
 
-            DeleteRecordsResult deleteRecordsResult = admin.deleteRecords(recordsToDeleteMap);
+                    DeleteRecordsResult deleteRecordsResult = admin.deleteRecords(recordsToDeleteMap);
 
-            deleteRecordsResult.all().get();
-        })
-        .onFailure(Throwable::printStackTrace);
+                    deleteRecordsResult.all().get();
+                })
+                .onFailure(Throwable::printStackTrace);
     }
 }
