@@ -1,4 +1,4 @@
-package com.ihren.processor.factory;
+package com.ihren.processor.exception.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
