@@ -41,7 +41,9 @@ public class ErrorHandlerFactory {
     }
 
     private DeadLetterPublishingRecoverer createRecoverer(BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
+        //TODO: can I use StreamBridge instead of KafkaTemplate to send records
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(this::templateResolver, dlqDestinationResolver);
+        //TODO: crate interface implementation of ExceptionHeadersCreator (it's a functional interface)
         recoverer.setExceptionHeadersCreator(this::headersCreator);
         return recoverer;
     }
@@ -58,12 +60,14 @@ public class ErrorHandlerFactory {
     }
 
     private void addHeaders(Headers kafkaHeaders, Exception exception) throws JsonProcessingException {
+        //TODO: remove ExceptionDetails and use applicationException type
         ExceptionDetails exceptionDetails = getExceptionDetailsFrom(exception);
         kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(exceptionDetails.errorCode()));
         kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(exceptionDetails.message()));
         kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
     }
 
+    //TODO: remove ExceptionDetails and use applicationException type
     private ExceptionDetails getExceptionDetailsFrom(Exception exception) {
         return Optional.of(exception)
                 .filter(ex -> ex instanceof ApplicationException)

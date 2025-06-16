@@ -40,6 +40,7 @@ public class ReplayServiceImpl implements ReplayService {
         consumer.subscribe(Collections.singletonList(topicDlt));
         AtomicInteger iteration = new AtomicInteger(0);
         return Try.of(() ->
+                //TODO: optimize, it's not a good solution
                         Stream.generate(() -> {
                                     iteration.incrementAndGet();
                                     return consumer.poll(TIME_TO_WAIT);

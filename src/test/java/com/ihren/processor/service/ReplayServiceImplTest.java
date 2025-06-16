@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
 import org.springframework.test.util.ReflectionTestUtils;
-import scala.Int;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -43,6 +41,7 @@ class ReplayServiceImplTest {
     @Mock
     private StreamBridge streamBridge;
 
+    //TODO: define these constants with the same values like in tested class, don't read them (if these constants are changed then tests will fail and you'll understand whether you have to change tests or logic)
     private final String BINDING_NAME = (String) ReflectionTestUtils.getField(ReplayServiceImpl.class, "BINDING_NAME");
     private final Duration TIME_TO_WAIT = (Duration) ReflectionTestUtils.getField(ReplayServiceImpl.class, "TIME_TO_WAIT");
     private final Integer MINIMUM_ITERATIONS = (Integer) ReflectionTestUtils.getField(ReplayServiceImpl.class, "MINIMUM_ITERATIONS");

@@ -17,6 +17,7 @@ public class CommonValidatorImpl<T> implements CommonValidator<T> {
         Set<ConstraintViolation<T>> errors = validator.validate(t);
 
         if (!errors.isEmpty()) {
+            //TODO: pass errorCodes inside each ApplicationException everywhere
             throw new ValidationException("Errors were found: "
                     + String.join(
                             ", ",
@@ -24,6 +25,7 @@ public class CommonValidatorImpl<T> implements CommonValidator<T> {
                                 .map(ConstraintViolation::getMessage)
                                 .toArray(String[]::new)
                     ),
+                    //TODO: don't pass like this
                     ErrorCode.VALIDATION_EXCEPTION
             );
         }
