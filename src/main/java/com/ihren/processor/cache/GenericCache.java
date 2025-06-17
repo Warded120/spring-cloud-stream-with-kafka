@@ -2,7 +2,6 @@ package com.ihren.processor.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.exception.CacheException;
 import java.time.Duration;
 import java.util.Map;

@@ -1,6 +1,5 @@
 package com.ihren.processor.mapper;
 
-import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.model.output.OutputTotal;
 import com.ihren.processor.model.output.OutputTransaction;

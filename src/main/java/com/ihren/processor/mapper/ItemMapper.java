@@ -1,7 +1,6 @@
 package com.ihren.processor.mapper;
 
 import com.ihren.processor.constant.Account;
-import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.enricher.Enricher;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.input.InputItem;

@@ -1,6 +1,5 @@
 package com.ihren.processor.validator;
 
-import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.exception.ValidationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;

@@ -1,6 +1,5 @@
 package com.ihren.processor.mapper;
 
-import com.ihren.processor.constant.Constants;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.util.DateTimeUtils;
