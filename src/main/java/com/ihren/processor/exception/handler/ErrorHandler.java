@@ -1,6 +1,5 @@
 package com.ihren.processor.exception.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.ErrorCode;
@@ -39,29 +38,30 @@ public class ErrorHandler {
         return new DefaultErrorHandler(recoverer, backOff);
     }
 
+    //TODO: how to make it a bean
     private DeadLetterPublishingRecoverer createRecoverer(BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(this::templateResolver, dlqDestinationResolver);
-        recoverer.setExceptionHeadersCreator(this::createHeaders);
+        recoverer.setExceptionHeadersCreator(this::headersCreator);
         return recoverer;
     }
 
+    //TODO: how to make it a bean
     private KafkaOperations<?, ?> templateResolver(ProducerRecord<?, ?> record) {
         return record.value() instanceof InputTransaction
                 ? inputTransactionKafkaTemplate
                 : byteArrayKafkaTemplate;
     }
 
-    private void createHeaders(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
-        Try.run(() -> addHeaders(kafkaHeaders, exception))
+    //TODO: how to make it a bean
+    private void headersCreator(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
+        Try.run(() -> {
+                    ApplicationException applicationException = getApplicationExceptionFrom(exception);
+
+                    kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(applicationException.getErrorCode()));
+                    kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(applicationException.getMessage()));
+                    kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
+                })
                 .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
-    }
-
-    private void addHeaders(Headers kafkaHeaders, Exception exception) throws JsonProcessingException {
-        ApplicationException applicationException = getApplicationExceptionFrom(exception);
-
-        kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(applicationException.getErrorCode()));
-        kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(applicationException.getMessage()));
-        kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
     }
 
     private ApplicationException getApplicationExceptionFrom(Exception exception) {
