@@ -12,7 +12,6 @@ import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
 
-//TODO: is it okay?
 @Component
 @RequiredArgsConstructor
 public class ApplicaitonExceptionHeadersCreator implements DeadLetterPublishingRecoverer.ExceptionHeadersCreator {

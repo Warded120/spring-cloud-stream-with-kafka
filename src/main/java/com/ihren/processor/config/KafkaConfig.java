@@ -69,7 +69,6 @@ public class KafkaConfig {
         return new KafkaTemplate<>(factory);
     }
 
-    //TODO: is it okay?
     @Bean
     public Function<ProducerRecord<?, ?>, KafkaOperations<?, ?>> templateResolver(
             KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate,

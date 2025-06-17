@@ -41,20 +41,9 @@ public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer
         return false;
     }
 
-    //TODO: maybe create recoverer directly in configure method?
     private DeadLetterPublishingRecoverer createRecoverer(BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(templateResolver, dlqDestinationResolver);
         recoverer.setExceptionHeadersCreator(headersCreator);
         return recoverer;
     }
-
-    //TODO: does it have to be here?
-    //TODO: maybe move to KafkaConfig and create as a bean?
-//    private final KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate;
-//    private final KafkaTemplate<String, byte[]> byteArrayKafkaTemplate;
-//    private KafkaOperations<?, ?> templateResolver(ProducerRecord<?, ?> record) {
-//        return record.value() instanceof InputTransaction
-//                ? inputTransactionKafkaTemplate
-//                : byteArrayKafkaTemplate;
-//    }
 }
