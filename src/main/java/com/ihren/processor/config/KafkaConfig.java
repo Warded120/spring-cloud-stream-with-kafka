@@ -39,6 +39,7 @@ public class KafkaConfig {
     }
 
     //TODO: configure kafkaTemplate in application.yml
+    //TODO: remove
     @Bean
     public KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate() {
         DefaultKafkaProducerFactory<String, InputTransaction> factory =
@@ -53,6 +54,7 @@ public class KafkaConfig {
         return new KafkaTemplate<>(factory);
     }
 
+    //TODO: remove
     @Bean
     public KafkaTemplate<String, byte[]> byteArrayKafkaTemplate() {
         DefaultKafkaProducerFactory<String, byte[]> factory =

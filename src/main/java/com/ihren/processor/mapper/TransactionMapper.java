@@ -24,10 +24,12 @@ import java.util.UUID;
                 DateTimeUtils.class
         }
 )
-public interface TransactionMapper {
+public abstract class TransactionMapper {
+    public static final String SOFTSERVE = "Softserve";
+
     @Mapping(target = "transactionId", expression = "java(UUID.randomUUID())")
-    @Mapping(target = "source", constant = Constants.Model.SOFTSERVE)
+    @Mapping(target = "source", constant = SOFTSERVE)
     @Mapping(target = "discount", ignore = true)
     @Mapping(target = "operationDateTime", expression = "java(DateTimeUtils.parseInstant(dto.endDateTime()))")
-    OutputTransaction map(InputTransaction dto);
+    public abstract OutputTransaction map(InputTransaction dto);
 }

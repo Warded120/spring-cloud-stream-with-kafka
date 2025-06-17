@@ -2,6 +2,7 @@ package com.ihren.processor.util;
 
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
+import com.ihren.processor.mapper.TransactionMapper;
 import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.model.input.InputTotal;
 import com.ihren.processor.model.input.InputTransaction;
@@ -105,7 +106,7 @@ public class TestUtils {
 
         return new OutputTransaction(
                 null,
-                Constants.Model.SOFTSERVE,
+                TransactionMapper.SOFTSERVE,
                 null,
                 1L,
                 operationDateTime,

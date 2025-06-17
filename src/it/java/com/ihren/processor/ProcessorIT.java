@@ -45,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.then;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @IntegrationTest
@@ -324,9 +323,9 @@ public class ProcessorIT {
         inputTransactionKafkaTemplate.send(message);
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.post("/replay/all"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1"));
+        mockMvc.perform(MockMvcRequestBuilders.post("/transactions/replay"))
+                .andExpect(status().isOk());
+
         ConsumerRecord<String, OutputTransaction> record = KafkaUtils.getRecord(kafkaConsumer, topicOut, TIME_TO_WAIT);
 
         //then

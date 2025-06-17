@@ -1,10 +1,10 @@
 package com.ihren.processor.service;
 
 import com.ihren.processor.model.input.InputTransaction;
-import io.vavr.control.Try;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -26,8 +25,7 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class ReplayServiceImpl implements ReplayService {
-    private static final int MINIMUM_ITERATIONS = 10;
-    private static final Duration TIME_TO_WAIT = Duration.ofMillis(500);
+    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
     private static final String BINDING_NAME = "replayTransaction-in-0";
 
     private final KafkaConsumer<String, InputTransaction> consumer;
@@ -36,25 +34,23 @@ public class ReplayServiceImpl implements ReplayService {
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
     private String topicDlt;
 
-    public Integer replayAll() {
+    @PostConstruct
+    public void init() {
         consumer.subscribe(Collections.singletonList(topicDlt));
-        AtomicInteger iteration = new AtomicInteger(0);
-        return Try.of(() ->
-                //TODO: optimize, it's not a good solution
-                        Stream.generate(() -> {
-                                    iteration.incrementAndGet();
-                                    return consumer.poll(TIME_TO_WAIT);
-                                })
-                                .takeWhile(recs -> recs.count() > 0 || iteration.get() < MINIMUM_ITERATIONS)
-                                .peek(recs ->
-                                        recs.forEach(record ->
-                                                streamBridge.send(BINDING_NAME, messageOf(record))
-                                        )
-                                )
-                                .mapToInt(ConsumerRecords::count)
-                                .sum())
-                .andFinally(consumer::unsubscribe)
-                .get();
+    }
+
+    @PreDestroy
+    public void destroy() {
+        consumer.unsubscribe();
+    }
+
+    public void replayAll() {
+        Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
+                .takeWhile(recs -> !recs.isEmpty())
+                .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
+                .forEach(record ->
+                        streamBridge.send(BINDING_NAME, messageOf(record))
+                );
     }
 
     private <T> Message<T> messageOf(ConsumerRecord<String, T> record) {
