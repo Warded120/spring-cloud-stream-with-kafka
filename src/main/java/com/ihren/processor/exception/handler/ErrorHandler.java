@@ -29,11 +29,11 @@ public class ErrorHandler {
     private final KafkaTemplate<String, byte[]> byteArrayKafkaTemplate;
     private final ObjectMapper mapper;
 
+    //TODO: move to DltCustomizer
     public CommonErrorHandler createErrorHandler(
             BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver,
             BackOff backOff
     ) {
-
         DeadLetterPublishingRecoverer recoverer = createRecoverer(dlqDestinationResolver);
         return new DefaultErrorHandler(recoverer, backOff);
     }
@@ -53,6 +53,7 @@ public class ErrorHandler {
     }
 
     //TODO: how to make it a bean
+    //TODO: create class implementation of ExceptionHeadersCreator
     private void headersCreator(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
         Try.run(() -> {
                     ApplicationException applicationException = getApplicationExceptionFrom(exception);
