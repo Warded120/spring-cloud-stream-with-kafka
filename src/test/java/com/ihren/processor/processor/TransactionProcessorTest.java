@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionProcessorTest {
+    private static final String SOFTSERVE = "Softserve";
     @InjectMocks
     private TransactionProcessor processor;
 
@@ -67,7 +68,7 @@ class TransactionProcessorTest {
                 "12345678901234"
         );
         OutputTotal expectedTotal = new OutputTotal(BigDecimal.valueOf(360L), CurrencyCode.USD);
-        OutputTransaction expectedTransaction = new OutputTransaction(uuid, TransactionMapper.SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
+        OutputTransaction expectedTransaction = new OutputTransaction(uuid, SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
 
         Message<OutputTransaction> expected = MessageBuilder
                 .withPayload(expectedTransaction)

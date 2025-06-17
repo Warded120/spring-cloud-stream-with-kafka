@@ -14,13 +14,13 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class ApplicaitonExceptionHeadersCreator implements DeadLetterPublishingRecoverer.ExceptionHeadersCreator {
+public class ExceptionHeaderHandler implements DeadLetterPublishingRecoverer.ExceptionHeadersCreator {
     private final ObjectMapper mapper;
 
     @Override
     public void create(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
         Try.run(() -> {
-                    ApplicationException applicationException = getApplicationExceptionFrom(exception);
+                    ApplicationException applicationException = getCause(exception);
 
                     kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(applicationException.getErrorCode()));
                     kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(applicationException.getMessage()));
@@ -29,15 +29,15 @@ public class ApplicaitonExceptionHeadersCreator implements DeadLetterPublishingR
                 .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
     }
 
-    private ApplicationException getApplicationExceptionFrom(Exception exception) {
+    private ApplicationException getCause(Exception exception) {
         return Optional.of(exception)
                 .filter(ApplicationException.class::isInstance)
                 .map(ApplicationException.class::cast)
-                .orElseGet(() ->
+                .or(() ->
                         Optional.of(exception)
                                 .map(ex -> (Exception) ex.getCause())
-                                .map(this::getApplicationExceptionFrom)
-                                .orElse(new ApplicationException(exception.getMessage(), ErrorCode.UNKNOWN))
-                );
+                                .map(this::getCause)
+                )
+                .orElse(new ApplicationException(exception.getMessage(), ErrorCode.UNKNOWN));
     }
 }

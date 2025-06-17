@@ -24,7 +24,7 @@ import java.util.UUID;
         }
 )
 public abstract class TransactionMapper {
-    public static final String SOFTSERVE = "Softserve";
+    private static final String SOFTSERVE = "Softserve";
 
     @Mapping(target = "transactionId", expression = "java(UUID.randomUUID())")
     @Mapping(target = "source", constant = SOFTSERVE)

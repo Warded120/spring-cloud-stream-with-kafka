@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
         qualifiers = "nonCacheableItemClient"
 )
 public interface ItemClient {
+    //TODO: should return Optional<ItemResponse>
     @GetMapping("/users/{id}")
     ItemResponse getById(@PathVariable("id") Long id);
 }

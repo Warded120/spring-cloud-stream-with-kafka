@@ -3,6 +3,7 @@ package com.ihren.processor.service;
 import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import com.ihren.processor.exception.NotFoundException;
+import com.ihren.processor.exception.ValidationException;
 import com.ihren.processor.validator.CommonValidator;
 import feign.FeignException;
 import org.junit.jupiter.api.Test;
@@ -64,5 +65,22 @@ class ClientServiceImplTest {
 
         then(client).should().getById(id);
         then(validator).should(never()).validate(any(ItemResponse.class));
+    }
+
+    @Test
+    void should_ThrowValidationException_when_ResponseIsInvalid() {
+        //given
+        Long id = 1L;
+        ItemResponse invalidItemResponse = mock(ItemResponse.class);
+
+        given(client.getById(id)).willReturn(invalidItemResponse);
+        given(validator.validate(invalidItemResponse)).willThrow(ValidationException.class);
+
+        //when
+        assertThrows(ValidationException.class, () -> clientService.getByItemId(id));
+
+        //then
+        then(client).should().getById(id);
+        then(validator).should().validate(any(ItemResponse.class));
     }
 }

@@ -68,15 +68,4 @@ public class KafkaConfig {
 
         return new KafkaTemplate<>(factory);
     }
-
-    @Bean
-    public Function<ProducerRecord<?, ?>, KafkaOperations<?, ?>> templateResolver(
-            KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate,
-            KafkaTemplate<String, byte[]> byteArrayKafkaTemplate
-    ) {
-        return record -> record.value() instanceof InputTransaction
-                ? inputTransactionKafkaTemplate
-                : byteArrayKafkaTemplate;
-
-    }
 }

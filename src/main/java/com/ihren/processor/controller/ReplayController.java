@@ -1,6 +1,6 @@
 package com.ihren.processor.controller;
 
-import com.ihren.processor.service.ReplayService;
+import com.ihren.processor.service.TransactionReplayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ReplayController {
 
-    private final ReplayService replayService;
+    private final TransactionReplayService transactionReplayService;
 
     @PostMapping("/replay")
     public void replay() {
-        replayService.replayAll();
+        transactionReplayService.replay();
     }
 }

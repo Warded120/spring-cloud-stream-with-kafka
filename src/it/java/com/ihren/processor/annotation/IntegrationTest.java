@@ -1,10 +1,12 @@
 package com.ihren.processor.annotation;
 
 import com.ihren.processor.config.KafkaAdminClientConfig;
+import com.ihren.processor.config.ObjectConverterConfig;
 import com.ihren.processor.config.WireMockConfig;
 import com.ihren.processor.initializer.KafkaInitializer;
 import com.ihren.processor.ProcessorApplication;
 import com.ihren.processor.config.KafkaConsumerConfig;
+import com.ihren.processor.util.ObjectConverter;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +41,9 @@ import java.lang.annotation.Target;
 @Import({
         KafkaConsumerConfig.class,
         KafkaAdminClientConfig.class,
-        WireMockConfig.class
+        WireMockConfig.class,
+        ObjectConverterConfig.class,
+        ObjectConverter.class
 })
 @ExtendWith(OutputCaptureExtension.class)
 @AutoConfigureWireMock

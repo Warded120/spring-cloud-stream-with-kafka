@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Collections;
@@ -24,7 +25,7 @@ import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
-public class ReplayServiceImpl implements ReplayService {
+public class TransactionReplayServiceImpl implements TransactionReplayService {
     private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
     private static final String BINDING_NAME = "replayTransaction-in-0";
 
@@ -44,7 +45,7 @@ public class ReplayServiceImpl implements ReplayService {
         consumer.unsubscribe();
     }
 
-    public void replayAll() {
+    public void replay() {
         Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
                 .takeWhile(recs -> !recs.isEmpty())
                 .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
@@ -56,6 +57,7 @@ public class ReplayServiceImpl implements ReplayService {
     private <T> Message<T> messageOf(ConsumerRecord<String, T> record) {
         return MessageBuilder
                 .withPayload(record.value())
+                //TODO: can I use setHeaders(MessageHeadersAccessor) ?
                 .copyHeaders(mapOf(record.headers()))
                 .build();
     }

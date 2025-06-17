@@ -28,12 +28,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-class ReplayServiceImplTest {
+class TransactionReplayServiceImplTest {
     private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
     private static final String BINDING_NAME = "replayTransaction-in-0";
 
     @InjectMocks
-    private ReplayServiceImpl replayService;
+    private TransactionReplayServiceImpl replayService;
 
     @Mock
     private KafkaConsumer<String, InputTransaction> consumer;
@@ -67,7 +67,7 @@ class ReplayServiceImplTest {
                 .willReturn(emptyRecords);
 
         //when
-        replayService.replayAll();
+        replayService.replay();
 
         //then
         then(consumer).should(atLeastOnce()).poll(TIME_TO_WAIT);

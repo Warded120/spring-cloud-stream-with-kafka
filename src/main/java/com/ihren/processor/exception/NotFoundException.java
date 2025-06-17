@@ -6,4 +6,8 @@ public class NotFoundException extends ApplicationException {
     public NotFoundException(String message, Throwable cause) {
         super(message, cause, ErrorCode.NOT_FOUND);
     }
+
+    public NotFoundException(String message) {
+        super(message, ErrorCode.NOT_FOUND);
+    }
 }

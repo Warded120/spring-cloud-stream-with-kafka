@@ -10,7 +10,7 @@ import com.ihren.processor.constant.ErrorCode;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.util.KafkaUtils;
-import com.ihren.processor.util.MapperUtils;
+import com.ihren.processor.util.ObjectConverter;
 import com.ihren.processor.util.TestUtils;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -65,6 +65,9 @@ public class ProcessorIT {
 
     @Autowired
     private KafkaConsumer<String, byte[]> byteArrayKafkaConsumer;
+
+    @Autowired
+    private ObjectConverter objectConverter;
 
     @Autowired
     private MockMvc mockMvc;
@@ -137,7 +140,7 @@ public class ProcessorIT {
         OutputTransaction actual = record.value();
 
         //then
-        assertFalse(MapperUtils.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
+        assertFalse(objectConverter.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
         assertAll(
                 () -> assertNotNull(actual.transactionId()),
                 () -> assertEquals(expectedTransaction.source(), actual.source()),
@@ -167,20 +170,20 @@ public class ProcessorIT {
         //then
         assertEquals(inputTransaction, record.value());
         assertTrue(
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
                         Boolean.class
                 )
         );
         assertEquals(
                 ErrorCode.VALIDATION,
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
                 )
         );
         assertNotNull(
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
                         String.class
                 )
@@ -214,20 +217,20 @@ public class ProcessorIT {
         //then
         assertEquals(inputTransaction, record.value());
         assertTrue(
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
                         Boolean.class
                 )
         );
         assertEquals(
                 ErrorCode.NOT_FOUND,
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
                 )
         );
         assertNotNull(
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
                         String.class
                 )
@@ -280,20 +283,20 @@ public class ProcessorIT {
         //then
         assertArrayEquals(invalidData.getBytes(), record.value());
         assertTrue(
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
                         Boolean.class
                 )
         );
         assertEquals(
                 ErrorCode.SERIALIZATION,
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
                         ErrorCode.class
                 )
         );
         assertNotNull(
-                MapperUtils.read(
+                objectConverter.read(
                         record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
                         String.class
                 )
@@ -330,7 +333,7 @@ public class ProcessorIT {
 
         //then
         OutputTransaction actual = record.value();
-        assertTrue(MapperUtils.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
+        assertTrue(objectConverter.read(record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(), Boolean.class));
         assertAll(
                 () -> assertNotNull(actual.transactionId()),
                 () -> assertEquals(expectedTransaction.source(), actual.source()),

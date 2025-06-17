@@ -1,6 +1,6 @@
 package com.ihren.processor.dlt.customizer;
 
-import com.ihren.processor.exception.handler.ApplicaitonExceptionHeadersCreator;
+import com.ihren.processor.exception.handler.ExceptionHeaderHandler;
 import com.ihren.processor.exception.handler.DltCustomizer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -27,7 +27,7 @@ class DltCustomizerTest {
     private DltCustomizer dltCustomizer;
 
     @Mock
-    private ApplicaitonExceptionHeadersCreator headersCreator;
+    private ExceptionHeaderHandler headersCreator;
 
     private MockedConstruction<DefaultErrorHandler> errorHandlerConstructionMock;
     private MockedConstruction<DeadLetterPublishingRecoverer> deadLetterPublishingRecovererConstructionMock;
