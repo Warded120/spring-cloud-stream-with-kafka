@@ -267,7 +267,7 @@ public class ProcessorIT {
     }
 
     @Test
-    void should_SendToDlt_when_DeserializationFailed() {
+    void should_SendToDltWithHeaders_when_DeserializationFailed() {
         //given
         String invalidData = "invalid";
         Message<byte[]> message = MessageBuilder

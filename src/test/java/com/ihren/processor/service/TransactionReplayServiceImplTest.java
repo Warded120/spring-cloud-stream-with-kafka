@@ -29,7 +29,7 @@ import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionReplayServiceImplTest {
-    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
+    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(5);
     private static final String BINDING_NAME = "replayTransaction-in-0";
 
     @InjectMocks

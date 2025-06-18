@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class TransactionReplayServiceImpl implements TransactionReplayService {
-    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(3);
+    private static final Duration TIME_TO_WAIT = Duration.ofSeconds(5);
     private static final String BINDING_NAME = "replayTransaction-in-0";
 
     private final KafkaConsumer<String, InputTransaction> consumer;
