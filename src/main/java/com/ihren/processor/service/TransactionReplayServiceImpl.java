@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Collections;
@@ -45,13 +44,11 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
         consumer.unsubscribe();
     }
 
-    //TODO: investigate, is there a more flexible solution?
+    //TODO: Is it worth using webFlux (or other async approach) here?
     public void replay() {
         Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
                 .takeWhile(recs -> !recs.isEmpty())
-                .flatMap(recs ->
-                        StreamSupport.stream(recs.spliterator(), false)
-                )
+                .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
                 .forEach(record ->
                         streamBridge.send(BINDING_NAME, messageOf(record))
                 );
@@ -60,13 +57,13 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     private <T> Message<T> messageOf(ConsumerRecord<String, T> record) {
         return MessageBuilder
                 .withPayload(record.value())
-                //TODO: can I use setHeaders(MessageHeadersAccessor) ?
+                //TODO: setHeaders(MessageHeadersAccessor) cannot be used here because Headers class is not compatible with MessageHeaders class
                 .copyHeaders(mapOf(record.headers()))
                 .build();
     }
 
     private Map<String, Object> mapOf(Headers headers) {
-        return Optional.ofNullable(headers)
+                return Optional.ofNullable(headers)
                 .map(hs ->
                         StreamSupport.stream(hs.spliterator(), false)
                                 .collect(Collectors.toMap(

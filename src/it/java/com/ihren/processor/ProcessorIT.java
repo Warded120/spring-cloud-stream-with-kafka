@@ -325,8 +325,6 @@ public class ProcessorIT {
         );
 
         inputTransactionKafkaTemplate.send(message);
-        //TODO: remove
-        inputTransactionKafkaTemplate.send(message);
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/transactions/replay"))
