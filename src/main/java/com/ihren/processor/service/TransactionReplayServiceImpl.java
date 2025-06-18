@@ -44,7 +44,7 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
         consumer.unsubscribe();
     }
 
-    //TODO: Is it worth using webFlux (or other async approach) here?
+    //TODO: Is there an async solution?
     public void replay() {
         Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
                 .takeWhile(recs -> !recs.isEmpty())
@@ -57,7 +57,6 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     private <T> Message<T> messageOf(ConsumerRecord<String, T> record) {
         return MessageBuilder
                 .withPayload(record.value())
-                //TODO: setHeaders(MessageHeadersAccessor) cannot be used here because Headers class is not compatible with MessageHeaders class
                 .copyHeaders(mapOf(record.headers()))
                 .build();
     }

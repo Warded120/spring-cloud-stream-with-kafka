@@ -13,6 +13,7 @@ import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.backoff.BackOff;
+import org.springframework.util.backoff.FixedBackOff;
 import java.util.function.BiFunction;
 
 @Component
@@ -32,7 +33,7 @@ public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer
         container.setCommonErrorHandler(
                 new DefaultErrorHandler(
                         createRecoverer(dlqDestinationResolver),
-                        backOff
+                        new FixedBackOff(0, 1)
                 )
         );
     }

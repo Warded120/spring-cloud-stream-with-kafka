@@ -22,6 +22,7 @@ public class ExceptionHeaderHandler implements DeadLetterPublishingRecoverer.Exc
         Try.run(() -> {
                     ApplicationException applicationException = getCause(exception);
 
+                    //TODO: put sourceTopic and retrieve it inside replayService
                     kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(applicationException.getErrorCode()));
                     kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(applicationException.getMessage()));
                     kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));

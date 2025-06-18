@@ -16,17 +16,13 @@ spring:
         processTransaction-in-0:
           destination: transaction
           group: processTransaction
-          consumer:
-            max-attempts: 2
-            back-off-initial-interval: 1000
-            back-off-max-interval: 2000
-            back-off-multiplier: 2.0
         processTransaction-out-0:
           destination: processed-transaction
+        #TODO: when smth went wrong in here, will it will be sent to dlt?
         replayTransaction-in-0:
           destination: transaction.replay
           group: replayTransaction
-#          TODO: is it worth it to manage state manually? (a lot of new code)
+#          TODO: is it worth it to manage state manually? (a lot of new code) (is there a solution for how to set state to STOPPED with a condition or so?)
 #          consumer:
 #            auto-startup: false
         replayTransaction-out-0:
