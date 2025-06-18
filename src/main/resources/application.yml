@@ -26,6 +26,9 @@ spring:
         replayTransaction-in-0:
           destination: transaction.replay
           group: replayTransaction
+#          TODO: is it worth it to manage state manually? (a lot of new code)
+#          consumer:
+#            auto-startup: false
         replayTransaction-out-0:
           destination: processed-transaction
       kafka:

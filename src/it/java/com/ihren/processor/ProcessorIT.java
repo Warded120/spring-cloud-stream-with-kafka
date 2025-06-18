@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -80,7 +81,7 @@ public class ProcessorIT {
     private Admin admin;
 
     @Autowired
-    private GenericCache<Long, ItemResponse> cache;
+    private GenericCache<Long, Optional<ItemResponse>> cache;
 
     @Value("${spring.cloud.stream.bindings.processTransaction-in-0.destination}")
     private String topicIn;
@@ -323,6 +324,8 @@ public class ProcessorIT {
                 )
         );
 
+        inputTransactionKafkaTemplate.send(message);
+        //TODO: remove
         inputTransactionKafkaTemplate.send(message);
 
         //when

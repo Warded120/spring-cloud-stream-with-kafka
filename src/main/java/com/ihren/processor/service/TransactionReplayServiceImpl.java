@@ -45,10 +45,13 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
         consumer.unsubscribe();
     }
 
+    //TODO: investigate, is there a more flexible solution?
     public void replay() {
         Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
                 .takeWhile(recs -> !recs.isEmpty())
-                .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
+                .flatMap(recs ->
+                        StreamSupport.stream(recs.spliterator(), false)
+                )
                 .forEach(record ->
                         streamBridge.send(BINDING_NAME, messageOf(record))
                 );

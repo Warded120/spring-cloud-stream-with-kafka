@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.time.Duration;
+import java.util.Optional;
 
 @Configuration
 public class CacheConfig {
@@ -14,7 +15,7 @@ public class CacheConfig {
     private Duration ttl;
 
     @Bean
-    public GenericCache<Long, ItemResponse> genericCache() {
+    public GenericCache<Long, Optional<ItemResponse>> genericCache() {
         return new GenericCache<>(ttl);
     }
 }

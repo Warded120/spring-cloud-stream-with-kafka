@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.any;
@@ -37,8 +39,9 @@ class ClientServiceImplTest {
         Long id = 1L;
 
         ItemResponse expected = mock();
+        Optional<ItemResponse> expectedOpt = Optional.of(expected);
 
-        given(client.getById(id)).willReturn(expected);
+        given(client.getById(id)).willReturn(expectedOpt);
         given(validator.validate(expected)).willReturn(expected);
 
         //when
@@ -56,7 +59,7 @@ class ClientServiceImplTest {
         //given
         Long id = 1L;
 
-        given(client.getById(id)).willThrow(FeignException.class);
+        given(client.getById(id)).willReturn(Optional.empty());
 
         //when
         assertThrows(NotFoundException.class, () -> clientService.getByItemId(id));
@@ -72,8 +75,9 @@ class ClientServiceImplTest {
         //given
         Long id = 1L;
         ItemResponse invalidItemResponse = mock(ItemResponse.class);
+        Optional<ItemResponse> invalidItemResponseOpt = Optional.of(invalidItemResponse);
 
-        given(client.getById(id)).willReturn(invalidItemResponse);
+        given(client.getById(id)).willReturn(invalidItemResponseOpt);
         given(validator.validate(invalidItemResponse)).willThrow(ValidationException.class);
 
         //when
