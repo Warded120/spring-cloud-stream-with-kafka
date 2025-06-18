@@ -110,6 +110,7 @@ public class ProcessorIT {
         KafkaUtils.purgeAllRecords(admin, topicReplay);
         kafkaConsumer.unsubscribe();
         dltKafkaConsumer.unsubscribe();
+        byteArrayKafkaConsumer.unsubscribe();
         cache.clearCache();
         WireMock.reset();
     }
