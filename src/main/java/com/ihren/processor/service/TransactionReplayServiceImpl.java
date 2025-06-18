@@ -1,9 +1,13 @@
 package com.ihren.processor.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ihren.processor.constant.Constants;
 import com.ihren.processor.model.input.InputTransaction;
+import io.vavr.control.Try;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.header.Header;
@@ -30,6 +34,7 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
 
     private final KafkaConsumer<String, InputTransaction> consumer;
     private final StreamBridge streamBridge;
+    private final ObjectMapper mapper;
 
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
     private String topicDlt;
@@ -50,8 +55,16 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
                 .takeWhile(recs -> !recs.isEmpty())
                 .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
                 .forEach(record ->
-                        streamBridge.send(BINDING_NAME, messageOf(record))
+                        streamBridge.send(getDestination(record), messageOf(record))
                 );
+    }
+
+    //TODO: is it okay?
+    private String getDestination(ConsumerRecord<String, InputTransaction> record) {
+        return Try.of(() ->
+                mapper.readValue(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value(), String.class)
+        )
+        .getOrElse(BINDING_NAME);
     }
 
     private <T> Message<T> messageOf(ConsumerRecord<String, T> record) {

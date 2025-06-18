@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.header.Headers;
 import org.springframework.cloud.stream.binder.kafka.ListenerContainerWithDlqAndRetryCustomizer;
 import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -22,6 +23,7 @@ public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer
     private final KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate;
     private final KafkaTemplate<String, byte[]> byteArrayKafkaTemplate;
     private final ExceptionHeaderHandler headersCreator;
+    private final BiFunction<ConsumerRecord<?, ?>, Exception, Headers> headersFunction;
 
     @Override
     public void configure(
@@ -46,6 +48,7 @@ public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer
     private DeadLetterPublishingRecoverer createRecoverer(BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(this::templateResolver, dlqDestinationResolver);
         recoverer.setExceptionHeadersCreator(headersCreator);
+        recoverer.setHeadersFunction(headersFunction);
         return recoverer;
     }
 

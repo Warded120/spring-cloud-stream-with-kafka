@@ -311,6 +311,7 @@ public class ProcessorIT {
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
                 .setHeader(KafkaHeaders.TOPIC, topicDlt)
+                .setHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC, topicIn)
                 .setHeader(Constants.Kafka.Headers.IS_DLT, true)
                 .build();
 
