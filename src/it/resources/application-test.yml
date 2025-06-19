@@ -15,3 +15,6 @@ spring:
           processTransaction-in-0:
             consumer:
               dlq-name: test.dlt
+          replayTransaction-in-0:
+            consumer:
+              dlq-name: test.dlt

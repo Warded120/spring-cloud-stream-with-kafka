@@ -347,4 +347,47 @@ public class ProcessorIT {
                 () -> assertEquals(expectedTransaction.total(), actual.total())
         );
     }
+
+    @Test
+    void should_SendToDltAgain_when_ReplayMechanismTriggered() throws Exception {
+        //given
+        InputTransaction inputTransaction = TestUtils.getInvalidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, topicDlt)
+                .setHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC, topicIn)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, true)
+                .build();
+
+        inputTransactionKafkaTemplate.send(message);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/transactions/replay"))
+                .andExpect(status().isOk());
+
+        //when
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicDlt, TIME_TO_WAIT);
+
+        //then
+        assertEquals(inputTransaction, record.value());
+        assertTrue(
+                objectConverter.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
+                        Boolean.class
+                )
+        );
+        assertEquals(
+                ErrorCode.VALIDATION,
+                objectConverter.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
+                        ErrorCode.class
+                )
+        );
+        assertNotNull(
+                objectConverter.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
+                        String.class
+                )
+        );
+    }
 }

@@ -1,14 +1,13 @@
 package com.ihren.processor.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.model.input.InputTransaction;
 import io.vavr.control.Try;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +34,6 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
 
     private final KafkaConsumer<String, InputTransaction> consumer;
     private final StreamBridge streamBridge;
-    private final ObjectMapper mapper;
 
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
     private String topicDlt;
@@ -50,19 +49,35 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     }
 
     //TODO: Is there an async solution?
+        // MAYBE
+    //TODO: commit records manually?
+        // OR
+    //TODO: count records in topic and create a function to poll with minRecords
     public void replay() {
+        long timestampThreshold = System.currentTimeMillis();
         Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
-                .takeWhile(recs -> !recs.isEmpty())
+                .takeWhile(recs ->
+                        !recs.isEmpty()
+                        && !filterRecordsByTimestamp(recs, timestampThreshold).isEmpty()
+                )
                 .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
-                .forEach(record ->
-                        streamBridge.send(getDestination(record), messageOf(record))
+                .forEach(record -> {
+                            if (record.timestamp() < timestampThreshold) {
+                                streamBridge.send(getDestination(record), messageOf(record));
+                            }
+                        }
                 );
     }
 
-    //TODO: is it okay?
-    private String getDestination(ConsumerRecord<String, InputTransaction> record) {
+    private List<ConsumerRecord<String, InputTransaction>> filterRecordsByTimestamp(ConsumerRecords<String, InputTransaction> records, long timestampThreshold) {
+        return StreamSupport.stream(records.spliterator(), false)
+                .filter(record -> record.timestamp() < timestampThreshold)
+                .toList();
+    }
+
+    private<T> String getDestination(ConsumerRecord<String, T> record) {
         return Try.of(() ->
-                mapper.readValue(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value(), String.class)
+                new String(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value())
         )
         .getOrElse(BINDING_NAME);
     }

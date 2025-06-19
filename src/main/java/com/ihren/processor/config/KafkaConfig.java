@@ -1,16 +1,11 @@
 package com.ihren.processor.config;
 
-import com.ihren.processor.constant.Constants;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.serializer.JsonDeserializer;
 import com.ihren.processor.serializer.JsonSerializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.header.Headers;
-import org.apache.kafka.common.header.internals.RecordHeader;
-import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -19,9 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 @Configuration
 public class KafkaConfig {
@@ -71,16 +64,5 @@ public class KafkaConfig {
                 );
 
         return new KafkaTemplate<>(factory);
-    }
-
-    //FIXME: is it okay to have headers function if I already have exceptionHeaderCreator?
-    @Bean
-    public BiFunction<ConsumerRecord<?, ?>, Exception, Headers> headersFunction() {
-        return (record, ex) ->
-          new RecordHeaders(
-                  List.of(
-                          new RecordHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC, record.topic().getBytes())
-                  )
-          );
     }
 }

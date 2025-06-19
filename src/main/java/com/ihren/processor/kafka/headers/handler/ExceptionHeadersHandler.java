@@ -1,4 +1,4 @@
-package com.ihren.processor.exception.handler;
+package com.ihren.processor.kafka.headers.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihren.processor.constant.Constants;
@@ -7,25 +7,29 @@ import com.ihren.processor.exception.ApplicationException;
 import com.ihren.processor.exception.SerializationException;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Headers;
-import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
+import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
-//TODO: move to a separate package
 @Component
 @RequiredArgsConstructor
-public class ExceptionHeaderHandler implements DeadLetterPublishingRecoverer.ExceptionHeadersCreator {
+public class ExceptionHeadersHandler implements BiFunction<ConsumerRecord<?, ?>, Exception, Headers> {
+
     private final ObjectMapper mapper;
 
     @Override
-    public void create(Headers kafkaHeaders, Exception exception, boolean isKey, DeadLetterPublishingRecoverer.HeaderNames headerNames) {
-        Try.run(() -> {
+    public Headers apply(ConsumerRecord<?, ?> record, Exception exception) {
+        return Try.of(() -> {
                     ApplicationException applicationException = getCause(exception);
-
-                    kafkaHeaders.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(applicationException.getErrorCode()));
-                    kafkaHeaders.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(applicationException.getMessage()));
-                    kafkaHeaders.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
+                    RecordHeaders headers = new RecordHeaders();
+                    headers.add(Constants.Kafka.Headers.ORIGINAL_TOPIC, record.topic().getBytes());
+                    headers.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(applicationException.getErrorCode()));
+                    headers.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(applicationException.getMessage()));
+                    headers.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
+                    return headers;
                 })
                 .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
     }
