@@ -48,38 +48,22 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
         consumer.unsubscribe();
     }
 
-    //TODO: Is there an async solution?
-        // MAYBE
-    //TODO: commit records manually?
-        // OR
-    //TODO: count records in topic and create a function to poll with minRecords
     public void replay() {
-        long timestampThreshold = System.currentTimeMillis();
-        Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
-                .takeWhile(recs ->
-                        !recs.isEmpty()
-                        && !filterRecordsByTimestamp(recs, timestampThreshold).isEmpty()
-                )
+        List<ConsumerRecord<String, InputTransaction>> recordsToSend = Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
+                .takeWhile(recs -> !recs.isEmpty())
                 .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
-                .forEach(record -> {
-                            if (record.timestamp() < timestampThreshold) {
-                                streamBridge.send(getDestination(record), messageOf(record));
-                            }
-                        }
-                );
-    }
-
-    private List<ConsumerRecord<String, InputTransaction>> filterRecordsByTimestamp(ConsumerRecords<String, InputTransaction> records, long timestampThreshold) {
-        return StreamSupport.stream(records.spliterator(), false)
-                .filter(record -> record.timestamp() < timestampThreshold)
                 .toList();
+
+        recordsToSend.forEach(record ->
+                streamBridge.send(getDestination(record), messageOf(record))
+        );
     }
 
-    private<T> String getDestination(ConsumerRecord<String, T> record) {
+    private <T> String getDestination(ConsumerRecord<String, T> record) {
         return Try.of(() ->
-                new String(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value())
-        )
-        .getOrElse(BINDING_NAME);
+                        new String(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value())
+                )
+                .getOrElse(BINDING_NAME);
     }
 
     private <T> Message<T> messageOf(ConsumerRecord<String, T> record) {
@@ -90,7 +74,7 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     }
 
     private Map<String, Object> mapOf(Headers headers) {
-                return Optional.ofNullable(headers)
+        return Optional.ofNullable(headers)
                 .map(hs ->
                         StreamSupport.stream(hs.spliterator(), false)
                                 .collect(Collectors.toMap(
