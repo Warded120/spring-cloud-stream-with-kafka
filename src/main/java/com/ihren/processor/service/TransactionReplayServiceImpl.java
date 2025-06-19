@@ -7,7 +7,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,29 +36,31 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
     private String topicDlt;
 
+    //TODO: write unit tests
     @PostConstruct
     public void init() {
         consumer.subscribe(Collections.singletonList(topicDlt));
     }
 
+    //TODO: write unit tests
     @PreDestroy
     public void destroy() {
         consumer.unsubscribe();
     }
 
     public void replay() {
-        List<ConsumerRecord<String, InputTransaction>> recordsToSend = Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
+        Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
                 .takeWhile(recs -> !recs.isEmpty())
                 .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
-                .toList();
-
-        recordsToSend.forEach(record ->
-                streamBridge.send(getDestination(record), messageOf(record))
-        );
+                .toList()
+                .forEach(record ->
+                        streamBridge.send(getDestination(record), messageOf(record))
+                );
     }
 
     private <T> String getDestination(ConsumerRecord<String, T> record) {
         return Try.of(() ->
+                        //TODO: how to test this line of code?
                         new String(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value())
                 )
                 .getOrElse(BINDING_NAME);

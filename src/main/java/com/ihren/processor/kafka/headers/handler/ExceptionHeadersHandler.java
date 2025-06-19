@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+//TODO: write unit tests
 @Component
 @RequiredArgsConstructor
 public class ExceptionHeadersHandler implements BiFunction<ConsumerRecord<?, ?>, Exception, Headers> {
