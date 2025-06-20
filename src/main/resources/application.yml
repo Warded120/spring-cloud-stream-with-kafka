@@ -18,13 +18,9 @@ spring:
           group: processTransaction
         processTransaction-out-0:
           destination: processed-transaction
-        #TODO: when smth went wrong in here, will it will be sent to dlt?
         replayTransaction-in-0:
           destination: transaction.replay
           group: replayTransaction
-#          TODO: is it worth it to manage state manually? (a lot of new code) (is there a solution for how to set state to STOPPED with a condition or so?)
-#          consumer:
-#            auto-startup: false
         replayTransaction-out-0:
           destination: processed-transaction
       kafka:
@@ -48,6 +44,8 @@ spring:
                   level: read_committed
           replayTransaction-in-0:
             consumer:
+              enable-dlq: true
+              dlq-name: transaction.dlt
               configuration:
                 isolation:
                   level: read_committed

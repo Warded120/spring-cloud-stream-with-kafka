@@ -1,6 +1,8 @@
 package com.ihren.processor.service;
 
+import com.ihren.processor.constant.Constants;
 import com.ihren.processor.model.input.InputTransaction;
+import io.vavr.control.Try;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -44,14 +46,21 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
         consumer.unsubscribe();
     }
 
-    //TODO: Is there an async solution?
     public void replay() {
         Stream.generate(() -> consumer.poll(TIME_TO_WAIT))
                 .takeWhile(recs -> !recs.isEmpty())
                 .flatMap(recs -> StreamSupport.stream(recs.spliterator(), false))
+                .toList()
                 .forEach(record ->
-                        streamBridge.send(BINDING_NAME, messageOf(record))
+                        streamBridge.send(getDestination(record), messageOf(record))
                 );
+    }
+
+    private <T> String getDestination(ConsumerRecord<String, T> record) {
+        return Try.of(() ->
+                        new String(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value())
+                )
+                .getOrElse(BINDING_NAME);
     }
 
     private <T> Message<T> messageOf(ConsumerRecord<String, T> record) {
@@ -62,7 +71,7 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     }
 
     private Map<String, Object> mapOf(Headers headers) {
-                return Optional.ofNullable(headers)
+        return Optional.ofNullable(headers)
                 .map(hs ->
                         StreamSupport.stream(hs.spliterator(), false)
                                 .collect(Collectors.toMap(

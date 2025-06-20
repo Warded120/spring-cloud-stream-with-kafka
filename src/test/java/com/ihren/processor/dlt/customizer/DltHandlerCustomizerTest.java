@@ -1,7 +1,7 @@
 package com.ihren.processor.dlt.customizer;
 
-import com.ihren.processor.exception.handler.ExceptionHeaderHandler;
-import com.ihren.processor.exception.handler.DltCustomizer;
+import com.ihren.processor.exception.handler.DltHandlerCustomizer;
+import com.ihren.processor.kafka.headers.handler.ExceptionHeadersHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +22,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 
 @ExtendWith(MockitoExtension.class)
-class DltCustomizerTest {
+class DltHandlerCustomizerTest {
     @InjectMocks
-    private DltCustomizer dltCustomizer;
+    private DltHandlerCustomizer dltHandlerCustomizer;
 
     @Mock
-    private ExceptionHeaderHandler headersCreator;
+    private ExceptionHeadersHandler headersFunction;
 
     private MockedConstruction<DefaultErrorHandler> errorHandlerConstructionMock;
     private MockedConstruction<DeadLetterPublishingRecoverer> deadLetterPublishingRecovererConstructionMock;
@@ -54,7 +54,7 @@ class DltCustomizerTest {
         BackOff backOff = mock(BackOff.class);
 
         //when
-        dltCustomizer.configure(container, destinationName, group, dlqDestinationResolver, backOff);
+        dltHandlerCustomizer.configure(container, destinationName, group, dlqDestinationResolver, backOff);
 
         //then
         Assertions.assertEquals(1, errorHandlerConstructionMock.constructed().size());
@@ -64,6 +64,6 @@ class DltCustomizerTest {
         DeadLetterPublishingRecoverer constructedRecoverer = deadLetterPublishingRecovererConstructionMock.constructed().get(0);
 
         then(container).should().setCommonErrorHandler(constructedErrorHandler);
-        then(constructedRecoverer).should().setExceptionHeadersCreator(headersCreator);
+        then(constructedRecoverer).should().setHeadersFunction(headersFunction);
     }
 }

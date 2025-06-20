@@ -8,9 +8,10 @@ public class Constants {
     public static final class Kafka {
         @UtilityClass
         public static final class Headers {
-            public static final String IS_DLT = "is-dlt";
-            public static final String EXCEPTION_MESSAGE = "exception-message";
-            public static final String ERROR_CODE = "error-code";
+            public static final String ORIGINAL_TOPIC = "x-original-topic";
+            public static final String IS_DLT = "x-is-dlt";
+            public static final String EXCEPTION_MESSAGE = "x-exception-message";
+            public static final String ERROR_CODE = "x-error-code";
         }
     }
 }

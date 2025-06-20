@@ -1,5 +1,6 @@
 package com.ihren.processor.exception.handler;
 
+import com.ihren.processor.kafka.headers.handler.ExceptionHeadersHandler;
 import com.ihren.processor.model.input.InputTransaction;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -18,10 +19,10 @@ import java.util.function.BiFunction;
 
 @Component
 @RequiredArgsConstructor
-public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer {
+public class DltHandlerCustomizer implements ListenerContainerWithDlqAndRetryCustomizer {
     private final KafkaTemplate<String, InputTransaction> inputTransactionKafkaTemplate;
     private final KafkaTemplate<String, byte[]> byteArrayKafkaTemplate;
-    private final ExceptionHeaderHandler headersCreator;
+    private final ExceptionHeadersHandler headersFunction;
 
     @Override
     public void configure(
@@ -45,7 +46,7 @@ public class DltCustomizer implements ListenerContainerWithDlqAndRetryCustomizer
 
     private DeadLetterPublishingRecoverer createRecoverer(BiFunction<ConsumerRecord<?, ?>, Exception, TopicPartition> dlqDestinationResolver) {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(this::templateResolver, dlqDestinationResolver);
-        recoverer.setExceptionHeadersCreator(headersCreator);
+        recoverer.setHeadersFunction(headersFunction);
         return recoverer;
     }
 

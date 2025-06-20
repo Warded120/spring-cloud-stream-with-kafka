@@ -90,7 +90,7 @@ public class ProcessorIT {
     private String topicOut;
 
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
-    private String topicDlt;
+    private String dlt;
 
     @Value("${spring.cloud.stream.bindings.replayTransaction-in-0.destination}")
     private String topicReplay;
@@ -98,14 +98,14 @@ public class ProcessorIT {
     @BeforeEach
     public void init() {
         kafkaConsumer.subscribe(Collections.singletonList(topicOut));
-        dltKafkaConsumer.subscribe(Collections.singletonList(topicDlt));
-        byteArrayKafkaConsumer.subscribe(Collections.singletonList(topicDlt));
+        dltKafkaConsumer.subscribe(Collections.singletonList(dlt));
+        byteArrayKafkaConsumer.subscribe(Collections.singletonList(dlt));
     }
 
     @AfterEach
     public void clean() {
         KafkaUtils.purgeAllRecords(admin, topicIn);
-        KafkaUtils.purgeAllRecords(admin, topicDlt);
+        KafkaUtils.purgeAllRecords(admin, dlt);
         KafkaUtils.purgeAllRecords(admin, topicOut);
         KafkaUtils.purgeAllRecords(admin, topicReplay);
         kafkaConsumer.unsubscribe();
@@ -167,7 +167,7 @@ public class ProcessorIT {
         inputTransactionKafkaTemplate.send(message);
 
         //when
-        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicDlt, TIME_TO_WAIT);
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, dlt, TIME_TO_WAIT);
 
         //then
         assertEquals(inputTransaction, record.value());
@@ -214,7 +214,7 @@ public class ProcessorIT {
         inputTransactionKafkaTemplate.send(message);
 
         //when
-        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, topicDlt, TIME_TO_WAIT);
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, dlt, TIME_TO_WAIT);
 
         //then
         assertEquals(inputTransaction, record.value());
@@ -280,7 +280,7 @@ public class ProcessorIT {
         byteArrayKafkaTemplate.send(message);
 
         //when
-        ConsumerRecord<String, byte[]> record = KafkaUtils.getRecord(byteArrayKafkaConsumer, topicDlt, TIME_TO_WAIT);
+        ConsumerRecord<String, byte[]> record = KafkaUtils.getRecord(byteArrayKafkaConsumer, dlt, TIME_TO_WAIT);
 
         //then
         assertArrayEquals(invalidData.getBytes(), record.value());
@@ -311,7 +311,8 @@ public class ProcessorIT {
         InputTransaction inputTransaction = TestUtils.getValidInputTransaction();
         Message<InputTransaction> message = MessageBuilder
                 .withPayload(inputTransaction)
-                .setHeader(KafkaHeaders.TOPIC, topicDlt)
+                .setHeader(KafkaHeaders.TOPIC, dlt)
+                .setHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC, topicIn)
                 .setHeader(Constants.Kafka.Headers.IS_DLT, true)
                 .build();
 
@@ -344,6 +345,49 @@ public class ProcessorIT {
                 () -> assertEquals(expectedTransaction.operationDateTime(), actual.operationDateTime()),
                 () -> assertArrayEquals(expectedTransaction.items().toArray(), actual.items().toArray()),
                 () -> assertEquals(expectedTransaction.total(), actual.total())
+        );
+    }
+
+    @Test
+    void should_SendToDltAgain_when_ReplayMechanismTriggered() throws Exception {
+        //given
+        InputTransaction inputTransaction = TestUtils.getInvalidInputTransaction();
+        Message<InputTransaction> message = MessageBuilder
+                .withPayload(inputTransaction)
+                .setHeader(KafkaHeaders.TOPIC, dlt)
+                .setHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC, topicIn)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, true)
+                .build();
+
+        inputTransactionKafkaTemplate.send(message);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/transactions/replay"))
+                .andExpect(status().isOk());
+
+        //when
+        ConsumerRecord<String, InputTransaction> record = KafkaUtils.getRecord(dltKafkaConsumer, dlt, TIME_TO_WAIT);
+
+        //then
+        assertEquals(inputTransaction, record.value());
+        assertTrue(
+                objectConverter.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.IS_DLT).value(),
+                        Boolean.class
+                )
+        );
+        assertEquals(
+                ErrorCode.VALIDATION,
+                objectConverter.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.ERROR_CODE).value(),
+                        ErrorCode.class
+                )
+        );
+        assertNotNull(
+                objectConverter.read(
+                        record.headers().lastHeader(Constants.Kafka.Headers.EXCEPTION_MESSAGE).value(),
+                        String.class
+                )
         );
     }
 }
