@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-//TODO: write unit tests
 @Component
 @RequiredArgsConstructor
 public class ExceptionHeadersHandler implements BiFunction<ConsumerRecord<?, ?>, Exception, Headers> {
@@ -26,13 +25,15 @@ public class ExceptionHeadersHandler implements BiFunction<ConsumerRecord<?, ?>,
         return Try.of(() -> {
                     ApplicationException applicationException = getCause(exception);
                     RecordHeaders headers = new RecordHeaders();
-                    headers.add(Constants.Kafka.Headers.ORIGINAL_TOPIC, record.topic().getBytes());
+                    headers.add(Constants.Kafka.Headers.ORIGINAL_TOPIC, mapper.writeValueAsBytes(record.topic()));
                     headers.add(Constants.Kafka.Headers.ERROR_CODE, mapper.writeValueAsBytes(applicationException.getErrorCode()));
                     headers.add(Constants.Kafka.Headers.EXCEPTION_MESSAGE, mapper.writeValueAsBytes(applicationException.getMessage()));
                     headers.add(Constants.Kafka.Headers.IS_DLT, mapper.writeValueAsBytes(true));
                     return headers;
                 })
-                .getOrElseThrow(ex -> new SerializationException("Cannot serialize record headers", ex));
+                .getOrElseThrow(ex ->
+                        new SerializationException("Cannot serialize record headers", ex)
+                );
     }
 
     private ApplicationException getCause(Exception exception) {
@@ -44,6 +45,8 @@ public class ExceptionHeadersHandler implements BiFunction<ConsumerRecord<?, ?>,
                                 .map(ex -> (Exception) ex.getCause())
                                 .map(this::getCause)
                 )
-                .orElse(new ApplicationException(exception.getMessage(), ErrorCode.UNKNOWN));
+                .orElseGet(() ->
+                        new ApplicationException(exception.getMessage(), ErrorCode.UNKNOWN)
+                );
     }
 }
