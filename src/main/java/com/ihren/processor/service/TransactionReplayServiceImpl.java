@@ -34,11 +34,11 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     private final StreamBridge streamBridge;
 
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
-    private String topicDlt;
+    private String dlt;
 
     @PostConstruct
     public void init() {
-        consumer.subscribe(Collections.singletonList(topicDlt));
+        consumer.subscribe(Collections.singletonList(dlt));
     }
 
     @PreDestroy

@@ -50,7 +50,7 @@ class TransactionReplayServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(replayService, "topicDlt", DLT);
+        ReflectionTestUtils.setField(replayService, "dlt", DLT);
     }
 
     @Test
