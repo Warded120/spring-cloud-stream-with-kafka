@@ -36,13 +36,11 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
     @Value("${spring.cloud.stream.kafka.bindings.processTransaction-in-0.consumer.dlq-name}")
     private String topicDlt;
 
-    //TODO: write unit tests
     @PostConstruct
     public void init() {
         consumer.subscribe(Collections.singletonList(topicDlt));
     }
 
-    //TODO: write unit tests
     @PreDestroy
     public void destroy() {
         consumer.unsubscribe();
@@ -60,7 +58,6 @@ public class TransactionReplayServiceImpl implements TransactionReplayService {
 
     private <T> String getDestination(ConsumerRecord<String, T> record) {
         return Try.of(() ->
-                        //TODO: how to test this line of code?
                         new String(record.headers().lastHeader(Constants.Kafka.Headers.ORIGINAL_TOPIC).value())
                 )
                 .getOrElse(BINDING_NAME);

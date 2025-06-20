@@ -7,7 +7,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
 
-//TODO: write unit tests
 @Component
 public class CustomMessageBuilder {
     public <T> Message<T> build(T payload, MessageHeaders headers) {
