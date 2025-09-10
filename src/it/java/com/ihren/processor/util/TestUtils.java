@@ -1,6 +1,5 @@
 package com.ihren.processor.util;
 
-import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
 import com.ihren.processor.model.input.InputItem;
 import com.ihren.processor.model.input.InputTotal;
@@ -15,6 +14,8 @@ import java.util.List;
 
 @UtilityClass
 public class TestUtils {
+    private static final String SOFTSERVE = "Softserve";
+
     public static InputTransaction getValidInputTransaction() {
         String endDateTime = "2023-04-10T09:00:00Z";
 
@@ -105,7 +106,7 @@ public class TestUtils {
 
         return new OutputTransaction(
                 null,
-                Constants.SOFTSERVE,
+                SOFTSERVE,
                 null,
                 1L,
                 operationDateTime,

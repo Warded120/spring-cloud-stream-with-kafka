@@ -22,6 +22,6 @@ public class JsonSerializer<T> implements Serializer<T> {
     @Override
     public byte[] serialize(String s, T data) {
         return Try.of(() -> objectMapper.writeValueAsBytes(data))
-                .getOrElseThrow(e -> new SerializationException("failed to serialize T", e));
+                .getOrElseThrow(ex -> new SerializationException("failed to serialize T", ex));
     }
 }

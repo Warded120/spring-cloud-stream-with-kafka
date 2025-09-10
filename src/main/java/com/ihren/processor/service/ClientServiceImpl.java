@@ -4,7 +4,6 @@ import com.ihren.processor.client.ItemClient;
 import com.ihren.processor.client.response.ItemResponse;
 import com.ihren.processor.exception.NotFoundException;
 import com.ihren.processor.validator.CommonValidator;
-import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +16,12 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ItemResponse getByItemId(Long id) {
-        return Try.of(() -> itemClient.getById(id))
+        return itemClient.getById(id)
                 .map(validator::validate)
-                .getOrElseThrow(() -> new NotFoundException("not found by item.id: " + id));
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("not found by item.id: %d", id)
+                        )
+                );
     }
 }

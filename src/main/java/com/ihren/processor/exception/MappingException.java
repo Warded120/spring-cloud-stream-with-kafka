@@ -1,7 +1,9 @@
 package com.ihren.processor.exception;
 
-public class MappingException extends RuntimeException {
-    public MappingException(final String message) {
-        super(message);
+import com.ihren.processor.constant.ErrorCode;
+
+public class MappingException extends ApplicationException {
+    public MappingException(String message) {
+        super(message, ErrorCode.MAPPING);
     }
 }

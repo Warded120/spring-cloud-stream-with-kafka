@@ -5,7 +5,7 @@ spring:
     name: processor
   cloud:
     function:
-      definition: processTransaction
+      definition: processTransaction;replayTransaction
     stream:
       default:
         consumer:
@@ -18,18 +18,34 @@ spring:
           group: processTransaction
         processTransaction-out-0:
           destination: processed-transaction
+        replayTransaction-in-0:
+          destination: transaction.replay
+          group: replayTransaction
+        replayTransaction-out-0:
+          destination: processed-transaction
       kafka:
         binder:
           brokers: localhost:9092
           consumer-properties:
-            value.deserializer: com.ihren.processor.serializer.JsonDeserializer
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value.deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+            spring.deserializer.value.delegate.class: com.ihren.processor.serializer.JsonDeserializer
             value.deserializer.target.class: com.ihren.processor.model.input.InputTransaction
           producer-properties:
+            key.serializer: org.apache.kafka.common.serialization.StringSerializer
             value.serializer: com.ihren.processor.serializer.JsonSerializer
         bindings:
-          processPerson-in-0:
+          processTransaction-in-0:
             consumer:
-              startOffset: earliest
+              enable-dlq: true
+              dlq-name: transaction.dlt
+              configuration:
+                isolation:
+                  level: read_committed
+          replayTransaction-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: transaction.dlt
               configuration:
                 isolation:
                   level: read_committed

@@ -2,41 +2,35 @@ package com.ihren.processor.processor;
 
 import com.ihren.processor.constant.Constants;
 import com.ihren.processor.constant.CurrencyCode;
-import com.ihren.processor.exception.handler.ExceptionHandler;
 import com.ihren.processor.mapper.TransactionMapper;
+import com.ihren.processor.messaging.CustomMessageBuilder;
 import com.ihren.processor.model.input.InputTransaction;
 import com.ihren.processor.model.output.OutputItem;
 import com.ihren.processor.model.output.OutputTotal;
 import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.validator.CommonValidator;
-import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionProcessorTest {
+    private static final String SOFTSERVE = "Softserve";
     @InjectMocks
     private TransactionProcessor processor;
-
-    @Mock
-    private ExceptionHandler exceptionHandler;
 
     @Mock
     private CommonValidator<InputTransaction> validator;
@@ -44,8 +38,8 @@ class TransactionProcessorTest {
     @Mock
     private TransactionMapper mapper;
 
-    @Captor
-    private ArgumentCaptor<Function<Message<InputTransaction>, Message<OutputTransaction>>> captor;
+    @Mock
+    private CustomMessageBuilder messageBuilder;
 
     @Test
     void should_processTransaction_when_EverythingIsOK() {
@@ -54,6 +48,9 @@ class TransactionProcessorTest {
 
         Message<InputTransaction> inputTransactionMessage = mock(Message.class);
         given(inputTransactionMessage.getPayload()).willReturn(inputTransaction);
+
+        MessageHeaders messageHeaders = mock(MessageHeaders.class);
+        given(inputTransactionMessage.getHeaders()).willReturn(messageHeaders);
 
         UUID uuid = UUID.randomUUID();
         Instant instant = Instant.now();
@@ -71,29 +68,22 @@ class TransactionProcessorTest {
                 "12345678901234"
         );
         OutputTotal expectedTotal = new OutputTotal(BigDecimal.valueOf(360L), CurrencyCode.USD);
-        OutputTransaction expectedTransaction = new OutputTransaction(uuid, Constants.SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
+        OutputTransaction expectedTransaction = new OutputTransaction(uuid, SOFTSERVE, null, 1L, instant, List.of(expectedItem), expectedTotal);
 
         Message<OutputTransaction> expected = MessageBuilder
                 .withPayload(expectedTransaction)
+                .setHeader(Constants.Kafka.Headers.IS_DLT, Boolean.FALSE)
                 .build();
-
-        Try<Message<OutputTransaction>> outputTransactionMessageTry = mock(Try.class);
-        given(outputTransactionMessageTry.get()).willReturn(expected);
 
         given(validator.validate(inputTransaction)).willReturn(inputTransaction);
         given(mapper.map(inputTransaction)).willReturn(expectedTransaction);
-
-        given(exceptionHandler.handle(captor.capture(), eq(inputTransactionMessage)))
-                .willReturn(outputTransactionMessageTry);
+        given(messageBuilder.build(expectedTransaction, messageHeaders)).willReturn(expected);
 
         //when
         Message<OutputTransaction> actual = processor.apply(inputTransactionMessage);
 
         //then
         assertEquals(expected.getPayload(), actual.getPayload());
-
-        Function<Message<InputTransaction>, Message<OutputTransaction>> captured = captor.getValue();
-        Message<OutputTransaction> applied = captured.apply(inputTransactionMessage);
-        assertEquals(expectedTransaction, applied.getPayload());
+        assertEquals(expected.getHeaders().get(Constants.Kafka.Headers.IS_DLT), actual.getHeaders().get(Constants.Kafka.Headers.IS_DLT));
     }
 }

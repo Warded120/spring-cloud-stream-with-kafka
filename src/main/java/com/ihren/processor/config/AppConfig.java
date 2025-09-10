@@ -16,4 +16,9 @@ public class AppConfig {
     public Function<Message<InputTransaction>, Message<OutputTransaction>> processTransaction(TransactionProcessor processor) {
         return processor;
     }
+
+    @Bean
+    public Function<Message<InputTransaction>, Message<OutputTransaction>> replayTransaction(TransactionProcessor processor) {
+        return processor;
+    }
 }

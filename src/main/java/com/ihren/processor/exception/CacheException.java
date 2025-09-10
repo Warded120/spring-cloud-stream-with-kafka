@@ -1,7 +1,9 @@
 package com.ihren.processor.exception;
 
-public class CacheException extends RuntimeException {
+import com.ihren.processor.constant.ErrorCode;
+
+public class CacheException extends ApplicationException {
     public CacheException(String message) {
-        super(message);
+        super(message, ErrorCode.CACHE);
     }
 }

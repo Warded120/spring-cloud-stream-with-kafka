@@ -26,7 +26,7 @@ public class JsonDeserializer<T> implements Deserializer<T> {
 
     @Override
     public T deserialize(String s, byte[] bytes) {
-            return Try.of(() -> objectMapper.readValue(bytes, targetClass))
-                .getOrElseThrow(e -> new SerializationException("failed to deserialize " + targetClass, e));
+        return Try.of(() -> objectMapper.readValue(bytes, targetClass))
+                .getOrElseThrow(ex -> new SerializationException("failed to deserialize " + targetClass, ex));
     }
 }

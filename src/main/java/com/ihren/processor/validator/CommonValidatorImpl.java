@@ -1,7 +1,7 @@
 package com.ihren.processor.validator;
 
+import com.ihren.processor.exception.ValidationException;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

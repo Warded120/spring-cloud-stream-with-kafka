@@ -1,7 +1,9 @@
 package com.ihren.processor.exception;
 
-public class NotFoundException extends RuntimeException {
-    public NotFoundException(final String message) {
-        super(message);
+import com.ihren.processor.constant.ErrorCode;
+
+public class NotFoundException extends ApplicationException {
+    public NotFoundException(String message) {
+        super(message, ErrorCode.NOT_FOUND);
     }
 }

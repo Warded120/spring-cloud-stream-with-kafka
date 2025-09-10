@@ -4,6 +4,7 @@ import com.ihren.processor.model.output.OutputTransaction;
 import com.ihren.processor.serializer.JsonDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -19,7 +20,7 @@ public class KafkaConsumerConfig {
     private String groupId;
 
     @Bean
-    public KafkaConsumer<String, OutputTransaction> kafkaConsumer() {
+    public KafkaConsumer<String, OutputTransaction> outputTransactionKafkaConsumer() {
         Map<String, Object> configs = Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                 ConsumerConfig.GROUP_ID_CONFIG, groupId,
@@ -27,6 +28,19 @@ public class KafkaConsumerConfig {
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class,
                 "value.deserializer.target.class", OutputTransaction.class.getName()
+        );
+
+        return new KafkaConsumer<>(configs);
+    }
+
+    @Bean
+    public KafkaConsumer<String, byte[]> byteArrayKafkaConsumer() {
+        Map<String, Object> configs = Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+                ConsumerConfig.GROUP_ID_CONFIG, groupId,
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class
         );
 
         return new KafkaConsumer<>(configs);
