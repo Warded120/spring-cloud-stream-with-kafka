@@ -1,6 +1,3 @@
-# Spring Cloud Stream with Kafka
-This document outlines the requir[README.md](README.md)ed tasks for understanding what is Dead Letter Topic (DLT) strategy and implementing replay mechanism.
-
 🧪 To Do:
 
 - Dead Letter Topic (DLT)
