@@ -4,8 +4,11 @@ Spring Boot microservice built with a functional approach, this project demostra
 - API calls, mapping etc.
 - DLT (dead leter topic)
 - Caching
+
 Key Features:
 - Scalable and maintainable architecture
 - Comprehensive testing: unit tests, integration tests, API mocking, Testcontainers
+
 Technologies: Java, Spring Boot, Spring Cloud Stream, Kafka
+
 Serves as a technology showcase demonstrating modern event streaming patterns and robust testing practices
