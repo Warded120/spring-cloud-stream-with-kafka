@@ -1,12 +1,11 @@
-🧪 To Do:
-
-- Dead Letter Topic (DLT)
-- Replay mechanism via HTTP request
-
-✅ Acceptance Criteria:
-
-- Implement DLTHandler to send broken messages to DLT
-- Implement Replay mechanism
-- Implement REST Controller to trigger manually replay mechanism
-- Error code and message are added to headers
-- Send messages with a custom header (isDLT or so) and check if the header exists after it goes to dlt topic
+Spring Boot microservice built with a functional approach, this project demostrates the usage of different application functions such as:
+- Kafka consumers/producers
+- Data transformation/enrichment
+- API calls, mapping etc.
+- DLT (dead leter topic)
+- Caching
+Key Features:
+- Scalable and maintainable architecture
+- Comprehensive testing: unit tests, integration tests, API mocking, Testcontainers
+Technologies: Java, Spring Boot, Spring Cloud Stream, Kafka
+Serves as a technology showcase demonstrating modern event streaming patterns and robust testing practices
